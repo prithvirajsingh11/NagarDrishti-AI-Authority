@@ -7,6 +7,7 @@ import {
   Flame,
   Layers,
   ArrowRight,
+  Inbox,
 } from 'lucide-react';
 import {
   Area,
@@ -92,11 +93,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 }) => {
   // Category chart formatting
   const categoryChartData = stats?.by_category
-    ? Object.entries(stats.by_category).map(([cat, count]) => ({
-        name: getProblemLabel(cat),
-        count,
-        key: cat,
-      }))
+    ? Object.entries(stats.by_category)
+        .filter(([, count]) => count > 0)
+        .map(([cat, count]) => ({
+          name: getProblemLabel(cat),
+          count,
+          key: cat,
+        }))
     : [];
 
   const categoryColors: Record<string, string> = {
@@ -110,10 +113,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   // 7-day trend chart formatting
   const trendData = stats?.daily_trends || [];
 
+  const totalReportsCount = stats?.total_reports ?? (loading ? '...' : 0);
+  const isZeroData = !loading && (stats?.total_reports ?? 0) === 0 && complaints.length === 0;
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Repeated Problem Intelligence Banner */}
-      {stats?.hotspots && (
+      {stats?.hotspots && stats.hotspots.length > 0 && (
         <RepeatedProblemBanner
           hotspots={stats.hotspots}
           onSelectHotspot={onSelectHotspot}
@@ -128,7 +134,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <Layers className="w-4 h-4 text-slate-400" />
           </div>
           <p className="text-2xl font-bold font-mono text-slate-100 mt-2">
-            {stats?.total_reports ?? (loading ? '...' : 0)}
+            {totalReportsCount}
           </p>
           <span className="text-[10px] text-slate-400 font-medium">All logged citizen reports</span>
         </div>
@@ -238,7 +244,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </div>
             <button
               onClick={onNavigateToHotspots}
-              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium"
+              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium cursor-pointer"
             >
               <span>View All</span>
               <ArrowRight className="w-3 h-3" />
@@ -274,9 +280,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-6 text-center">
-                No active hotspot clusters identified.
-              </p>
+              <div className="py-8 text-center text-slate-400">
+                <p className="text-xs font-medium">No civic reports yet</p>
+                <p className="text-[11px] text-slate-500 mt-0.5">No geographic hotspot corridors identified.</p>
+              </div>
             )}
           </div>
         </div>
@@ -289,7 +296,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </h3>
             <button
               onClick={onNavigateToReports}
-              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium"
+              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-medium cursor-pointer"
             >
               <span>Full Queue</span>
               <ArrowRight className="w-3 h-3" />
@@ -325,9 +332,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 </div>
               ))
             ) : (
-              <p className="text-xs text-slate-400 py-6 text-center">
-                No complaints match the filter criteria.
-              </p>
+              <div className="py-8 text-center text-slate-400">
+                <p className="text-xs font-medium">
+                  {isZeroData ? 'No civic reports yet' : 'No complaints match the filter criteria.'}
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -341,29 +350,36 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             Category Distribution
           </h3>
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={categoryChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                  }}
-                />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                  {categoryChartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={categoryColors[entry.key] || '#38bdf8'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {categoryChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
+                  <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                  <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      borderColor: '#334155',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {categoryChartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={categoryColors[entry.key] || '#38bdf8'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-slate-500">
+                <Inbox className="w-8 h-8 text-slate-600 mb-1" />
+                <p className="text-xs">No civic reports yet</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -373,35 +389,42 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             7-Day Complaint Inflow
           </h3>
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="day_label" tick={{ fill: '#94a3b8', fontSize: 11 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#0f172a',
-                    borderColor: '#334155',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#inflowGrad)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {trendData.some((d) => d.count > 0) ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
+                  <XAxis dataKey="day_label" tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                  <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#0f172a',
+                      borderColor: '#334155',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="count"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#inflowGrad)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-slate-500">
+                <Inbox className="w-8 h-8 text-slate-600 mb-1" />
+                <p className="text-xs">No civic reports yet</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

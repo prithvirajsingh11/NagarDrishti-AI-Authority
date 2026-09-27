@@ -6,24 +6,26 @@ import {
   Flame,
   Home,
   Shield,
-  RotateCcw,
+  LogOut,
+  ShieldCheck,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export type AuthorityRoute = '/' | '/dashboard' | '/reports' | '/map' | '/hotspots';
 
 interface SidebarProps {
   currentRoute: AuthorityRoute;
   onRouteChange: (route: AuthorityRoute) => void;
-  onResetDemo: () => void;
-  isResettingDemo?: boolean;
+  onLogout: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentRoute,
   onRouteChange,
-  onResetDemo,
-  isResettingDemo = false,
+  onLogout,
 }) => {
+  const { user } = useAuth();
+
   const navItems = [
     { route: '/' as AuthorityRoute, label: 'Portal Home', icon: Home },
     { route: '/dashboard' as AuthorityRoute, label: 'Command Center', icon: LayoutDashboard },
@@ -33,7 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 min-h-screen">
+    <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 min-h-screen select-none">
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-800">
         <div className="flex items-center gap-2.5">
@@ -61,7 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.route}
               onClick={() => onRouteChange(item.route)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors text-left ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${
                 isActive
                   ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
@@ -74,30 +76,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
         })}
       </nav>
 
-      {/* System Actions */}
+      {/* Authority Profile & System Status */}
       <div className="p-4 border-t border-slate-800 space-y-3">
         <div className="bg-slate-900/60 rounded-lg p-3 border border-slate-800/80">
           <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-            <span>Server Sync</span>
+            <span>FastAPI Backend</span>
             <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Connected
             </span>
           </div>
-          <p className="text-[10px] text-slate-400 leading-relaxed">
-            FastAPI + Supabase PostgreSQL
+          <p className="text-[10px] text-slate-500 leading-relaxed">
+            Authenticated Spatial PostGIS
           </p>
         </div>
 
-        <button
-          onClick={onResetDemo}
-          disabled={isResettingDemo}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors disabled:opacity-50"
-          title="Resets seeded demo dataset while preserving citizen submissions"
-        >
-          <RotateCcw className={`w-3.5 h-3.5 ${isResettingDemo ? 'animate-spin' : ''}`} />
-          <span>{isResettingDemo ? 'Resetting...' : 'Reset Demo Data'}</span>
-        </button>
+        {user && (
+          <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-800">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
+                <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">
+                  Authority Session
+                </span>
+              </div>
+              <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded font-semibold uppercase">
+                {user.role}
+              </span>
+            </div>
+            <p className="text-[11px] font-mono text-slate-300 truncate" title={user.email}>
+              {user.email}
+            </p>
+
+            <button
+              onClick={onLogout}
+              className="w-full mt-2.5 flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors cursor-pointer"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Sign Out</span>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

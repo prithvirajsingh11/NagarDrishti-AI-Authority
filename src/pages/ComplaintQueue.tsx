@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpDown, Eye } from 'lucide-react';
+import { ArrowUpDown, Eye, Inbox } from 'lucide-react';
 import type { Complaint, Department } from '../types/complaint';
 import { FilterBar } from '../components/FilterBar';
 import { ProblemIcon } from '../components/ProblemIcon';
@@ -172,8 +172,18 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                 </tr>
               ) : sortedComplaints.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400">
-                    No complaints found matching the criteria.
+                  <td colSpan={8} className="py-14 text-center text-slate-400">
+                    <div className="flex flex-col items-center justify-center space-y-1">
+                      <Inbox className="w-7 h-7 text-slate-600 mb-1" />
+                      <p className="text-sm font-semibold text-slate-300">
+                        {complaints.length === 0 ? 'No civic reports yet' : 'No complaints found matching the criteria.'}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {complaints.length === 0
+                          ? 'Citizen reports submitted via the mobile/web app will appear here in real-time.'
+                          : 'Try clearing your search or adjusting the master filters above.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -232,7 +242,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                           e.stopPropagation();
                           onSelectComplaint(c);
                         }}
-                        className="p-1 text-slate-400 group-hover:text-blue-400 hover:bg-slate-800 rounded transition-colors"
+                        className="p-1 text-slate-400 group-hover:text-blue-400 hover:bg-slate-800 rounded transition-colors cursor-pointer"
                         title="Inspect complaint"
                       >
                         <Eye className="w-4 h-4" />

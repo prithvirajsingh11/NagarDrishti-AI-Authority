@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import type {
   Complaint,
   ComplaintStatus,
@@ -12,7 +12,6 @@ import {
   getDashboardHeatmap,
   getDashboardStatistics,
   getDepartments,
-  resetDemoDataset,
   updateComplaintStatus,
 } from './services/api';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
@@ -23,20 +22,27 @@ import { CommandCenter } from './pages/CommandCenter';
 import { ComplaintQueue } from './pages/ComplaintQueue';
 import { MapIntelligence } from './pages/MapIntelligence';
 import { HotspotIntelligence } from './pages/HotspotIntelligence';
+import { LoginPage } from './pages/LoginPage';
+import { AccessDeniedPage } from './pages/AccessDeniedPage';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import type { MapMode } from './components/LeafletMap';
+import { Shield } from 'lucide-react';
 
-export function App() {
+export type AppRoute = AuthorityRoute | '/login' | '/access-denied';
+
+function AuthorityAppContent() {
+  const { session, loading: authLoading, isAuthority, logout } = useAuth();
+
   // Routing state
-  const [currentRoute, setCurrentRoute] = useState<AuthorityRoute>('/dashboard');
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>('/dashboard');
 
   // Backend state
   const [stats, setStats] = useState<DashboardStatistics | null>(null);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [heatmapPoints, setHeatmapPoints] = useState<HeatmapPoint[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isResettingDemo, setIsResettingDemo] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   // Master Filter state
@@ -52,14 +58,30 @@ export function App() {
   const [focusedHotspot, setFocusedHotspot] = useState<HotspotInfo | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
 
+  // Navigate helper
+  const navigateTo = useCallback((route: AppRoute) => {
+    setCurrentRoute(route);
+    if (window.location.pathname !== route) {
+      window.history.pushState({}, '', route);
+    }
+  }, []);
+
   // Sync routing from URL path / hash
   useEffect(() => {
-    const parseRoute = (): AuthorityRoute => {
+    const parseRoute = (): AppRoute => {
       const path = window.location.pathname;
       const hash = window.location.hash.replace('#', '');
       const target = hash ? `/${hash}` : path;
 
-      if (target === '/dashboard' || target === '/reports' || target === '/map' || target === '/hotspots') {
+      if (target === '/login' || target === '/access-denied') {
+        return target;
+      }
+      if (
+        target === '/dashboard' ||
+        target === '/reports' ||
+        target === '/map' ||
+        target === '/hotspots'
+      ) {
         return target as AuthorityRoute;
       }
       if (target === '/' || target === '') {
@@ -82,13 +104,37 @@ export function App() {
     };
   }, []);
 
-  const navigateTo = (route: AuthorityRoute) => {
-    setCurrentRoute(route);
-    window.history.pushState({}, '', route);
-  };
+  // Route guarding based on auth session and role
+  useEffect(() => {
+    if (authLoading) return;
 
-  // Fetch backend records
-  const loadData = async (showLoadingSpinner = false) => {
+    if (!session) {
+      // Unauthenticated users must be redirected to /login
+      if (currentRoute !== '/login') {
+        navigateTo('/login');
+      }
+      return;
+    }
+
+    // Authenticated user exists
+    if (!isAuthority) {
+      // User is authenticated but does NOT possess the authority role (e.g. citizen)
+      if (currentRoute !== '/access-denied') {
+        navigateTo('/access-denied');
+      }
+      return;
+    }
+
+    // Authenticated authority user
+    if (currentRoute === '/login' || currentRoute === '/access-denied') {
+      navigateTo('/dashboard');
+    }
+  }, [authLoading, session, isAuthority, currentRoute, navigateTo]);
+
+  // Fetch backend records (strictly with authority access token)
+  const loadData = useCallback(async (showLoadingSpinner = false) => {
+    if (!session || !isAuthority) return;
+
     if (showLoadingSpinner) setLoading(true);
     setIsRefreshing(true);
     try {
@@ -109,11 +155,13 @@ export function App() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, [session, isAuthority]);
 
   useEffect(() => {
-    loadData(true);
-  }, []);
+    if (!authLoading && session && isAuthority) {
+      loadData(true);
+    }
+  }, [authLoading, session, isAuthority, loadData]);
 
   // Reset master filters
   const handleResetFilters = () => {
@@ -129,23 +177,18 @@ export function App() {
   // Filter complaints based on master criteria
   const filteredComplaints = useMemo(() => {
     return complaints.filter((c) => {
-      // Category
       if (categoryFilter && c.problem_type.toLowerCase() !== categoryFilter.toLowerCase()) {
         return false;
       }
-      // Severity
       if (severityFilter && c.severity.toUpperCase() !== severityFilter.toUpperCase()) {
         return false;
       }
-      // Status
       if (statusFilter && c.status.toUpperCase() !== statusFilter.toUpperCase()) {
         return false;
       }
-      // Department
       if (departmentFilter && c.department !== departmentFilter) {
         return false;
       }
-      // Date Horizon
       if (dateHorizon !== 'all') {
         const itemDate = new Date(c.created_at).getTime();
         const now = Date.now();
@@ -160,7 +203,6 @@ export function App() {
           return false;
         }
       }
-      // Search
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const matchId = c.report_id.toLowerCase().includes(query);
@@ -178,12 +220,10 @@ export function App() {
   // Update status action handler
   const handleUpdateStatus = async (id: string, newStatus: ComplaintStatus) => {
     const updated = await updateComplaintStatus(id, newStatus);
-    // Update local complaint state immediately
     setComplaints((prev) => prev.map((item) => (item.id === id ? updated : item)));
     if (selectedComplaint && selectedComplaint.id === id) {
       setSelectedComplaint(updated);
     }
-    // Re-sync dashboard statistics in background
     getDashboardStatistics().then((s) => setStats(s)).catch(() => {});
   };
 
@@ -197,27 +237,41 @@ export function App() {
     }
   };
 
-  // Reset Demo Dataset handler
-  const handleResetDemo = async () => {
-    if (isResettingDemo) return;
-    const confirmReset = window.confirm(
-      'Reset seeded demo dataset? Citizen submissions will be preserved.'
-    );
-    if (!confirmReset) return;
-
-    setIsResettingDemo(true);
-    try {
-      await resetDemoDataset();
-      await loadData(false);
-      handleResetFilters();
-    } catch (err: any) {
-      alert(`Reset failed: ${err.message || err}`);
-    } finally {
-      setIsResettingDemo(false);
-    }
+  const handleLogout = async () => {
+    await logout();
+    navigateTo('/login');
   };
 
-  const getPageTitle = (route: AuthorityRoute) => {
+  // Render Loading Splash while verifying initial session
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
+        <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 animate-pulse">
+          <Shield className="w-7 h-7" />
+        </div>
+        <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
+        <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
+      </div>
+    );
+  }
+
+  // 1. Unauthenticated -> Login Page
+  if (!session || currentRoute === '/login') {
+    return (
+      <LoginPage
+        onLoginSuccess={() => navigateTo('/dashboard')}
+        onAccessDenied={() => navigateTo('/access-denied')}
+      />
+    );
+  }
+
+  // 2. Authenticated Citizen -> Access Denied Page
+  if (!isAuthority || currentRoute === '/access-denied') {
+    return <AccessDeniedPage onBackToLogin={() => navigateTo('/login')} />;
+  }
+
+  // 3. Authorized Municipal Officer -> Authority Portal Layout
+  const getPageTitle = (route: AppRoute) => {
     switch (route) {
       case '/':
         return 'Portal Overview';
@@ -234,14 +288,22 @@ export function App() {
     }
   };
 
+  const authorityRoute: AuthorityRoute =
+    currentRoute === '/' ||
+    currentRoute === '/dashboard' ||
+    currentRoute === '/reports' ||
+    currentRoute === '/map' ||
+    currentRoute === '/hotspots'
+      ? currentRoute
+      : '/dashboard';
+
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans">
       {/* Sidebar Navigation */}
       <Sidebar
-        currentRoute={currentRoute}
-        onRouteChange={navigateTo}
-        onResetDemo={handleResetDemo}
-        isResettingDemo={isResettingDemo}
+        currentRoute={authorityRoute}
+        onRouteChange={(r) => navigateTo(r)}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -253,6 +315,7 @@ export function App() {
           onRefresh={() => loadData(false)}
           isRefreshing={isRefreshing}
           lastUpdated={lastUpdated}
+          onLogout={handleLogout}
         />
 
         {/* Route Pages */}
@@ -370,4 +433,13 @@ export function App() {
     </div>
   );
 }
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AuthorityAppContent />
+    </AuthProvider>
+  );
+}
+
 export default App;
