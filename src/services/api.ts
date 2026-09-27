@@ -1,5 +1,6 @@
 import type {
   Complaint,
+  ComplaintCreate,
   ComplaintStatus,
   DashboardStatistics,
   Department,
@@ -179,4 +180,27 @@ export async function getDepartments(): Promise<Department[]> {
   const headers = await getAuthHeaders();
   const res = await fetch(`${API_BASE}/departments`, { headers });
   return handleResponse<Department[]>(res, 'Failed to fetch departments.');
+}
+
+export async function createComplaint(data: ComplaintCreate): Promise<Complaint> {
+  const res = await fetch(`${API_BASE}/complaints`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    let detail = 'Failed to submit incident report.';
+    try {
+      const err = await res.json();
+      if (err.detail) detail = err.detail;
+    } catch {
+      // fallback
+    }
+    throw new Error(detail);
+  }
+
+  return res.json();
 }

@@ -14,7 +14,6 @@ interface ComplaintQueueProps {
   departments: Department[];
   loading: boolean;
   onSelectComplaint: (c: Complaint) => void;
-  // Filters
   categoryFilter: string;
   onCategoryFilterChange: (val: string) => void;
   severityFilter: string;
@@ -83,16 +82,18 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
   });
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-6 space-y-5 max-w-7xl mx-auto transition-colors">
       {/* Title */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-100">Municipal Complaint Queue</h2>
-          <p className="text-xs text-slate-400">
+          <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+            Municipal Complaint Queue
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Official triage and audit register for citizen-reported civic infrastructure defects.
           </p>
         </div>
-        <span className="text-xs text-slate-300 font-mono bg-slate-900 border border-slate-800 px-3 py-1 rounded-lg">
+        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg shadow-xs">
           {sortedComplaints.length} Records
         </span>
       </div>
@@ -115,55 +116,55 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
         onResetFilters={onResetFilters}
       />
 
-      {/* Table */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+      {/* Table Card */}
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950/80 border-b border-slate-800 text-[11px] uppercase tracking-wider text-slate-400 font-semibold select-none">
+          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+            <thead className="bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-medium select-none">
               <tr>
                 <th
                   onClick={() => handleSort('report_id')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-200"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Report ID</span>
-                    <ArrowUpDown className="w-3 h-3" />
+                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
                 <th className="py-3 px-4">Problem</th>
                 <th className="py-3 px-4">Location</th>
                 <th
                   onClick={() => handleSort('severity')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-200"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Severity</span>
-                    <ArrowUpDown className="w-3 h-3" />
+                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
                 <th className="py-3 px-4">Department</th>
                 <th
                   onClick={() => handleSort('status')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-200"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Status</span>
-                    <ArrowUpDown className="w-3 h-3" />
+                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
                 <th
                   onClick={() => handleSort('created_at')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-200"
+                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
                 >
                   <div className="flex items-center gap-1.5">
                     <span>Date</span>
-                    <ArrowUpDown className="w-3 h-3" />
+                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
                   </div>
                 </th>
                 <th className="py-3 px-4 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
               {loading ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-slate-400">
@@ -191,43 +192,43 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                   <tr
                     key={c.id}
                     onClick={() => onSelectComplaint(c)}
-                    className="hover:bg-slate-800/40 cursor-pointer transition-colors group"
+                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
                   >
                     {/* Report ID */}
-                    <td className="py-3.5 px-4 font-mono font-bold text-slate-200">
+                    <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100">
                       {c.report_id}
                     </td>
 
                     {/* Problem */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <ProblemIcon type={c.problem_type} className="w-4 h-4 shrink-0" />
-                        <span className="capitalize text-slate-200 font-medium">
+                        <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5 shrink-0 text-slate-500" />
+                        <span className="capitalize text-slate-800 dark:text-slate-200 font-medium">
                           {c.problem_type}
                         </span>
                       </div>
                     </td>
 
                     {/* Location */}
-                    <td className="py-3.5 px-4 text-slate-300 max-w-[200px] truncate">
+                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">
                       {c.location_name}
                     </td>
 
                     {/* Severity */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <SeverityBadge severity={c.severity} size="sm" />
                     </td>
 
                     {/* Department */}
-                    <td className="py-3.5 px-4 text-slate-300">{c.department}</td>
+                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{c.department}</td>
 
                     {/* Status */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <StatusBadge status={c.status} size="sm" />
                     </td>
 
                     {/* Date */}
-                    <td className="py-3.5 px-4 text-slate-400 font-mono text-[11px]">
+                    <td className="py-3 px-4 text-slate-400 dark:text-slate-500 font-mono text-[11px]">
                       {new Date(c.created_at).toLocaleDateString([], {
                         month: 'short',
                         day: 'numeric',
@@ -236,13 +237,13 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                     </td>
 
                     {/* Action */}
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-3 px-4 text-right">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onSelectComplaint(c);
                         }}
-                        className="p-1 text-slate-400 group-hover:text-blue-400 hover:bg-slate-800 rounded transition-colors cursor-pointer"
+                        className="p-1 text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors cursor-pointer"
                         title="Inspect complaint"
                       >
                         <Eye className="w-4 h-4" />

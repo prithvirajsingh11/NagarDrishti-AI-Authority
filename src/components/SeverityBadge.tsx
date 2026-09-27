@@ -9,39 +9,31 @@ interface SeverityBadgeProps {
 export const SeverityBadge: React.FC<SeverityBadgeProps> = ({ severity, size = 'md' }) => {
   const norm = (severity || 'LOW').toUpperCase();
 
-  const configs: Record<string, { label: string; bg: string; text: string; border: string }> = {
+  const configs: Record<string, { label: string; cls: string }> = {
     LOW: {
       label: 'Low',
-      bg: 'bg-slate-700/50',
-      text: 'text-slate-300',
-      border: 'border-slate-600',
+      cls: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800/70 dark:text-slate-300 dark:border-slate-700/60',
     },
     MEDIUM: {
       label: 'Medium',
-      bg: 'bg-amber-500/15',
-      text: 'text-amber-400',
-      border: 'border-amber-500/30',
+      cls: 'bg-sky-50 text-sky-700 border-sky-200/80 dark:bg-sky-950/40 dark:text-sky-300 dark:border-sky-800/50',
     },
     HIGH: {
       label: 'High',
-      bg: 'bg-orange-500/15',
-      text: 'text-orange-400',
-      border: 'border-orange-500/30',
+      cls: 'bg-amber-50 text-amber-700 border-amber-200/80 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/50',
     },
     CRITICAL: {
       label: 'Critical',
-      bg: 'bg-red-500/20',
-      text: 'text-red-400 font-semibold',
-      border: 'border-red-500/40',
+      cls: 'bg-rose-50 text-rose-700 border-rose-200/80 font-medium dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50',
     },
   };
 
   const c = configs[norm] || configs.LOW;
-  const padding = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs';
+  const padding = size === 'sm' ? 'px-1.5 py-0.5 text-[11px]' : 'px-2 py-0.5 text-xs';
 
   return (
     <span
-      className={`inline-flex items-center rounded-md border ${c.bg} ${c.text} ${c.border} ${padding}`}
+      className={`inline-flex items-center rounded-md border font-normal tracking-wide transition-colors ${c.cls} ${padding}`}
     >
       {c.label}
     </span>

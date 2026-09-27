@@ -18,7 +18,6 @@ interface MapIntelligenceProps {
   onSelectComplaint: (c: Complaint) => void;
   focusedHotspot: HotspotInfo | null;
   onSelectHotspot: (h: HotspotInfo | null) => void;
-  // Filters
   categoryFilter: string;
   onCategoryFilterChange: (val: string) => void;
   severityFilter: string;
@@ -59,21 +58,21 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
   onResetFilters,
 }) => {
   return (
-    <div className="p-6 space-y-5 max-w-7xl mx-auto flex flex-col h-[calc(100vh-4rem)]">
+    <div className="p-6 space-y-4 max-w-7xl mx-auto flex flex-col h-[calc(100vh-4rem)] transition-colors">
       {/* Title & Hotspot quick selector */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-100">
+          <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Geographic Map Intelligence
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Spatial distribution, density clusters, and high-risk thermal hotspots across municipal zones.
           </p>
         </div>
 
         {/* Hotspot Focus Quick Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 font-medium">Focus Corridor:</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Focus Corridor:</span>
           <select
             value={focusedHotspot ? focusedHotspot.title : ''}
             onChange={(e) => {
@@ -81,7 +80,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
               onSelectHotspot(selected || null);
             }}
             aria-label="Focus on specific corridor hotspot"
-            className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">Full City Overview</option>
             {hotspots.map((h, i) => (
@@ -112,7 +111,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
       />
 
       {/* Large Authority Map Viewport */}
-      <div className="flex-1 min-h-[480px]">
+      <div className="flex-1 min-h-[460px]">
         <LeafletMap
           complaints={complaints}
           heatmapPoints={heatmapPoints}

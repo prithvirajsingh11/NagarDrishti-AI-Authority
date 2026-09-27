@@ -8,6 +8,7 @@ import {
   Shield,
   LogOut,
   ShieldCheck,
+  RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -17,12 +18,16 @@ interface SidebarProps {
   currentRoute: AuthorityRoute;
   onRouteChange: (route: AuthorityRoute) => void;
   onLogout: () => void;
+  onResetDemo?: () => void;
+  isResettingDemo?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentRoute,
   onRouteChange,
   onLogout,
+  onResetDemo,
+  isResettingDemo = false,
 }) => {
   const { user } = useAuth();
 
@@ -35,27 +40,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="w-64 bg-slate-950 border-r border-slate-800 flex flex-col shrink-0 min-h-screen select-none">
+    <aside className="w-60 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800/80 flex flex-col shrink-0 min-h-screen transition-colors duration-150">
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-800">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800/80">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
-            <Shield className="w-5 h-5" />
+          <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 shadow-xs">
+            <Shield className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="font-semibold text-slate-100 text-sm leading-tight tracking-wide">
+            <h1 className="font-semibold text-slate-900 dark:text-slate-100 text-xs tracking-tight leading-snug">
               NagarDrishti AI
             </h1>
-            <p className="text-xs font-medium text-blue-400">Authority Portal</p>
+            <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Authority Portal</p>
           </div>
         </div>
-        <p className="text-[11px] text-slate-400 mt-2 font-medium tracking-wider uppercase">
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 font-medium tracking-wider uppercase">
           Municipal Civic Intelligence
         </p>
       </div>
 
       {/* Navigation */}
-      <nav className="p-3 space-y-1 flex-1">
+      <nav className="p-2.5 space-y-0.5 flex-1">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentRoute === item.route;
@@ -63,13 +68,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.route}
               onClick={() => onRouteChange(item.route)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all text-left cursor-pointer ${
                 isActive
-                  ? 'bg-blue-600 text-white font-semibold shadow-sm shadow-blue-500/20'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60'
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+              <Icon
+                className={`w-4 h-4 shrink-0 transition-colors ${
+                  isActive
+                    ? 'text-white dark:text-slate-900'
+                    : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600'
+                }`}
+              />
               <span>{item.label}</span>
             </button>
           );
@@ -77,40 +88,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Authority Profile & System Status */}
-      <div className="p-4 border-t border-slate-800 space-y-3">
-        <div className="bg-slate-900/60 rounded-lg p-3 border border-slate-800/80">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-            <span>FastAPI Backend</span>
-            <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800/80 space-y-2.5">
+        <div className="bg-slate-50 dark:bg-slate-900/60 rounded-lg p-2.5 border border-slate-200/80 dark:border-slate-800/80">
+          <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 mb-0.5">
+            <span className="font-medium">Backend Sync</span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Connected
             </span>
           </div>
-          <p className="text-[10px] text-slate-500 leading-relaxed">
-            Authenticated Spatial PostGIS
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+            FastAPI + Shared Datastore
           </p>
         </div>
 
+        {onResetDemo && (
+          <button
+            onClick={onResetDemo}
+            disabled={isResettingDemo}
+            className="w-full flex items-center justify-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-850 border border-slate-200 dark:border-slate-800 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+            title="Resets seeded demo dataset while preserving citizen submissions"
+          >
+            <RotateCcw className={`w-3.5 h-3.5 ${isResettingDemo ? 'animate-spin' : ''}`} />
+            <span>{isResettingDemo ? 'Resetting...' : 'Reset Demo Data'}</span>
+          </button>
+        )}
+
         {user && (
-          <div className="bg-slate-900/40 rounded-lg p-3 border border-slate-800">
-            <div className="flex items-center justify-between mb-1.5">
+          <div className="bg-slate-100/70 dark:bg-slate-900/40 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-                <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider">
-                  Authority Session
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400 tracking-wider">
+                  Authority
                 </span>
               </div>
-              <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded font-semibold uppercase">
+              <span className="text-[9px] font-mono px-1.5 py-0.2 bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded font-semibold uppercase">
                 {user.role}
               </span>
             </div>
-            <p className="text-[11px] font-mono text-slate-300 truncate" title={user.email}>
+            <p className="text-[11px] font-mono text-slate-700 dark:text-slate-300 truncate" title={user.email}>
               {user.email}
             </p>
 
             <button
               onClick={onLogout}
-              className="w-full mt-2.5 flex items-center justify-center gap-1.5 py-1.5 text-[11px] font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-md transition-colors cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-1.5 py-1 text-[11px] font-medium text-slate-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-md transition-colors cursor-pointer"
             >
               <LogOut className="w-3 h-3" />
               <span>Sign Out</span>

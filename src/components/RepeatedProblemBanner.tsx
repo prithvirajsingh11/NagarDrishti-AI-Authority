@@ -11,7 +11,6 @@ export const RepeatedProblemBanner: React.FC<RepeatedProblemBannerProps> = ({
   hotspots,
   onSelectHotspot,
 }) => {
-  // Find hotspot with the highest repeated report density
   const primaryRepeated = hotspots.find(
     (h) => (h.repeated_count && h.repeated_count > 1) || h.total_reports >= 4
   );
@@ -21,32 +20,32 @@ export const RepeatedProblemBanner: React.FC<RepeatedProblemBannerProps> = ({
   const count = primaryRepeated.repeated_count || primaryRepeated.total_reports;
 
   return (
-    <div className="bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/90 dark:border-amber-900/50 rounded-xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-colors">
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-          <AlertTriangle className="w-5 h-5" />
+        <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/60 flex items-center justify-center text-amber-700 dark:text-amber-400 shrink-0 mt-0.5">
+          <AlertTriangle className="w-4 h-4" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400">
-              REPEATED CIVIC PROBLEM DETECTED
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+              Repeated Pattern Detected
             </span>
-            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-semibold">
-              Corridor Hotspot
+            <span className="px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 text-[10px] font-medium">
+              Corridor Cluster
             </span>
           </div>
-          <p className="text-sm font-semibold text-slate-100 mt-0.5">
+          <p className="text-xs font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
             {count} {primaryRepeated.dominant_issue} reports clustered within {primaryRepeated.title}
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Suggested Operational Action: {primaryRepeated.suggested_action}
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+            Suggested action: {primaryRepeated.suggested_action}
           </p>
         </div>
       </div>
 
       <button
         onClick={() => onSelectHotspot(primaryRepeated)}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs rounded-lg transition-colors shrink-0 shadow-sm shadow-amber-500/20"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-slate-950 font-medium text-xs rounded-lg transition-colors shrink-0 shadow-xs"
       >
         <span>Inspect Corridor</span>
         <ArrowRight className="w-3.5 h-3.5" />
