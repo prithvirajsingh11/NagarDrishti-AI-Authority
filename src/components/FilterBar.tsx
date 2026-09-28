@@ -35,12 +35,18 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   departments,
   onResetFilters,
 }) => {
-  const hasActiveFilters =
-    category || severity || status || department || dateHorizon !== 'all' || search;
+  const activeCount = [
+    category,
+    severity,
+    status,
+    department,
+    dateHorizon !== 'all' ? dateHorizon : '',
+    search,
+  ].filter(Boolean).length;
 
   return (
-    <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800/80 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
-      <div className="flex flex-wrap items-center gap-2.5">
+    <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 shadow-2xs space-y-2.5 transition-colors">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Search Input */}
         <div className="relative flex-1 min-w-[200px]">
           <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -49,7 +55,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             placeholder="Search report ID, location, details..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
+            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
           />
         </div>
 
@@ -58,7 +64,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
           aria-label="Filter by problem category"
-          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
         >
           <option value="">All Categories</option>
           <option value="pothole">Pothole</option>
@@ -73,7 +79,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           value={severity}
           onChange={(e) => onSeverityChange(e.target.value)}
           aria-label="Filter by severity level"
-          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
         >
           <option value="">All Severities</option>
           <option value="CRITICAL">Critical</option>
@@ -87,7 +93,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           value={status}
           onChange={(e) => onStatusChange(e.target.value)}
           aria-label="Filter by status"
-          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
         >
           <option value="">All Statuses</option>
           <option value="REPORTED">Reported</option>
@@ -101,7 +107,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           value={department}
           onChange={(e) => onDepartmentChange(e.target.value)}
           aria-label="Filter by department"
-          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 max-w-[170px] truncate transition-colors cursor-pointer"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 max-w-[160px] truncate transition-colors cursor-pointer"
         >
           <option value="">All Departments</option>
           {departments.map((d) => (
@@ -112,7 +118,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         </select>
 
         {/* Time Horizon Segmented Control */}
-        <div className="flex items-center rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
+        <div className="flex items-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
           {[
             { val: 'all', label: 'All' },
             { val: 'today', label: 'Today' },
@@ -122,9 +128,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <button
               key={item.val}
               onClick={() => onDateHorizonChange(item.val)}
-              className={`px-2 py-1 rounded-md text-[11px] font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                 dateHorizon === item.val
-                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs'
+                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
@@ -133,15 +139,15 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           ))}
         </div>
 
-        {/* Clear Filters */}
-        {hasActiveFilters && (
+        {/* Clear Filters Button */}
+        {activeCount > 0 && (
           <button
             onClick={onResetFilters}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors ml-auto"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors ml-auto cursor-pointer"
             title="Clear all active filters"
           >
             <X className="w-3.5 h-3.5" />
-            <span>Clear</span>
+            <span>Reset ({activeCount})</span>
           </button>
         )}
       </div>

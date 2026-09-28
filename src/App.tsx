@@ -16,6 +16,7 @@ import {
 } from './services/api';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { ComplaintDrawer } from './components/ComplaintDrawer';
 import { AuthorityLanding } from './pages/AuthorityLanding';
 import { CommandCenter } from './pages/CommandCenter';
@@ -57,6 +58,10 @@ function AuthorityAppContent() {
   const [mapMode, setMapMode] = useState<MapMode>('markers');
   const [focusedHotspot, setFocusedHotspot] = useState<HotspotInfo | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+
+  // Responsive Navigation State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Navigate helper
   const navigateTo = useCallback((route: AppRoute) => {
@@ -304,10 +309,14 @@ function AuthorityAppContent() {
         currentRoute={authorityRoute}
         onRouteChange={(r) => navigateTo(r)}
         onLogout={handleLogout}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/60 dark:bg-slate-900/30 overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/60 dark:bg-slate-900/30 overflow-y-auto pb-16 lg:pb-0">
         {/* Top Navbar */}
         <Navbar
           title={getPageTitle(currentRoute)}
@@ -316,6 +325,7 @@ function AuthorityAppContent() {
           isRefreshing={isRefreshing}
           lastUpdated={lastUpdated}
           onLogout={handleLogout}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
         {/* Route Pages */}
@@ -430,6 +440,14 @@ function AuthorityAppContent() {
         onUpdateStatus={handleUpdateStatus}
         onSelectDuplicate={handleSelectDuplicate}
       />
+
+      {/* Bottom Navigation Dock for Mobile (Screens < 1024px) */}
+      {currentRoute !== '/' && (
+        <MobileBottomNav
+          currentRoute={authorityRoute}
+          onRouteChange={(r) => navigateTo(r)}
+        />
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ArrowUpDown, Eye, Inbox } from 'lucide-react';
 import type { Complaint, Department } from '../types/complaint';
 import { FilterBar } from '../components/FilterBar';
-import { ProblemIcon } from '../components/ProblemIcon';
+import { ProblemIcon, getProblemLabel } from '../components/ProblemIcon';
 import { StatusBadge } from '../components/StatusBadge';
 import { SeverityBadge } from '../components/SeverityBadge';
 
@@ -82,9 +82,9 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
   });
 
   return (
-    <div className="p-6 space-y-5 max-w-7xl mx-auto transition-colors">
-      {/* Title */}
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto transition-colors">
+      {/* Title & Stats */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Municipal Complaint Queue
@@ -93,12 +93,12 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
             Official triage and audit register for citizen-reported civic infrastructure defects.
           </p>
         </div>
-        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-lg shadow-xs">
+        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-xl shadow-2xs">
           {sortedComplaints.length} Records
         </span>
       </div>
 
-      {/* Synchronized Filter Bar */}
+      {/* Filter Bar */}
       <FilterBar
         category={categoryFilter}
         onCategoryChange={onCategoryFilterChange}
@@ -116,145 +116,160 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
         onResetFilters={onResetFilters}
       />
 
-      {/* Table Card */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-            <thead className="bg-slate-50/80 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-[11px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-medium select-none">
-              <tr>
-                <th
-                  onClick={() => handleSort('report_id')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span>Report ID</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="py-3 px-4">Problem</th>
-                <th className="py-3 px-4">Location</th>
-                <th
-                  onClick={() => handleSort('severity')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span>Severity</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="py-3 px-4">Department</th>
-                <th
-                  onClick={() => handleSort('status')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span>Status</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSort('created_at')}
-                  className="py-3 px-4 cursor-pointer hover:text-slate-900 dark:hover:text-slate-200"
-                >
-                  <div className="flex items-center gap-1.5">
-                    <span>Date</span>
-                    <ArrowUpDown className="w-3 h-3 text-slate-400" />
-                  </div>
-                </th>
-                <th className="py-3 px-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/70">
-              {loading ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400">
-                    Loading complaints queue...
-                  </td>
-                </tr>
-              ) : sortedComplaints.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-14 text-center text-slate-400">
-                    <div className="flex flex-col items-center justify-center space-y-1">
-                      <Inbox className="w-7 h-7 text-slate-600 mb-1" />
-                      <p className="text-sm font-semibold text-slate-300">
-                        {complaints.length === 0 ? 'No civic reports yet' : 'No complaints found matching the criteria.'}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {complaints.length === 0
-                          ? 'Citizen reports submitted via the mobile/web app will appear here in real-time.'
-                          : 'Try clearing your search or adjusting the master filters above.'}
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                sortedComplaints.map((c) => (
-                  <tr
-                    key={c.id}
-                    onClick={() => onSelectComplaint(c)}
-                    className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 cursor-pointer transition-colors group"
-                  >
-                    {/* Report ID */}
-                    <td className="py-3 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100">
-                      {c.report_id}
-                    </td>
-
-                    {/* Problem */}
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-2">
-                        <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5 shrink-0 text-slate-500" />
-                        <span className="capitalize text-slate-800 dark:text-slate-200 font-medium">
-                          {c.problem_type}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Location */}
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300 max-w-[200px] truncate">
-                      {c.location_name}
-                    </td>
-
-                    {/* Severity */}
-                    <td className="py-3 px-4">
-                      <SeverityBadge severity={c.severity} size="sm" />
-                    </td>
-
-                    {/* Department */}
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">{c.department}</td>
-
-                    {/* Status */}
-                    <td className="py-3 px-4">
-                      <StatusBadge status={c.status} size="sm" />
-                    </td>
-
-                    {/* Date */}
-                    <td className="py-3 px-4 text-slate-400 dark:text-slate-500 font-mono text-[11px]">
-                      {new Date(c.created_at).toLocaleDateString([], {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </td>
-
-                    {/* Action */}
-                    <td className="py-3 px-4 text-right">
+      {/* Triage Register (Responsive Table & Mobile Cards) */}
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-2xs">
+        {sortedComplaints.length === 0 ? (
+          <div className="py-20 text-center flex flex-col items-center justify-center space-y-2">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-1">
+              <Inbox className="w-6 h-6" />
+            </div>
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+              {loading ? 'Loading civic reports...' : 'No civic reports yet'}
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+              As citizens submit civic complaints through the portal, they will appear here for authority triage and dispatch.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View (md and up) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="bg-slate-50/75 dark:bg-slate-950/60 border-b border-slate-200/90 dark:border-slate-800/80 text-slate-500 dark:text-slate-400 font-medium">
+                    <th className="py-3 px-4">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectComplaint(c);
-                        }}
-                        className="p-1 text-slate-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors cursor-pointer"
-                        title="Inspect complaint"
+                        onClick={() => handleSort('report_id')}
+                        className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer font-semibold uppercase text-[10px] tracking-wider"
                       >
-                        <Eye className="w-4 h-4" />
+                        <span>Report ID</span>
+                        <ArrowUpDown className="w-3 h-3" />
                       </button>
-                    </td>
+                    </th>
+                    <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Incident Type</th>
+                    <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Location / Ward</th>
+                    <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Department</th>
+                    <th className="py-3 px-4">
+                      <button
+                        onClick={() => handleSort('severity')}
+                        className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer font-semibold uppercase text-[10px] tracking-wider"
+                      >
+                        <span>Severity</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4">
+                      <button
+                        onClick={() => handleSort('status')}
+                        className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer font-semibold uppercase text-[10px] tracking-wider"
+                      >
+                        <span>Status</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4">
+                      <button
+                        onClick={() => handleSort('created_at')}
+                        className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer font-semibold uppercase text-[10px] tracking-wider"
+                      >
+                        <span>Reported</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
+                    <th className="py-3 px-4 text-right uppercase text-[10px] tracking-wider font-semibold">Action</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                  {sortedComplaints.map((c) => (
+                    <tr
+                      key={c.id}
+                      onClick={() => onSelectComplaint(c)}
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors cursor-pointer group"
+                    >
+                      <td className="py-3.5 px-4 font-mono font-semibold text-slate-900 dark:text-slate-100 whitespace-nowrap">
+                        {c.report_id}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
+                            <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5" />
+                          </div>
+                          <span className="capitalize font-medium text-slate-800 dark:text-slate-200">
+                            {getProblemLabel(c.problem_type)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300 max-w-[200px] truncate" title={c.location_name}>
+                        {c.location_name || 'City Coordinates'}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                        {c.department || 'Unassigned'}
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <SeverityBadge severity={c.severity} size="sm" />
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <StatusBadge status={c.status} size="sm" />
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap font-mono text-[11px]">
+                        {new Date(c.created_at).toLocaleDateString([], {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectComplaint(c);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3 h-3 text-slate-500" />
+                          <span>Inspect</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List (under md) */}
+            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
+              {sortedComplaints.map((c) => (
+                <div
+                  key={c.id}
+                  onClick={() => onSelectComplaint(c)}
+                  className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer space-y-2.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
+                        <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
+                        {c.report_id}
+                      </span>
+                    </div>
+                    <SeverityBadge severity={c.severity} size="sm" />
+                  </div>
+
+                  <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-1">
+                    {c.location_name || 'City Coordinates'}
+                  </p>
+
+                  <div className="flex items-center justify-between pt-1">
+                    <StatusBadge status={c.status} size="sm" />
+                    <span className="text-[11px] font-mono text-slate-400">
+                      {new Date(c.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

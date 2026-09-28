@@ -58,9 +58,9 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
   onResetFilters,
 }) => {
   return (
-    <div className="p-6 space-y-4 max-w-7xl mx-auto flex flex-col h-[calc(100vh-4rem)] transition-colors">
+    <div className="p-4 sm:p-6 space-y-4 max-w-7xl mx-auto flex flex-col h-[calc(100vh-4.5rem)] transition-colors">
       {/* Title & Hotspot quick selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div>
           <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Geographic Map Intelligence
@@ -80,7 +80,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
               onSelectHotspot(selected || null);
             }}
             aria-label="Focus on specific corridor hotspot"
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer shadow-2xs"
           >
             <option value="">Full City Overview</option>
             {hotspots.map((h, i) => (
@@ -93,25 +93,27 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
       </div>
 
       {/* Filter Bar */}
-      <FilterBar
-        category={categoryFilter}
-        onCategoryChange={onCategoryFilterChange}
-        severity={severityFilter}
-        onSeverityChange={onSeverityFilterChange}
-        status={statusFilter}
-        onStatusChange={onStatusFilterChange}
-        department={departmentFilter}
-        onDepartmentChange={onDepartmentFilterChange}
-        dateHorizon={dateHorizon}
-        onDateHorizonChange={onDateHorizonChange}
-        search={searchQuery}
-        onSearchChange={onSearchQueryChange}
-        departments={departments}
-        onResetFilters={onResetFilters}
-      />
+      <div className="shrink-0">
+        <FilterBar
+          category={categoryFilter}
+          onCategoryChange={onCategoryFilterChange}
+          severity={severityFilter}
+          onSeverityChange={onSeverityFilterChange}
+          status={statusFilter}
+          onStatusChange={onStatusFilterChange}
+          department={departmentFilter}
+          onDepartmentChange={onDepartmentFilterChange}
+          dateHorizon={dateHorizon}
+          onDateHorizonChange={onDateHorizonChange}
+          search={searchQuery}
+          onSearchChange={onSearchQueryChange}
+          departments={departments}
+          onResetFilters={onResetFilters}
+        />
+      </div>
 
       {/* Large Authority Map Viewport */}
-      <div className="flex-1 min-h-[460px]">
+      <div className="flex-1 min-h-[380px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/90 dark:border-slate-800/80">
         <LeafletMap
           complaints={complaints}
           heatmapPoints={heatmapPoints}

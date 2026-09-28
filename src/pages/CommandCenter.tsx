@@ -7,7 +7,8 @@ import {
   Flame,
   Layers,
   ArrowRight,
-  Inbox,
+  TrendingUp,
+  BarChart3,
 } from 'lucide-react';
 import {
   Area,
@@ -105,7 +106,6 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         }))
     : [];
 
-  // Moderate muted tones
   const categoryColors: Record<string, string> = {
     pothole: isDark ? '#38bdf8' : '#0284c7',
     garbage: isDark ? '#fb923c' : '#d97706',
@@ -129,7 +129,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto transition-colors">
+    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-7xl mx-auto transition-colors">
       {/* Repeated Problem Intelligence Banner */}
       {stats?.hotspots && stats.hotspots.length > 0 && (
         <RepeatedProblemBanner
@@ -139,64 +139,79 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       )}
 
       {/* 5 Minimalist KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+        {/* Total Reports */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             <span className="font-medium">Total Reports</span>
-            <Layers className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+              <Layers className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-slate-900 dark:text-slate-100 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 mt-2">
             {totalReportsCount}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">All logged incidents</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        {/* Critical & High */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-rose-200 dark:hover:border-rose-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
             <span className="font-medium">Critical & High</span>
-            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+            <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-rose-700 dark:text-rose-400 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-2">
             {stats?.high_critical ?? (loading ? '...' : 0)}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Requires urgent triage</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        {/* Pending Triage */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-amber-200 dark:hover:border-amber-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
             <span className="font-medium">Pending Triage</span>
-            <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-amber-700 dark:text-amber-400 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-amber-600 dark:text-amber-400 mt-2">
             {stats?.pending ?? (loading ? '...' : 0)}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Awaiting department</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
+        {/* In Progress */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-sky-200 dark:hover:border-sky-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-sky-700 dark:text-sky-400">
             <span className="font-medium">In Progress</span>
-            <Building2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+            <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+              <Building2 className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-sky-700 dark:text-sky-400 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-sky-600 dark:text-sky-400 mt-2">
             {stats?.in_progress ?? (loading ? '...' : 0)}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Active crew dispatched</span>
         </div>
 
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs col-span-2 sm:col-span-1">
+        {/* Resolved */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400">
             <span className="font-medium">Resolved</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <p className="text-2xl font-bold font-mono text-emerald-700 dark:text-emerald-400 mt-2">
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 mt-2">
             {stats?.resolved ?? (loading ? '...' : 0)}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Completed resolutions</span>
         </div>
       </div>
 
-      {/* Synchronized Master Filter Bar */}
+      {/* Master Filter Bar */}
       <FilterBar
         category={categoryFilter}
         onCategoryChange={onCategoryFilterChange}
@@ -215,7 +230,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       />
 
       {/* Main Map (Dominant Visual Element) */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
@@ -226,7 +241,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </span>
           </div>
           {focusedHotspot && (
-            <span className="text-xs text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2 py-0.5 rounded-md">
+            <span className="text-xs text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-2.5 py-0.5 rounded-lg">
               Focus: {focusedHotspot.title}
             </span>
           )}
@@ -239,15 +254,15 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           onMapModeChange={onMapModeChange}
           onSelectComplaint={onSelectComplaint}
           focusedHotspot={focusedHotspot}
-          heightClass="h-[460px]"
+          heightClass="h-[360px] sm:h-[460px]"
         />
       </div>
 
       {/* Split Section: Top Hotspots vs Recent Complaints */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Top Hotspots */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col shadow-2xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-500 dark:text-amber-400" />
               <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
@@ -269,10 +284,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <div
                   key={i}
                   onClick={() => onSelectHotspot(h)}
-                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-lg cursor-pointer transition-colors"
+                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-xl cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="w-5 h-5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
                       {i + 1}
                     </span>
                     <div>
@@ -283,7 +298,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-mono font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-md border border-rose-200/80 dark:border-rose-900/40">
+                  <span className="text-[11px] font-mono font-medium text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2.5 py-0.5 rounded-lg border border-rose-200/80 dark:border-rose-900/40">
                     {h.high_critical_count} critical
                   </span>
                 </div>
@@ -297,8 +312,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Recent Complaints */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col shadow-2xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
               Recent Complaints Queue
             </h3>
@@ -317,20 +332,20 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <div
                   key={c.id}
                   onClick={() => onSelectComplaint(c)}
-                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-lg cursor-pointer transition-colors"
+                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-xl cursor-pointer transition-colors"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-md bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
-                      <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
+                      <ProblemIcon type={c.problem_type} className="w-4 h-4" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-200">
                           {c.report_id}
                         </span>
                         <StatusBadge status={c.status} size="sm" />
                       </div>
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[200px]">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[180px] sm:max-w-[240px]">
                         {c.location_name}
                       </p>
                     </div>
@@ -350,75 +365,89 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       </div>
 
-      {/* Analytics: Category Distribution & 7-Day Inflow */}
+      {/* Analytics Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Category Distribution */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
-          <h3 className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-            Category Breakdown
-          </h3>
-          <div className="h-56">
+        {/* Problem Distribution */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                Incident Category Breakdown
+              </h3>
+            </div>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
+              Live Volume
+            </span>
+          </div>
+
+          <div className="h-56 mt-4">
             {categoryChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
-                  <XAxis dataKey="name" tick={{ fill: chartTheme.tick, fontSize: 11 }} />
-                  <YAxis tick={{ fill: chartTheme.tick, fontSize: 11 }} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
+                  <XAxis dataKey="name" stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: chartTheme.tooltipBg,
                       borderColor: chartTheme.tooltipBorder,
                       color: chartTheme.tooltipColor,
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      borderRadius: '0.75rem',
+                      fontSize: '0.75rem',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                     }}
                   />
-                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
                     {categoryChartData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={categoryColors[entry.key] || '#38bdf8'}
-                      />
+                      <Cell key={`cell-${index}`} fill={categoryColors[entry.key] || '#3b82f6'} />
                     ))}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-slate-500">
-                <Inbox className="w-8 h-8 text-slate-400 mb-1" />
-                <p className="text-xs">No civic reports yet</p>
+              <div className="h-full flex items-center justify-center text-slate-400 text-xs">
+                No categorical data available.
               </div>
             )}
           </div>
         </div>
 
-        {/* 7-Day Inflow Trend */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-xs">
-          <h3 className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-            7-Day Inflow Velocity
-          </h3>
-          <div className="h-56">
-            {trendData.some((d) => d.count > 0) ? (
+        {/* 14-day Resolution Trend */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                14-Day Velocity & Volume Trend
+              </h3>
+            </div>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
+              Daily Count
+            </span>
+          </div>
+
+          <div className="h-56 mt-4">
+            {trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="inflowGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.lineStroke} stopOpacity={0.25} />
+                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={chartTheme.lineStroke} stopOpacity={0.3} />
                       <stop offset="95%" stopColor={chartTheme.lineStroke} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
-                  <XAxis dataKey="day_label" tick={{ fill: chartTheme.tick, fontSize: 11 }} />
-                  <YAxis tick={{ fill: chartTheme.tick, fontSize: 11 }} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
+                  <XAxis dataKey="date" stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: chartTheme.tooltipBg,
                       borderColor: chartTheme.tooltipBorder,
                       color: chartTheme.tooltipColor,
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                      boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                      borderRadius: '0.75rem',
+                      fontSize: '0.75rem',
+                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                     }}
                   />
                   <Area
@@ -427,14 +456,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                     stroke={chartTheme.lineStroke}
                     strokeWidth={2}
                     fillOpacity={1}
-                    fill="url(#inflowGrad)"
+                    fill="url(#trendGradient)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-slate-500">
-                <Inbox className="w-8 h-8 text-slate-400 mb-1" />
-                <p className="text-xs">No civic reports yet</p>
+              <div className="h-full flex items-center justify-center text-slate-400 text-xs">
+                No recent activity recorded.
               </div>
             )}
           </div>
