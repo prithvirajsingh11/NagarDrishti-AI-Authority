@@ -47,7 +47,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Listen to system OS preference changes if not manually set
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (!mediaQuery || !mediaQuery.addEventListener) {
+      return;
+    }
     const handleChange = (e: MediaQueryListEvent) => {
       const stored = localStorage.getItem(THEME_STORAGE_KEY);
       if (!stored) {

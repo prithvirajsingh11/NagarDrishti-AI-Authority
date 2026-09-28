@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import React from 'react';
+import '@testing-library/jest-dom/vitest';
 import { LoginPage } from '../pages/LoginPage';
 import { AccessDeniedPage } from '../pages/AccessDeniedPage';
 import { AuthProvider, useAuth } from '../context/AuthContext';
@@ -16,6 +16,7 @@ import { CommandCenter } from '../pages/CommandCenter';
 import { ComplaintQueue } from '../pages/ComplaintQueue';
 import { HotspotIntelligence } from '../pages/HotspotIntelligence';
 import { Sidebar } from '../components/Sidebar';
+import { ThemeProvider } from '../context/ThemeContext';
 
 // Mock Supabase Auth
 vi.mock('../services/supabaseClient', () => {
@@ -83,7 +84,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       error: null,
     });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
@@ -142,7 +143,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
   });
 
   // 3. Unauthenticated portal access
-  it('3. unauthenticated portal access: renders login prompt without leaking dashboard', () => {
+  it('3. unauthenticated portal access: renders login prompt without leaking dashboard', async () => {
     vi.mocked(supabase.auth.getSession).mockResolvedValue({
       data: { session: null },
       error: null,
@@ -154,7 +155,9 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       </AuthProvider>
     );
 
-    expect(screen.getByText('Authority Portal')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Authority Portal')).toBeInTheDocument();
+    });
     expect(screen.getByText('Municipal Civic Intelligence')).toBeInTheDocument();
     expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
@@ -189,7 +192,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
     });
 
     // Backend returns citizen role
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
@@ -233,7 +236,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       error: null,
     });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
@@ -282,7 +285,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
     const expiryHandler = vi.fn();
     registerSessionExpiryHandler(expiryHandler);
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
       json: async () => ({ detail: 'Invalid or expired session. Please sign in again.' }),
@@ -304,7 +307,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       error: null,
     });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
@@ -323,7 +326,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
 
     await getDashboardStatistics();
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/dashboard/statistics'),
       expect.objectContaining({
         headers: expect.objectContaining({
@@ -345,7 +348,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       error: null,
     });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 403,
       json: async () => ({ detail: 'Authority role required. Citizens are not permitted to access this resource.' }),
@@ -366,7 +369,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
       error: null,
     });
 
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({
@@ -378,7 +381,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
 
     const res = await updateComplaintStatus('comp-uuid-1', 'IN_PROGRESS');
 
-    expect(global.fetch).toHaveBeenCalledWith(
+    expect(globalThis.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/complaints/comp-uuid-1/status'),
       expect.objectContaining({
         method: 'PATCH',
@@ -432,33 +435,35 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
 
     // Render CommandCenter
     const { unmount: unmountCommandCenter } = render(
-      <CommandCenter
-        stats={zeroStats}
-        complaints={[]}
-        heatmapPoints={[]}
-        departments={[]}
-        loading={false}
-        onSelectComplaint={vi.fn()}
-        onSelectHotspot={vi.fn()}
-        focusedHotspot={null}
-        mapMode="markers"
-        onMapModeChange={vi.fn()}
-        categoryFilter=""
-        onCategoryFilterChange={vi.fn()}
-        severityFilter=""
-        onSeverityFilterChange={vi.fn()}
-        statusFilter=""
-        onStatusFilterChange={vi.fn()}
-        departmentFilter=""
-        onDepartmentFilterChange={vi.fn()}
-        dateHorizon="all"
-        onDateHorizonChange={vi.fn()}
-        searchQuery=""
-        onSearchQueryChange={vi.fn()}
-        onResetFilters={vi.fn()}
-        onNavigateToReports={vi.fn()}
-        onNavigateToHotspots={vi.fn()}
-      />
+      <ThemeProvider>
+        <CommandCenter
+          stats={zeroStats}
+          complaints={[]}
+          heatmapPoints={[]}
+          departments={[]}
+          loading={false}
+          onSelectComplaint={vi.fn()}
+          onSelectHotspot={vi.fn()}
+          focusedHotspot={null}
+          mapMode="markers"
+          onMapModeChange={vi.fn()}
+          categoryFilter=""
+          onCategoryFilterChange={vi.fn()}
+          severityFilter=""
+          onSeverityFilterChange={vi.fn()}
+          statusFilter=""
+          onStatusFilterChange={vi.fn()}
+          departmentFilter=""
+          onDepartmentFilterChange={vi.fn()}
+          dateHorizon="all"
+          onDateHorizonChange={vi.fn()}
+          searchQuery=""
+          onSearchQueryChange={vi.fn()}
+          onResetFilters={vi.fn()}
+          onNavigateToReports={vi.fn()}
+          onNavigateToHotspots={vi.fn()}
+        />
+      </ThemeProvider>
     );
 
     // Verify 0 reports rendered across KPI cards, not fake numbers
@@ -501,12 +506,12 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
         onSelectComplaint={vi.fn()}
       />
     );
-    expect(screen.getByText('No civic reports yet')).toBeInTheDocument();
+    expect(screen.getByText('No active hotspot corridors identified')).toBeInTheDocument();
     unmountHotspots();
   });
 
   // 12. No demo data / reset functionality
-  it('12. no demo data / reset functionality: verify no Reset Demo buttons or dummy controls exist in UI', () => {
+  it('12. no demo data / reset functionality: verify no Reset Demo buttons or dummy controls exist in UI', async () => {
     render(
       <AuthProvider>
         <Sidebar
@@ -516,6 +521,10 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
         />
       </AuthProvider>
     );
+
+    await waitFor(() => {
+      expect(screen.getByText('Authority Portal')).toBeInTheDocument();
+    });
 
     expect(screen.queryByText(/Reset Demo/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Reset Demo Data/i)).not.toBeInTheDocument();

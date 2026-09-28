@@ -10,6 +10,7 @@
     ],
     "module": "ESNext",
     "skipLibCheck": true,
+    "types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
@@ -23,10 +24,5 @@
   },
   "include": [
     "src"
-  ],
-  "exclude": [
-    "src/test",
-    "**/*.test.ts",
-    "**/*.test.tsx"
   ]
 }
