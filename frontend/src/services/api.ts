@@ -17,8 +17,14 @@ import type {
 } from '../types/complaint';
 import { supabase } from './supabaseClient';
 
-const rawBase = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '');
-export const API_BASE = rawBase ? `${rawBase}/api` : '/api';
+const envApiUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+export const API_BASE = envApiUrl
+  ? (envApiUrl.endsWith('/api') ? envApiUrl : `${envApiUrl}/api`)
+  : '/api';
+
+export const SERVER_ORIGIN = envApiUrl.endsWith('/api')
+  ? envApiUrl.slice(0, -4)
+  : envApiUrl;
 
 export interface AuthUserProfile {
   id: string;
@@ -115,8 +121,8 @@ export function resolveImageUrl(url?: string | null): string {
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
     return url;
   }
-  if (rawBase) {
-    return `${rawBase}${url.startsWith('/') ? '' : '/'}${url}`;
+  if (SERVER_ORIGIN) {
+    return `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
   }
   return url;
 }
