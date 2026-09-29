@@ -68,3 +68,13 @@ def require_authority(user: Dict[str, Any] = Depends(verify_token)) -> Dict[str,
             detail="Authority role required. Citizens are not permitted to access this resource."
         )
     return user
+
+
+def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)) -> Optional[Dict[str, Any]]:
+    """Returns authenticated user profile if token is provided, otherwise None."""
+    if not credentials or not credentials.credentials:
+        return None
+    try:
+        return verify_token(credentials)
+    except HTTPException:
+        return None

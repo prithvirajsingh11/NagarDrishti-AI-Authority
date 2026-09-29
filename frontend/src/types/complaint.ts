@@ -195,6 +195,8 @@ export interface AgingAnalysis {
 export interface DepartmentPerformance {
   department: string;
   total: number;
+  assigned?: number;
+  active_workload?: number;
   total_assigned?: number;
   pending: number;
   in_progress: number;
@@ -202,6 +204,29 @@ export interface DepartmentPerformance {
   reopened: number;
   avg_resolution_hours?: number | null;
   resolution_rate: number;
+}
+
+export interface GovernanceOutcomes {
+  total_complaints: number;
+  active_complaints: number;
+  resolved_complaints: number;
+  reopened_complaints: number;
+  resolution_rate_pct?: number | null;
+  avg_response_hours?: number | null;
+  avg_resolution_hours?: number | null;
+  pending_citizen_verification: number;
+  escalated_cases: number;
+  resolution_rate_label: string;
+  response_time_label: string;
+  resolution_time_label: string;
+}
+
+export interface TimeBasedAnalytics {
+  received_over_time: DailyTrendPoint[];
+  resolved_over_time: DailyTrendPoint[];
+  reopened_over_time: DailyTrendPoint[];
+  avg_response_hours?: number | null;
+  avg_resolution_hours?: number | null;
 }
 
 export interface CategoryTrend {
@@ -236,6 +261,8 @@ export interface DashboardStatistics {
   aging_analysis?: AgingAnalysis | null;
   department_performance?: DepartmentPerformance[];
   category_trends?: CategoryTrend[];
+  governance_outcomes?: GovernanceOutcomes | null;
+  time_analytics?: TimeBasedAnalytics | null;
 }
 
 export interface HeatmapPoint {

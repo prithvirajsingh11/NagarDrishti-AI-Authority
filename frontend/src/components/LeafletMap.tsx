@@ -16,6 +16,10 @@ export type TileLayerMode = 'normal' | 'satellite' | '3d';
 export const DEFAULT_MAP_CENTER: [number, number] = [23.2599, 77.4126];
 export const DEFAULT_MAP_ZOOM = 12;
 
+export const isValidCoord = (lat?: number | null, lng?: number | null): boolean => {
+  return typeof lat === 'number' && typeof lng === 'number' && !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+};
+
 interface LeafletMapProps {
   complaints: Complaint[];
   heatmapPoints?: HeatmapPoint[];
@@ -266,7 +270,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
 
     if (mapMode === 'markers') {
       displayedComplaints.forEach((c) => {
-        if (!c.latitude || !c.longitude) return;
+        if (!isValidCoord(c.latitude, c.longitude)) return;
 
         const isCritical = c.severity?.toUpperCase() === 'CRITICAL';
         const isHigh = c.severity?.toUpperCase() === 'HIGH';
@@ -342,7 +346,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       const roundCoord = (coord: number) => Math.round(coord * 65) / 65;
 
       displayedComplaints.forEach((c) => {
-        if (!c.latitude || !c.longitude) return;
+        if (!isValidCoord(c.latitude, c.longitude)) return;
         const key = `${roundCoord(c.latitude)}_${roundCoord(c.longitude)}`;
         if (!clusters[key]) {
           clusters[key] = {
@@ -410,7 +414,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
             }));
 
       points.forEach((p) => {
-        if (!p.latitude || !p.longitude) return;
+        if (!isValidCoord(p.latitude, p.longitude)) return;
         const lat = p.latitude;
         const lng = p.longitude;
         const weight = p.weight || 0.5;
@@ -435,7 +439,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     }
 
     // Corridor Hotspot focus highlight
-    if (focusedHotspot && focusedHotspot.latitude && focusedHotspot.longitude) {
+    if (focusedHotspot && isValidCoord(focusedHotspot.latitude, focusedHotspot.longitude)) {
       const pulseCircle = L.circle(
         [focusedHotspot.latitude, focusedHotspot.longitude],
         {
@@ -462,7 +466,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     // Render all hotspot corridors when overlay is set to 'corridors'
     if (intelligenceOverlay === 'corridors' && hotspots && hotspots.length > 0) {
       hotspots.forEach((h) => {
-        if (!h.latitude || !h.longitude) return;
+        if (!isValidCoord(h.latitude, h.longitude)) return;
         const circle = L.circle([h.latitude, h.longitude], {
           radius: (h.radius_km || 1) * 1000,
           fillColor: '#d97706',

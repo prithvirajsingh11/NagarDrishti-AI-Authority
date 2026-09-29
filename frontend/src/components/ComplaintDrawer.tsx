@@ -435,6 +435,96 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
               </div>
             )}
 
+            {/* Phase 8: Case Detail Operational Summary */}
+            <div className="bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-4 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <h4 className="text-xs font-bold tracking-tight text-slate-900 dark:text-slate-100 uppercase">
+                    Case Detail Operational Summary
+                  </h4>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  {complaint.report_id}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 text-xs">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Category & Severity</span>
+                  <div className="flex items-center gap-1.5 mt-0.5 font-medium text-slate-900 dark:text-slate-100 capitalize">
+                    <span>{getProblemLabel(complaint.problem_type)}</span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                    <span className="font-semibold">{complaint.severity}</span>
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Current Status & Priority</span>
+                  <div className="flex items-center gap-1.5 mt-0.5 font-medium text-slate-900 dark:text-slate-100">
+                    <StatusBadge status={complaint.status} size="sm" />
+                    <PriorityBadge level={complaint.priority_level} score={complaint.priority_score} size="xs" />
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Department & Officer</span>
+                  <div className="mt-0.5 font-medium text-slate-900 dark:text-slate-100 truncate">
+                    <div className="truncate font-semibold">Dept: {complaint.department || 'Unassigned'}</div>
+                    <div className="text-[11px] text-slate-500 truncate">Officer: {complaint.assigned_to || 'Unassigned'}</div>
+                  </div>
+                </div>
+
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Verification & Resolution</span>
+                  <div className="mt-0.5 text-[11px] font-medium text-slate-900 dark:text-slate-100">
+                    <div>Status: <span className="font-semibold">{isResolved ? 'Resolved' : isReopened ? 'Reopened' : 'In Progress'}</span></div>
+                    <div className="text-slate-500 text-[10px]">Verification: <span className="font-medium text-slate-700 dark:text-slate-300">{verificationStatus || 'N/A'}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Location & Timestamps */}
+              <div className="p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80 text-xs space-y-1">
+                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="truncate font-medium">Site: {complaint.location_name}</span>
+                  {complaint.latitude && complaint.longitude && (
+                    <span className="text-[10px] font-mono text-slate-400 ml-auto shrink-0">
+                      {complaint.latitude.toFixed(4)}, {complaint.longitude.toFixed(4)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                  <span>Intake: {new Date(complaint.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                  {complaint.resolved_at ? (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                      Resolved: {new Date(complaint.resolved_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  ) : (
+                    <span>Last updated: {new Date(complaint.updated_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Escalation Triggers Indicator */}
+              {(isReopened || (complaint.priority_score && complaint.priority_score >= 70) || (complaint.status_update_requests && complaint.status_update_requests.length > 0)) && (
+                <div className="p-2 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/60 text-[11px] text-amber-900 dark:text-amber-200 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <div className="flex-1">
+                    <span className="font-semibold">Active Escalation Triggers: </span>
+                    <span>
+                      {[
+                        isReopened ? 'Citizen Reopened' : null,
+                        (complaint.priority_score && complaint.priority_score >= 70) ? 'Critical Priority Index (≥70)' : null,
+                        (complaint.status_update_requests && complaint.status_update_requests.length > 0) ? `${complaint.status_update_requests.length} Citizen Status Request(s)` : null,
+                      ].filter(Boolean).join(' • ')}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Deterministic Municipal Priority Intelligence */}
             {complaint.priority_explanation && (
               <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 space-y-1">

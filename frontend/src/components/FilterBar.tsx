@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, Download } from 'lucide-react';
 import type { Department } from '../types/complaint';
 
 interface FilterBarProps {
@@ -21,6 +21,8 @@ interface FilterBarProps {
   onSearchChange: (val: string) => void;
   departments: Department[];
   onResetFilters: () => void;
+  onExportCsv?: () => void;
+  isExporting?: boolean;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -42,6 +44,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onSearchChange,
   departments,
   onResetFilters,
+  onExportCsv,
+  isExporting = false,
 }) => {
   const activeCount = [
     category,
@@ -179,11 +183,24 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           ))}
         </div>
 
+        {/* Export Filtered CSV Button */}
+        {onExportCsv && (
+          <button
+            onClick={onExportCsv}
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer ml-auto disabled:opacity-50"
+            title="Export filtered complaints as CSV"
+          >
+            <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>{isExporting ? 'Exporting...' : 'Export CSV'}</span>
+          </button>
+        )}
+
         {/* Clear Filters Button */}
         {activeCount > 0 && (
           <button
             onClick={onResetFilters}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors ml-auto cursor-pointer"
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer ${!onExportCsv ? 'ml-auto' : ''}`}
             title="Clear all active filters"
           >
             <X className="w-3.5 h-3.5" />

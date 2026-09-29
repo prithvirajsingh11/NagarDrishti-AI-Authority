@@ -12,6 +12,8 @@ import type {
   InternalNote,
   StatusUpdateRequestItem,
   EscalationItem,
+  GovernanceOutcomes,
+  TimeBasedAnalytics,
 } from '../types/complaint';
 import { supabase } from './supabaseClient';
 
@@ -132,6 +134,8 @@ export async function getComplaints(filters?: {
   department?: string;
   resolution_status?: string;
   priority_level?: string;
+  aging?: string;
+  is_reopened?: boolean;
   limit?: number;
 }): Promise<Complaint[]> {
   const params = new URLSearchParams();
@@ -141,6 +145,8 @@ export async function getComplaints(filters?: {
   if (filters?.department) params.append('department', filters.department);
   if (filters?.resolution_status) params.append('resolution_status', filters.resolution_status);
   if (filters?.priority_level) params.append('priority_level', filters.priority_level);
+  if (filters?.aging) params.append('aging', filters.aging);
+  if (filters?.is_reopened !== undefined) params.append('is_reopened', String(filters.is_reopened));
   if (filters?.limit) params.append('limit', filters.limit.toString());
 
   const url = `${API_BASE}/complaints${params.toString() ? '?' + params.toString() : ''}`;
@@ -377,4 +383,70 @@ export async function getStatusUpdateRequests(state?: string): Promise<StatusUpd
   const res = await fetch(`${API_BASE}/dashboard/status-requests${params}`, { headers });
   return handleResponse<StatusUpdateRequestItem[]>(res, 'Failed to load status update requests.');
 }
+
+export async function getGovernanceOutcomes(): Promise<GovernanceOutcomes> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/governance-outcomes`, { headers });
+  return handleResponse<GovernanceOutcomes>(res, 'Failed to load governance outcomes.');
+}
+
+export async function getTimeAnalytics(): Promise<TimeBasedAnalytics> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/time-analytics`, { headers });
+  return handleResponse<TimeBasedAnalytics>(res, 'Failed to load time-based analytics.');
+}
+
+export async function downloadComplaintsCsv(filters?: {
+  problem_type?: string;
+  severity?: string;
+  status?: string;
+  department?: string;
+  resolution_status?: string;
+  priority_level?: string;
+  aging?: string;
+  is_reopened?: boolean;
+}): Promise<void> {
+  const params = new URLSearchParams();
+  if (filters?.problem_type) params.append('problem_type', filters.problem_type);
+  if (filters?.severity) params.append('severity', filters.severity);
+  if (filters?.status) params.append('status', filters.status);
+  if (filters?.department) params.append('department', filters.department);
+  if (filters?.resolution_status) params.append('resolution_status', filters.resolution_status);
+  if (filters?.priority_level) params.append('priority_level', filters.priority_level);
+  if (filters?.aging) params.append('aging', filters.aging);
+  if (filters?.is_reopened !== undefined) params.append('is_reopened', String(filters.is_reopened));
+
+  const url = `${API_BASE}/complaints/export${params.toString() ? '?' + params.toString() : ''}`;
+  const headers = await getAuthHeaders();
+  const res = await fetch(url, { headers });
+
+  if (res.status === 401) {
+    triggerSessionExpired();
+    throw new Error('Your session has expired. Please sign in again.');
+  }
+  if (res.status === 403) {
+    throw new Error('Access denied. Authority privileges required to export complaint records.');
+  }
+  if (!res.ok) {
+    throw new Error('Failed to export complaint data.');
+  }
+
+  const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition') || '';
+  let filename = 'nagardrishti_complaints.csv';
+  const match = disposition.match(/filename="?([^"]+)"?/);
+  if (match && match[1]) {
+    filename = match[1];
+  }
+
+  const downloadUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(downloadUrl);
+}
+
 

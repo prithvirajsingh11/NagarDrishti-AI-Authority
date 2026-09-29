@@ -238,6 +238,8 @@ class AgingAnalysis(BaseModel):
 class DepartmentPerformance(BaseModel):
     department: str
     total: int
+    assigned: int = 0
+    active_workload: int = 0
     pending: int
     in_progress: int
     resolved: int
@@ -254,6 +256,29 @@ class CategoryTrend(BaseModel):
     trend_30d_pct: Optional[float] = None # None if insufficient historical data
     direction: Literal["increasing", "decreasing", "stable", "insufficient_data"] = "insufficient_data"
     status_label: str = "Insufficient data"
+
+
+class GovernanceOutcomes(BaseModel):
+    total_complaints: int
+    active_complaints: int
+    resolved_complaints: int
+    reopened_complaints: int
+    resolution_rate_pct: Optional[float] = None
+    avg_response_hours: Optional[float] = None
+    avg_resolution_hours: Optional[float] = None
+    pending_citizen_verification: int = 0
+    escalated_cases: int = 0
+    resolution_rate_label: str = "Insufficient data"
+    response_time_label: str = "Insufficient data"
+    resolution_time_label: str = "Insufficient data"
+
+
+class TimeBasedAnalytics(BaseModel):
+    received_over_time: List[DailyTrendPoint] = Field(default_factory=list)
+    resolved_over_time: List[DailyTrendPoint] = Field(default_factory=list)
+    reopened_over_time: List[DailyTrendPoint] = Field(default_factory=list)
+    avg_response_hours: Optional[float] = None
+    avg_resolution_hours: Optional[float] = None
 
 
 class DashboardStatistics(BaseModel):
@@ -273,6 +298,8 @@ class DashboardStatistics(BaseModel):
     aging_analysis: Optional[AgingAnalysis] = None
     department_performance: List[DepartmentPerformance] = Field(default_factory=list)
     category_trends: List[CategoryTrend] = Field(default_factory=list)
+    governance_outcomes: Optional[GovernanceOutcomes] = None
+    time_analytics: Optional[TimeBasedAnalytics] = None
 
 
 class HeatmapPoint(BaseModel):

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowUpDown, Eye, Inbox } from 'lucide-react';
 import type { Complaint, Department } from '../types/complaint';
+import { downloadComplaintsCsv } from '../services/api';
 import { FilterBar } from '../components/FilterBar';
 import { ProblemIcon, getProblemLabel } from '../components/ProblemIcon';
 import { StatusBadge } from '../components/StatusBadge';
@@ -59,6 +60,25 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
 }) => {
   const [sortField, setSortField] = useState<SortField>('priority');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportCsv = async () => {
+    setIsExporting(true);
+    try {
+      await downloadComplaintsCsv({
+        problem_type: categoryFilter || undefined,
+        severity: severityFilter || undefined,
+        status: statusFilter || undefined,
+        department: departmentFilter || undefined,
+        resolution_status: resolutionStatusFilter || undefined,
+        priority_level: priorityLevelFilter || undefined,
+      });
+    } catch (err: any) {
+      alert(err.message || 'Failed to export CSV file.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -129,6 +149,8 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
         onSearchChange={onSearchQueryChange}
         departments={departments}
         onResetFilters={onResetFilters}
+        onExportCsv={handleExportCsv}
+        isExporting={isExporting}
       />
 
       {/* Triage Register (Responsive Table & Mobile Cards) */}

@@ -22,6 +22,8 @@ from .schemas import (
     AcknowledgeStatusRequest,
     CreateStatusUpdateRequest,
     EscalationItem,
+    GovernanceOutcomes,
+    TimeBasedAnalytics,
 )
 
 __all__ = [

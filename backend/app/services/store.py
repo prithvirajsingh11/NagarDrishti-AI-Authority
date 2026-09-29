@@ -35,6 +35,8 @@ from ..models.schemas import (
     InternalNote,
     StatusUpdateRequestItem,
     EscalationItem,
+    GovernanceOutcomes,
+    TimeBasedAnalytics,
 )
 
 logger = logging.getLogger(__name__)
@@ -621,6 +623,14 @@ def calculate_department_performance(
             if c.department and (dept_name.lower() in c.department.lower() or c.department.lower() in dept_name.lower())
         ]
         total = len(dept_complaints)
+        assigned = sum(
+            1 for c in dept_complaints
+            if c.status == "ASSIGNED" or (c.assigned_to is not None and len(c.assigned_to.strip()) > 0)
+        )
+        active_workload = sum(
+            1 for c in dept_complaints
+            if c.status in ("REPORTED", "ASSIGNED", "IN_PROGRESS", "REOPENED") or c.citizen_reopened is True
+        )
         pending = sum(1 for c in dept_complaints if c.status == "REPORTED")
         in_progress = sum(1 for c in dept_complaints if c.status in ("ASSIGNED", "IN_PROGRESS"))
         resolved = sum(1 for c in dept_complaints if c.status == "RESOLVED")
@@ -647,6 +657,8 @@ def calculate_department_performance(
         perf_list.append(DepartmentPerformance(
             department=dept_name,
             total=total,
+            assigned=assigned,
+            active_workload=active_workload,
             pending=pending,
             in_progress=in_progress,
             resolved=resolved,
@@ -784,6 +796,171 @@ def calculate_daily_trends(complaints: List[Complaint]) -> List[DailyTrendPoint]
             count=day_counts[key]
         ))
     return trends
+
+
+def calculate_governance_outcomes(
+    complaints: List[Complaint],
+    escalations_count: int = 0,
+) -> GovernanceOutcomes:
+    """
+    Computes evidence-based municipal governance outcomes from actual complaint records.
+    Never invents numbers; uses 'Insufficient data' labels when baseline is missing.
+    """
+    total = len(complaints)
+    active = sum(1 for c in complaints if c.status in ("REPORTED", "ASSIGNED", "IN_PROGRESS", "REOPENED") or c.citizen_reopened is True)
+    resolved = sum(1 for c in complaints if c.status == "RESOLVED")
+    reopened = sum(
+        1 for c in complaints
+        if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+    )
+    pending_verif = sum(
+        1 for c in complaints
+        if c.status == "RESOLVED" and (
+            c.citizen_verification_status == "PENDING"
+            or (c.citizen_resolution_confirmed is None and not c.citizen_reopened)
+        )
+    )
+
+    # Resolution rate
+    if total > 0:
+        res_rate = round((resolved / total * 100.0), 1)
+        res_label = f"{res_rate}%"
+    else:
+        res_rate = None
+        res_label = "Insufficient data"
+
+    # Average response time: time between created_at and earliest operational action (assigned_at or status change)
+    response_durations: List[float] = []
+    for c in complaints:
+        if not c.created_at:
+            continue
+        try:
+            c_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+            earliest_action_dt = None
+
+            if c.assigned_at:
+                earliest_action_dt = datetime.fromisoformat(c.assigned_at.replace("Z", "+00:00"))
+
+            for h in (c.status_history or []):
+                if h.status in ("ASSIGNED", "IN_PROGRESS", "INTERNAL_NOTE", "STATUS_REQUEST_ACKNOWLEDGED") and h.timestamp:
+                    try:
+                        h_dt = datetime.fromisoformat(h.timestamp.replace("Z", "+00:00"))
+                        if earliest_action_dt is None or h_dt < earliest_action_dt:
+                            earliest_action_dt = h_dt
+                    except Exception:
+                        pass
+
+            if earliest_action_dt:
+                diff_h = (earliest_action_dt - c_dt).total_seconds() / 3600.0
+                if diff_h >= 0:
+                    response_durations.append(diff_h)
+        except Exception:
+            pass
+
+    if response_durations:
+        avg_resp_h = round(sum(response_durations) / len(response_durations), 1)
+        resp_label = f"{avg_resp_h}h avg response"
+    else:
+        avg_resp_h = None
+        resp_label = "Insufficient data"
+
+    # Average resolution turnaround: time between created_at and resolved_at for resolved complaints
+    resolution_durations: List[float] = []
+    for c in complaints:
+        if c.status == "RESOLVED" and c.resolved_at and c.created_at:
+            try:
+                c_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                r_dt = datetime.fromisoformat(c.resolved_at.replace("Z", "+00:00"))
+                diff_h = (r_dt - c_dt).total_seconds() / 3600.0
+                if diff_h >= 0:
+                    resolution_durations.append(diff_h)
+            except Exception:
+                pass
+
+    if resolution_durations:
+        avg_res_h = round(sum(resolution_durations) / len(resolution_durations), 1)
+        res_turnaround_label = f"{avg_res_h}h avg turnaround"
+    else:
+        avg_res_h = None
+        res_turnaround_label = "Insufficient data (no resolved complaints in period)"
+
+    return GovernanceOutcomes(
+        total_complaints=total,
+        active_complaints=active,
+        resolved_complaints=resolved,
+        reopened_complaints=reopened,
+        resolution_rate_pct=res_rate,
+        avg_response_hours=avg_resp_h,
+        avg_resolution_hours=avg_res_h,
+        pending_citizen_verification=pending_verif,
+        escalated_cases=escalations_count,
+        resolution_rate_label=res_label,
+        response_time_label=resp_label,
+        resolution_time_label=res_turnaround_label,
+    )
+
+
+def calculate_time_analytics(complaints: List[Complaint]) -> TimeBasedAnalytics:
+    """
+    Computes lightweight time-series volume curves for received, resolved, and reopened cases
+    across 7 days using actual timestamps.
+    """
+    now_utc = datetime.now(timezone.utc)
+    day_keys = [(now_utc - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(6, -1, -1)]
+    day_labels = {k: datetime.fromisoformat(k).strftime("%a") for k in day_keys}
+
+    rcv_counts = {k: 0 for k in day_keys}
+    res_counts = {k: 0 for k in day_keys}
+    reopen_counts = {k: 0 for k in day_keys}
+
+    for c in complaints:
+        # Received
+        if c.created_at:
+            try:
+                k = datetime.fromisoformat(c.created_at.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                if k in rcv_counts:
+                    rcv_counts[k] += 1
+            except Exception:
+                pass
+
+        # Resolved
+        if c.status == "RESOLVED" and c.resolved_at:
+            try:
+                k = datetime.fromisoformat(c.resolved_at.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                if k in res_counts:
+                    res_counts[k] += 1
+            except Exception:
+                pass
+
+        # Reopened
+        reopen_ts = c.citizen_reopened_at or c.reopened_at
+        if (c.status == "REOPENED" or c.citizen_reopened is True) and reopen_ts:
+            try:
+                k = datetime.fromisoformat(reopen_ts.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                if k in reopen_counts:
+                    reopen_counts[k] += 1
+            except Exception:
+                pass
+
+    received_over_time = [
+        DailyTrendPoint(date=k, day_label=day_labels[k], count=rcv_counts[k]) for k in day_keys
+    ]
+    resolved_over_time = [
+        DailyTrendPoint(date=k, day_label=day_labels[k], count=res_counts[k]) for k in day_keys
+    ]
+    reopened_over_time = [
+        DailyTrendPoint(date=k, day_label=day_labels[k], count=reopen_counts[k]) for k in day_keys
+    ]
+
+    outcomes = calculate_governance_outcomes(complaints, 0)
+
+    return TimeBasedAnalytics(
+        received_over_time=received_over_time,
+        resolved_over_time=resolved_over_time,
+        reopened_over_time=reopened_over_time,
+        avg_response_hours=outcomes.avg_response_hours,
+        avg_resolution_hours=outcomes.avg_resolution_hours,
+    )
 
 
 class CivicDataStore:
@@ -1452,6 +1629,8 @@ class CivicDataStore:
         department: Optional[str] = None,
         resolution_status: Optional[str] = None,
         priority_level: Optional[str] = None,
+        aging: Optional[str] = None,
+        is_reopened: Optional[bool] = None,
         limit: Optional[int] = None,
     ) -> List[Complaint]:
         self._check_auto_reload()
@@ -1476,6 +1655,37 @@ class CivicDataStore:
             results = [c for c in results if department.lower() in c.department.lower()]
         if priority_level:
             results = [c for c in results if (c.priority_level or "").upper() == priority_level.upper()]
+        if is_reopened is not None:
+            if is_reopened:
+                results = [
+                    c for c in results
+                    if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+                ]
+            else:
+                results = [
+                    c for c in results
+                    if not (c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED")
+                ]
+        if aging:
+            ag = aging.lower().strip()
+            def _get_age_days(c: Complaint) -> float:
+                if not c.created_at:
+                    return 0.0
+                try:
+                    c_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                    return max(0.0, (now_utc - c_dt).total_seconds() / 86400.0)
+                except Exception:
+                    return 0.0
+
+            if ag in ("0-24h", "24h", "0-1d"):
+                results = [c for c in results if _get_age_days(c) < 1.0]
+            elif ag in ("1-3d", "3d"):
+                results = [c for c in results if 1.0 <= _get_age_days(c) < 3.0]
+            elif ag in ("3-7d", "7d"):
+                results = [c for c in results if 3.0 <= _get_age_days(c) < 7.0]
+            elif ag in ("7+d", "7d+", "critical"):
+                results = [c for c in results if _get_age_days(c) >= 7.0]
+
         if resolution_status:
             rs = resolution_status.lower().strip()
             if rs in ("pending_resolution", "pending-resolution", "unresolved"):
@@ -1885,6 +2095,8 @@ class CivicDataStore:
             aging_analysis=aging_analysis,
             department_performance=department_performance,
             category_trends=category_trends,
+            governance_outcomes=calculate_governance_outcomes(self.complaints, len(self.get_escalations())),
+            time_analytics=calculate_time_analytics(self.complaints),
         )
 
     def get_priority_actions(self, limit: int = 10) -> List[Complaint]:
@@ -1902,6 +2114,14 @@ class CivicDataStore:
     def get_category_trends(self) -> List[CategoryTrend]:
         stats = self.get_statistics()
         return stats.category_trends
+
+    def get_governance_outcomes(self) -> GovernanceOutcomes:
+        self._check_auto_reload()
+        return calculate_governance_outcomes(self.complaints, len(self.get_escalations()))
+
+    def get_time_analytics(self) -> TimeBasedAnalytics:
+        self._check_auto_reload()
+        return calculate_time_analytics(self.complaints)
 
     def assign_complaint(
         self,

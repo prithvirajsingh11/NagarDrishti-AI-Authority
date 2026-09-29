@@ -149,8 +149,11 @@ class TestPhase7Operations(unittest.TestCase):
         self.assertEqual(req_data["citizen_message"], req_payload["citizen_message"])
         self.assertFalse(req_data["citizen_notified"])
 
-        # Verify request appears in dashboard status-requests queue
-        queue_resp = self.client.get("/api/dashboard/status-requests?state=OPEN")
+        # Verify request appears in dashboard status-requests queue (requires authority)
+        queue_resp = self.client.get(
+            "/api/dashboard/status-requests?state=OPEN",
+            headers={"Authorization": "Bearer test-authority-token"}
+        )
         self.assertEqual(queue_resp.status_code, 200)
         open_requests = queue_resp.json()
         req_ids = [r["id"] for r in open_requests]
@@ -181,7 +184,10 @@ class TestPhase7Operations(unittest.TestCase):
 
     def test_04_escalation_center_intelligence_and_explicit_reasons(self):
         """Escalation center surfaces complaints with transparent, explicit reasons."""
-        escalations_resp = self.client.get("/api/dashboard/escalations")
+        escalations_resp = self.client.get(
+            "/api/dashboard/escalations",
+            headers={"Authorization": "Bearer test-authority-token"}
+        )
         self.assertEqual(escalations_resp.status_code, 200)
         escalations = escalations_resp.json()
 

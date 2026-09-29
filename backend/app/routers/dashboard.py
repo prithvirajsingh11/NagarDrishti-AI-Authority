@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from ..models.schemas import (
     DashboardStatistics,
     HeatmapPoint,
@@ -9,8 +9,11 @@ from ..models.schemas import (
     CategoryTrend,
     EscalationItem,
     StatusUpdateRequestItem,
+    GovernanceOutcomes,
+    TimeBasedAnalytics,
 )
 from ..services.store import data_store
+from ..auth import require_authority
 
 router = APIRouter(prefix="/api/dashboard", tags=["Dashboard"])
 
@@ -51,22 +54,35 @@ def get_category_trends():
     return data_store.get_category_trends()
 
 
+@router.get("/governance-outcomes", response_model=GovernanceOutcomes)
+def get_governance_outcomes():
+    """Retrieve municipal governance outcome KPIs derived strictly from real complaint records."""
+    return data_store.get_governance_outcomes()
+
+
+@router.get("/time-analytics", response_model=TimeBasedAnalytics)
+def get_time_analytics():
+    """Retrieve time-based volume curves and response/resolution turnaround averages."""
+    return data_store.get_time_analytics()
+
+
 @router.get("/escalations", response_model=List[EscalationItem])
-def get_escalations():
-    """Retrieve operational complaints escalated for urgent intervention with explicit reasons."""
+def get_escalations(current_user: dict = Depends(require_authority)):
+    """Retrieve operational complaints escalated for urgent intervention with explicit reasons. Authority only."""
     return data_store.get_escalations()
 
 
 @router.get("/status-requests", response_model=List[StatusUpdateRequestItem])
 def get_status_update_requests(
     state: Optional[str] = Query(None, description="Filter by state (OPEN, ACKNOWLEDGED, RESOLVED)"),
+    current_user: dict = Depends(require_authority),
 ):
-    """Retrieve citizen status update requests queue."""
+    """Retrieve citizen status update requests queue. Authority only."""
     return data_store.list_status_update_requests(state=state)
 
 
 @router.post("/reset-demo", response_model=Dict[str, Any])
-def reset_demo_dataset():
-    """Reset municipal complaint store back to pristine sample demonstration state."""
+def reset_demo_dataset(current_user: dict = Depends(require_authority)):
+    """Reset municipal complaint store back to pristine sample demonstration state. Authority only."""
     return data_store.reset_demo()
 

@@ -10,6 +10,9 @@ import {
   TrendingUp,
   BarChart3,
   Zap,
+  Download,
+  ShieldCheck,
+  Info,
 } from 'lucide-react';
 import {
   Area,
@@ -30,8 +33,15 @@ import type {
   HeatmapPoint,
   HotspotInfo,
   EscalationItem,
+  GovernanceOutcomes,
+  TimeBasedAnalytics,
 } from '../types/complaint';
-import { getEscalations } from '../services/api';
+import {
+  getEscalations,
+  getGovernanceOutcomes,
+  getTimeAnalytics,
+  downloadComplaintsCsv,
+} from '../services/api';
 import { LeafletMap, type MapMode } from '../components/LeafletMap';
 import { FilterBar } from '../components/FilterBar';
 import { ProblemIcon, getProblemLabel } from '../components/ProblemIcon';
@@ -144,6 +154,67 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       active = false;
     };
   }, [complaints, stats]);
+
+  // Phase 8 Governance Reporting & Outcome Intelligence State
+  const [govOutcomes, setGovOutcomes] = React.useState<GovernanceOutcomes | null>(
+    stats?.governance_outcomes || null
+  );
+  const [timeAnalytics, setTimeAnalytics] = React.useState<TimeBasedAnalytics | null>(
+    stats?.time_analytics || null
+  );
+  const [timeMetricView, setTimeMetricView] = React.useState<'received' | 'resolved' | 'reopened'>('received');
+  const [isExportingCsv, setIsExportingCsv] = React.useState(false);
+  const [exportNotice, setExportNotice] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  React.useEffect(() => {
+    if (stats?.governance_outcomes) setGovOutcomes(stats.governance_outcomes);
+    if (stats?.time_analytics) setTimeAnalytics(stats.time_analytics);
+  }, [stats]);
+
+  React.useEffect(() => {
+    let active = true;
+    if (!stats?.governance_outcomes) {
+      getGovernanceOutcomes()
+        .then((data) => {
+          if (active && data) setGovOutcomes(data);
+        })
+        .catch(() => {});
+    }
+    if (!stats?.time_analytics) {
+      getTimeAnalytics()
+        .then((data) => {
+          if (active && data) setTimeAnalytics(data);
+        })
+        .catch(() => {});
+    }
+    return () => {
+      active = false;
+    };
+  }, [stats, complaints]);
+
+  const handleExportCsv = async () => {
+    setIsExportingCsv(true);
+    setExportNotice(null);
+    try {
+      await downloadComplaintsCsv({
+        problem_type: categoryFilter || undefined,
+        severity: severityFilter || undefined,
+        status: statusFilter || undefined,
+        department: departmentFilter || undefined,
+        resolution_status: resolutionStatusFilter || undefined,
+        priority_level: priorityLevelFilter || undefined,
+      });
+      setExportNotice({ type: 'success', message: 'Complaint records exported successfully.' });
+      setTimeout(() => setExportNotice(null), 4000);
+    } catch (err: any) {
+      setExportNotice({
+        type: 'error',
+        message: err.message || 'Failed to export CSV. Authority privileges required.',
+      });
+    } finally {
+      setIsExportingCsv(false);
+    }
+  };
 
   // Derived escalations if API not yet populated or offline
   const displayedEscalations = React.useMemo(() => {
@@ -272,8 +343,82 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
     lineStroke: isDark ? '#60a5fa' : '#2563eb',
   };
 
+  const activeTimePoints = React.useMemo(() => {
+    if (!timeAnalytics) return trendData.map((d) => ({ ...d, day_label: d.day_label || d.date.slice(5) }));
+    if (timeMetricView === 'resolved') return timeAnalytics.resolved_over_time;
+    if (timeMetricView === 'reopened') return timeAnalytics.reopened_over_time;
+    return timeAnalytics.received_over_time;
+  }, [timeAnalytics, timeMetricView, trendData]);
+
+  const activeCurveColor = timeMetricView === 'resolved'
+    ? (isDark ? '#34d399' : '#059669')
+    : timeMetricView === 'reopened'
+    ? (isDark ? '#f87171' : '#e11d48')
+    : (isDark ? '#60a5fa' : '#2563eb');
+
   return (
     <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-7xl mx-auto transition-colors">
+      {/* Export Notification Banner */}
+      {exportNotice && (
+        <div
+          className={`p-3 rounded-2xl flex items-center justify-between text-xs font-medium border animate-in fade-in ${
+            exportNotice.type === 'success'
+              ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
+              : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200'
+          }`}
+        >
+          <span>{exportNotice.message}</span>
+          <button
+            onClick={() => setExportNotice(null)}
+            className="text-[10px] font-bold uppercase underline cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Phase 8: Hackathon Civic Lifecycle Pipeline Ribbon */}
+      <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3.5 shadow-2xs">
+        <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+              NagarDrishti Civic Lifecycle Pipeline
+            </h4>
+          </div>
+          <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
+            Intake → AI Vision → GIS → Priority → Dispatch → Evidence → Citizen Sign-off
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] font-semibold py-1">
+          {[
+            { step: '1', title: 'Citizen Reports', desc: 'Direct Intake' },
+            { step: '2', title: 'AI Classification', desc: 'Gemini Vision' },
+            { step: '3', title: 'Geographic Intelligence', desc: 'GIS Clustering' },
+            { step: '4', title: 'Priority', desc: 'Deterministic Index' },
+            { step: '5', title: 'Assignment', desc: 'Department Dispatch' },
+            { step: '6', title: 'Action', desc: 'Field Execution' },
+            { step: '7', title: 'Resolution', desc: 'Evidence Upload' },
+            { step: '8', title: 'Citizen Verification', desc: 'Close / Reopen' },
+          ].map((item, idx, arr) => (
+            <React.Fragment key={item.step}>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-slate-800 dark:text-slate-200 shrink-0">
+                <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex items-center justify-center font-mono">
+                  #{item.step}
+                </span>
+                <div>
+                  <div className="leading-tight">{item.title}</div>
+                  <div className="text-[9px] text-slate-400 font-normal leading-none">{item.desc}</div>
+                </div>
+              </div>
+              {idx < arr.length - 1 && (
+                <ArrowRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700 shrink-0" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
       {/* High-Visibility Reopened Alert Indicator */}
       {(stats?.reopened ?? 0) > 0 && (
         <div
@@ -433,6 +578,141 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       </div>
 
+      {/* Phase 8: Governance Outcome Intelligence */}
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/60">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                  Governance Outcomes & Performance Intelligence
+                </h3>
+                <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
+                  Evidence-Based
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Municipal service deliverables computed directly from logged civic incidents. Zero speculative data.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCsv}
+              disabled={isExportingCsv}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+              title="Export complaint dataset respecting current filters"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>{isExportingCsv ? 'Exporting...' : 'Export Filtered CSV'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 9 Outcomes Metrics Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {/* Total Complaints */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Total Complaints</span>
+            <p className="text-2xl font-bold font-mono text-slate-900 dark:text-slate-100">
+              {govOutcomes?.total_complaints ?? totalReportsCount}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Logged authority records</span>
+          </div>
+
+          {/* Active Workload */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400 tracking-wider">Active Workload</span>
+            <p className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
+              {govOutcomes?.active_complaints ?? ((stats?.pending ?? 0) + (stats?.in_progress ?? 0))}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Field action underway</span>
+          </div>
+
+          {/* Resolved */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Resolved</span>
+            <p className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+              {govOutcomes?.resolved_complaints ?? stats?.resolved ?? 0}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Rectified with evidence</span>
+          </div>
+
+          {/* Reopened */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400 tracking-wider">Reopened</span>
+            <p className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+              {govOutcomes?.reopened_complaints ?? stats?.reopened ?? 0}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Citizen contested resolution</span>
+          </div>
+
+          {/* Resolution Rate */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-blue-700 dark:text-blue-400 tracking-wider">Resolution Rate</span>
+            <p className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
+              {govOutcomes?.resolution_rate_pct != null
+                ? `${govOutcomes.resolution_rate_pct}% rate`
+                : <span className="text-xs font-normal text-slate-400">Insufficient sample</span>}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Resolved / Total</span>
+          </div>
+
+          {/* Average Response Time */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-indigo-700 dark:text-indigo-400 tracking-wider">Avg Response Time</span>
+            <p className="text-2xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
+              {govOutcomes?.avg_response_hours != null
+                ? `${govOutcomes.avg_response_hours}h avg`
+                : <span className="text-xs font-normal text-slate-400">Insufficient records</span>}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Intake to initial action</span>
+          </div>
+
+          {/* Average Resolution Turnaround */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-teal-700 dark:text-teal-400 tracking-wider">Avg Resolution Time</span>
+            <p className="text-2xl font-bold font-mono text-teal-600 dark:text-teal-400">
+              {govOutcomes?.avg_resolution_hours != null
+                ? `${govOutcomes.avg_resolution_hours}h avg`
+                : <span className="text-xs font-normal text-slate-400">No resolved cases</span>}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Intake to resolution</span>
+          </div>
+
+          {/* Pending Citizen Verification */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-purple-700 dark:text-purple-400 tracking-wider">Pending Verification</span>
+            <p className="text-2xl font-bold font-mono text-purple-600 dark:text-purple-400">
+              {govOutcomes?.pending_citizen_verification ?? stats?.awaiting_verification ?? 0} cases
+            </p>
+            <span className="text-[10px] text-slate-400 block">Awaiting citizen sign-off</span>
+          </div>
+
+          {/* Escalated Cases */}
+          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1 sm:col-span-2 lg:col-span-2">
+            <span className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400 tracking-wider">Escalated Cases</span>
+            <p className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
+              {govOutcomes?.escalated_cases ?? displayedEscalations.length}
+            </p>
+            <span className="text-[10px] text-slate-400 block">Priority breaches, repeat flags, or citizen status queries</span>
+          </div>
+        </div>
+
+        {/* Data Quality & Trust Indicator Footnote */}
+        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-600 dark:text-slate-400">
+          <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+          <span>
+            <strong>Data Integrity Standard:</strong> All municipal governance metrics are computed strictly from real timestamped complaints.
+            When incident sample sizes are zero in a category or period, "Insufficient data" is explicitly stated rather than artificial numbers.
+          </span>
+        </div>
+      </div>
+
       {/* Master Filter Bar */}
       <FilterBar
         category={categoryFilter}
@@ -453,6 +733,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         onSearchChange={onSearchQueryChange}
         departments={departments}
         onResetFilters={onResetFilters}
+        onExportCsv={handleExportCsv}
+        isExporting={isExportingCsv}
       />
 
       {/* Main Map (Dominant Visual Element) */}
@@ -788,9 +1070,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
               Department Performance
             </h3>
+            <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">• Workload & Operational Capacity</span>
           </div>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
-            Click Department to Filter Queue
+            Operational Visibility • Click to Filter
           </span>
         </div>
 
@@ -800,11 +1083,12 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider">
                 <th className="pb-2.5 font-semibold">Department</th>
                 <th className="pb-2.5 font-semibold text-center">Total</th>
+                <th className="pb-2.5 font-semibold text-center">Assigned</th>
+                <th className="pb-2.5 font-semibold text-center">Active Workload</th>
                 <th className="pb-2.5 font-semibold text-center">Pending</th>
-                <th className="pb-2.5 font-semibold text-center">In Progress</th>
                 <th className="pb-2.5 font-semibold text-center">Resolved</th>
                 <th className="pb-2.5 font-semibold text-center">Reopened</th>
-                <th className="pb-2.5 font-semibold">Avg Resolution</th>
+                <th className="pb-2.5 font-semibold">Avg Turnaround</th>
                 <th className="pb-2.5 font-semibold">Resolution Rate</th>
               </tr>
             </thead>
@@ -824,14 +1108,21 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                       <span>{dp.department}</span>
                     </td>
                     <td className="py-2.5 font-mono text-center font-semibold">{dp.total}</td>
-                    <td className="py-2.5 font-mono text-center text-amber-600 font-semibold">{dp.pending}</td>
-                    <td className="py-2.5 font-mono text-center text-sky-600 font-semibold">{dp.in_progress}</td>
+                    <td className="py-2.5 font-mono text-center text-blue-600 font-semibold">
+                      {dp.assigned ?? (dp.pending + dp.in_progress)}
+                    </td>
+                    <td className="py-2.5 font-mono text-center text-amber-600 font-semibold">
+                      {dp.active_workload ?? (dp.pending + dp.in_progress + dp.reopened)}
+                    </td>
+                    <td className="py-2.5 font-mono text-center text-slate-600 dark:text-slate-400">{dp.pending}</td>
                     <td className="py-2.5 font-mono text-center text-emerald-600 font-semibold">{dp.resolved}</td>
                     <td className="py-2.5 font-mono text-center text-rose-600 font-semibold">{dp.reopened}</td>
                     <td className="py-2.5 font-mono text-slate-600 dark:text-slate-400">
-                      {dp.avg_resolution_hours !== null && dp.avg_resolution_hours !== undefined
-                        ? `${dp.avg_resolution_hours}h`
-                        : 'N/A'}
+                      {dp.avg_resolution_hours !== null && dp.avg_resolution_hours !== undefined ? (
+                        `${dp.avg_resolution_hours}h`
+                      ) : (
+                        <span className="text-[11px] text-slate-400 italic">Unavailable (no resolved cases)</span>
+                      )}
                     </td>
                     <td className="py-2.5">
                       <div className="flex items-center gap-2 min-w-[120px]">
@@ -850,7 +1141,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="py-6 text-center text-slate-400">
+                  <td colSpan={9} className="py-6 text-center text-slate-400">
                     No department data logged.
                   </td>
                 </tr>
@@ -1076,32 +1367,70 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
         </div>
 
-        {/* 14-day Resolution Trend */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                14-Day Velocity & Volume Trend
-              </h3>
+        {/* Phase 8 Time-Based Analytics */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                  Time-Based Operational Analytics
+                </h3>
+              </div>
+              <div className="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-0.5 text-xs">
+                {[
+                  { key: 'received', label: 'Received' },
+                  { key: 'resolved', label: 'Resolved' },
+                  { key: 'reopened', label: 'Reopened' },
+                ].map((t) => (
+                  <button
+                    key={t.key}
+                    onClick={() => setTimeMetricView(t.key as any)}
+                    className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all cursor-pointer ${
+                      timeMetricView === t.key
+                        ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 shadow-2xs font-bold'
+                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-wider font-semibold">
-              Daily Count
-            </span>
+
+            {/* Turnaround Quick Indicators */}
+            <div className="grid grid-cols-2 gap-2 mt-3 mb-2">
+              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80 text-[11px]">
+                <span className="text-slate-500 text-[10px] uppercase font-bold block">Avg Response Time</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+                  {timeAnalytics?.avg_response_hours != null
+                    ? `${timeAnalytics.avg_response_hours}h`
+                    : <span className="text-slate-400 font-normal">Awaiting response records</span>}
+                </span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80 text-[11px]">
+                <span className="text-slate-500 text-[10px] uppercase font-bold block">Avg Resolution Turnaround</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
+                  {timeAnalytics?.avg_resolution_hours != null
+                    ? `${timeAnalytics.avg_resolution_hours}h`
+                    : <span className="text-slate-400 font-normal">No resolved cases</span>}
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="h-56 mt-4">
-            {trendData.length > 0 ? (
+          <div className="h-44 mt-2">
+            {activeTimePoints.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={activeTimePoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="trendGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={chartTheme.lineStroke} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={chartTheme.lineStroke} stopOpacity={0} />
+                    <linearGradient id="timeCurveGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={activeCurveColor} stopOpacity={0.35} />
+                      <stop offset="95%" stopColor={activeCurveColor} stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} vertical={false} />
-                  <XAxis dataKey="date" stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="day_label" stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} />
                   <YAxis stroke={chartTheme.tick} fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
@@ -1112,20 +1441,24 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                       fontSize: '0.75rem',
                       boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
                     }}
+                    labelFormatter={(val, items) => {
+                      const item = items[0]?.payload;
+                      return item?.date ? `${val} (${item.date})` : val;
+                    }}
                   />
                   <Area
                     type="monotone"
                     dataKey="count"
-                    stroke={chartTheme.lineStroke}
+                    stroke={activeCurveColor}
                     strokeWidth={2}
                     fillOpacity={1}
-                    fill="url(#trendGradient)"
+                    fill="url(#timeCurveGradient)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center text-slate-400 text-xs">
-                No recent activity recorded.
+                No time-series data recorded for selected view.
               </div>
             )}
           </div>

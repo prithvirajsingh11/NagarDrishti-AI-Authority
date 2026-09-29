@@ -1,8 +1,11 @@
+import csv
+import io
 import logging
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Depends
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Depends, Response
 
 from ..models.schemas import (
     Complaint,
@@ -19,7 +22,7 @@ from ..models.schemas import (
     AcknowledgeStatusRequest,
 )
 from ..services.store import data_store
-from ..auth import require_authority, verify_token
+from ..auth import require_authority, verify_token, get_current_user_optional
 from ..config import UPLOAD_DIR, STORAGE_BUCKET
 
 logger = logging.getLogger(__name__)
@@ -35,18 +38,27 @@ def get_complaints(
     department: Optional[str] = Query(None, description="Filter by department name substring"),
     resolution_status: Optional[str] = Query(None, description="Filter by resolution status"),
     priority_level: Optional[str] = Query(None, description="Filter by priority level (CRITICAL, HIGH, MEDIUM, LOW)"),
+    aging: Optional[str] = Query(None, description="Filter by aging bucket (0-24h, 1-3d, 3-7d, 7+d)"),
+    is_reopened: Optional[bool] = Query(None, description="Filter by citizen reopened flag"),
     limit: Optional[int] = Query(None, description="Limit number of returned records"),
+    current_user: Optional[dict] = Depends(get_current_user_optional),
 ):
-    """Retrieve filtered civic complaint records for authority triage."""
-    return data_store.list_complaints(
+    """Retrieve filtered civic complaint records for authority triage. Internal notes stripped for non-authority callers."""
+    records = data_store.list_complaints(
         problem_type=problem_type,
         severity=severity,
         status=status,
         department=department,
         resolution_status=resolution_status,
         priority_level=priority_level,
+        aging=aging,
+        is_reopened=is_reopened,
         limit=limit,
     )
+    is_authority = bool(current_user and current_user.get("role") == "authority")
+    if not is_authority:
+        return [c.model_copy(update={"internal_notes": []}) if c.internal_notes else c for c in records]
+    return records
 
 
 @router.post("/upload-resolution-evidence")
@@ -98,12 +110,105 @@ async def upload_resolution_evidence(
     }
 
 
+@router.get("/export")
+def export_complaints_csv(
+    problem_type: Optional[str] = Query(None, description="Filter by problem type"),
+    severity: Optional[str] = Query(None, description="Filter by severity"),
+    status: Optional[str] = Query(None, description="Filter by status"),
+    department: Optional[str] = Query(None, description="Filter by department"),
+    resolution_status: Optional[str] = Query(None, description="Filter by resolution status"),
+    priority_level: Optional[str] = Query(None, description="Filter by priority level"),
+    aging: Optional[str] = Query(None, description="Filter by aging bucket"),
+    is_reopened: Optional[bool] = Query(None, description="Filter by reopened status"),
+    limit: Optional[int] = Query(None, description="Limit number of exported records"),
+    current_user: dict = Depends(require_authority),
+):
+    """Export filtered complaint records as CSV for authenticated authority operations. Never exposes internal notes."""
+    complaints = data_store.list_complaints(
+        problem_type=problem_type,
+        severity=severity,
+        status=status,
+        department=department,
+        resolution_status=resolution_status,
+        priority_level=priority_level,
+        aging=aging,
+        is_reopened=is_reopened,
+        limit=limit,
+    )
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "Report ID",
+        "Category",
+        "Severity",
+        "Status",
+        "Priority Level",
+        "Priority Score",
+        "Department",
+        "Assigned Officer/Team",
+        "Assigned At",
+        "Location",
+        "Latitude",
+        "Longitude",
+        "Created At",
+        "Updated At",
+        "Resolved At",
+        "Reopened",
+        "Reopen Reason",
+        "Citizen Verification Status",
+        "Description",
+    ])
+
+    for c in complaints:
+        writer.writerow([
+            c.report_id or c.id,
+            c.problem_type or "",
+            c.severity or "",
+            c.status or "",
+            c.priority_level or "",
+            c.priority_score if c.priority_score is not None else "",
+            c.department or "",
+            c.assigned_to or "Unassigned",
+            c.assigned_at or "",
+            c.location_name or "",
+            c.latitude if c.latitude is not None else "",
+            c.longitude if c.longitude is not None else "",
+            c.created_at or "",
+            c.updated_at or "",
+            c.resolved_at or "",
+            "YES" if (c.status == "REOPENED" or c.citizen_reopened) else "NO",
+            c.reopen_reason or "",
+            c.citizen_verification_status or "NONE",
+            c.description or "",
+        ])
+
+    csv_data = output.getvalue()
+    timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    filename = f"complaints_export_{timestamp_str}.csv"
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache",
+        },
+    )
+
+
 @router.get("/{complaint_id}", response_model=Complaint)
-def get_complaint(complaint_id: str):
-    """Inspect deep detail of a specific civic complaint by ID or Report ID."""
+def get_complaint(
+    complaint_id: str,
+    current_user: Optional[dict] = Depends(get_current_user_optional),
+):
+    """Inspect deep detail of a specific civic complaint by ID or Report ID. Internal notes stripped for non-authority callers."""
     complaint = data_store.get_complaint(complaint_id)
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found.")
+    is_authority = bool(current_user and current_user.get("role") == "authority")
+    if not is_authority and complaint.internal_notes:
+        return complaint.model_copy(update={"internal_notes": []})
     return complaint
 
 
