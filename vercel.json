@@ -37,9 +37,22 @@
       }
     },
     {
-      "source": "/(.*)",
+      "source": "/(assets|public)/(.*)",
       "destination": {
         "service": "frontend"
+      }
+    },
+    {
+      "source": "/(.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|json|txt|woff2?|ttf|eot))",
+      "destination": {
+        "service": "frontend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend",
+        "path": "/index.html"
       }
     }
   ]

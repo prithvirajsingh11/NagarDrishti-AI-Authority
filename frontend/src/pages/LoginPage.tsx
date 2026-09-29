@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Shield, Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { CITIZEN_PORTAL_URL } from '../services/api';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -167,7 +168,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
         {/* Back to Citizen Portal */}
         <div className="mt-6 text-center">
           <a
-            href="http://localhost:5173"
+            href={CITIZEN_PORTAL_URL}
             target="_blank"
             rel="noreferrer"
             className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"

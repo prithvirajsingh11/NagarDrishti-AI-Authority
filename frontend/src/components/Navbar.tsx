@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { CITIZEN_PORTAL_URL } from '../services/api';
 
 interface NavbarProps {
   title: string;
@@ -118,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Citizen Portal Link */}
         <a
-          href="http://localhost:5173"
+          href={CITIZEN_PORTAL_URL}
           target="_blank"
           rel="noreferrer"
           className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 hover:bg-slate-200/80 dark:bg-slate-900 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl transition-all shadow-2xs"

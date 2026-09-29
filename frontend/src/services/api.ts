@@ -26,6 +26,10 @@ export const SERVER_ORIGIN = envApiUrl.endsWith('/api')
   ? envApiUrl.slice(0, -4)
   : envApiUrl;
 
+export const CITIZEN_PORTAL_URL =
+  import.meta.env.VITE_CITIZEN_PORTAL_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5173' : 'https://nagar-drishit-ai.vercel.app');
+
 export interface AuthUserProfile {
   id: string;
   email: string;

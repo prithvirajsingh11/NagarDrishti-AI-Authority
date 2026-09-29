@@ -2,6 +2,7 @@ import React from 'react';
 import { ShieldAlert, ArrowLeft, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { CITIZEN_PORTAL_URL } from '../services/api';
 
 interface AccessDeniedPageProps {
   onBackToLogin: () => void;
@@ -76,7 +77,7 @@ export const AccessDeniedPage: React.FC<AccessDeniedPageProps> = ({ onBackToLogi
           </button>
 
           <a
-            href="http://localhost:5173"
+            href={CITIZEN_PORTAL_URL}
             target="_blank"
             rel="noreferrer"
             className="block text-xs text-blue-600 dark:text-blue-400 hover:underline transition-colors"
