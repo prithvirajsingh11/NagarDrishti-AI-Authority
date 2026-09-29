@@ -23,6 +23,7 @@ interface LeafletMapProps {
   onMapModeChange: (mode: MapMode) => void;
   onSelectComplaint: (complaint: Complaint) => void;
   focusedHotspot?: HotspotInfo | null;
+  hotspots?: HotspotInfo[];
   heightClass?: string;
   id?: string;
 }
@@ -34,6 +35,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   onMapModeChange,
   onSelectComplaint,
   focusedHotspot,
+  hotspots = [],
   heightClass = 'h-[460px]',
   id = 'city-map',
 }) => {
@@ -46,6 +48,11 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
 
   // Active tile layer mode state (normal / satellite / 3d)
   const [tileMode, setTileMode] = useState<TileLayerMode>('normal');
+
+  // Phase 6 Intelligence Overlay state
+  const [intelligenceOverlay, setIntelligenceOverlay] = useState<
+    'all' | 'priority' | 'reopened' | 'aging' | 'corridors'
+  >('all');
 
   // Geolocation & coordinate state
   const [coordinates, setCoordinates] = useState('');
@@ -234,8 +241,31 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       }
     };
 
+    // Filter complaints according to Phase 6 Intelligence Overlay
+    let displayedComplaints = complaints;
+    if (intelligenceOverlay === 'priority') {
+      displayedComplaints = complaints.filter(
+        (c) =>
+          c.priority_level === 'CRITICAL' ||
+          c.priority_level === 'HIGH' ||
+          (c.priority_score && c.priority_score >= 50) ||
+          ['CRITICAL', 'HIGH'].includes((c.severity || '').toUpperCase())
+      );
+    } else if (intelligenceOverlay === 'reopened') {
+      displayedComplaints = complaints.filter(
+        (c) => c.status === 'REOPENED' || c.citizen_reopened === true || c.citizen_verification_status === 'REOPENED'
+      );
+    } else if (intelligenceOverlay === 'aging') {
+      const now = Date.now();
+      displayedComplaints = complaints.filter((c) => {
+        if (c.status === 'RESOLVED') return false;
+        const ageHours = (now - new Date(c.created_at).getTime()) / (1000 * 3600);
+        return ageHours >= 72; // 3+ days
+      });
+    }
+
     if (mapMode === 'markers') {
-      complaints.forEach((c) => {
+      displayedComplaints.forEach((c) => {
         if (!c.latitude || !c.longitude) return;
 
         const isCritical = c.severity?.toUpperCase() === 'CRITICAL';
@@ -260,15 +290,18 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         }
 
         // Informative popup
+        const isReopened = c.status === 'REOPENED' || c.citizen_reopened === true;
         const popupContent = document.createElement('div');
         popupContent.className = 'p-3 text-xs space-y-1.5 font-sans min-w-[210px]';
         popupContent.innerHTML = `
           <div style="font-weight: 700; font-family: monospace; font-size: 12px; color: ${color};">${c.report_id}</div>
           <div style="font-size: 11px; opacity: 0.85; line-height: 1.3; font-weight: 500;">${c.location_name}</div>
           ${c.description ? `<div style="font-size: 11px; opacity: 0.7; margin-top: 2px;">${c.description.slice(0, 80)}${c.description.length > 80 ? '...' : ''}</div>` : ''}
-          <div style="display: flex; gap: 6px; margin-top: 6px; align-items: center;">
+          <div style="display: flex; gap: 4px; margin-top: 6px; align-items: center; flex-wrap: wrap;">
             <span style="background: ${color}18; color: ${color}; border: 1px solid ${color}35; padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 10px;">${c.severity}</span>
             <span style="background: ${theme === 'dark' ? '#1e293b' : '#f1f5f9'}; opacity: 0.85; padding: 1px 6px; border-radius: 4px; font-size: 10px; text-transform: capitalize;">${c.problem_type}</span>
+            ${c.priority_level ? `<span style="background: #f43f5e18; color: #f43f5e; border: 1px solid #f43f5e35; padding: 1px 5px; border-radius: 4px; font-weight: 700; font-size: 10px;">${c.priority_level}${c.priority_score ? ` (${Math.round(c.priority_score)})` : ''}</span>` : ''}
+            ${isReopened ? `<span style="background: #e11d48; color: #ffffff; padding: 1px 5px; border-radius: 4px; font-weight: 700; font-size: 10px;">⚠ Reopened</span>` : ''}
             <span style="font-size: 10px; opacity: 0.6; margin-left: auto;">${c.status}</span>
           </div>
         `;
@@ -308,7 +341,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
 
       const roundCoord = (coord: number) => Math.round(coord * 65) / 65;
 
-      complaints.forEach((c) => {
+      displayedComplaints.forEach((c) => {
         if (!c.latitude || !c.longitude) return;
         const key = `${roundCoord(c.latitude)}_${roundCoord(c.longitude)}`;
         if (!clusters[key]) {
@@ -425,7 +458,28 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         duration: 1.2,
       });
     }
-  }, [complaints, heatmapPoints, mapMode, focusedHotspot, theme]);
+
+    // Render all hotspot corridors when overlay is set to 'corridors'
+    if (intelligenceOverlay === 'corridors' && hotspots && hotspots.length > 0) {
+      hotspots.forEach((h) => {
+        if (!h.latitude || !h.longitude) return;
+        const circle = L.circle([h.latitude, h.longitude], {
+          radius: (h.radius_km || 1) * 1000,
+          fillColor: '#d97706',
+          color: '#f59e0b',
+          weight: 2,
+          dashArray: '5, 5',
+          fillOpacity: 0.15,
+        }).addTo(group);
+
+        circle.bindTooltip(`${h.title} (${h.total_reports} reports, ${h.unresolved_count} unresolved)`, {
+          permanent: false,
+          direction: 'top',
+          className: 'font-semibold text-xs',
+        });
+      });
+    }
+  }, [complaints, heatmapPoints, mapMode, focusedHotspot, hotspots, intelligenceOverlay, theme]);
 
   return (
     <div
@@ -467,6 +521,68 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
           >
             <Building2 className="w-3.5 h-3.5" />
             <span>3D Dark</span>
+          </button>
+        </div>
+
+        {/* Center: Phase 6 Intelligence Overlay */}
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto">
+          <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 px-1.5 select-none tracking-wider">
+            Overlay
+          </span>
+          <button
+            type="button"
+            onClick={() => setIntelligenceOverlay('all')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+              intelligenceOverlay === 'all'
+                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 font-semibold shadow-xs'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setIntelligenceOverlay('priority')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+              intelligenceOverlay === 'priority'
+                ? 'bg-rose-600 text-white font-semibold shadow-xs'
+                : 'text-rose-700 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+            }`}
+          >
+            Priority
+          </button>
+          <button
+            type="button"
+            onClick={() => setIntelligenceOverlay('reopened')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+              intelligenceOverlay === 'reopened'
+                ? 'bg-amber-600 text-white font-semibold shadow-xs'
+                : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
+            }`}
+          >
+            Reopened
+          </button>
+          <button
+            type="button"
+            onClick={() => setIntelligenceOverlay('aging')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+              intelligenceOverlay === 'aging'
+                ? 'bg-indigo-600 text-white font-semibold shadow-xs'
+                : 'text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40'
+            }`}
+          >
+            Aging (3d+)
+          </button>
+          <button
+            type="button"
+            onClick={() => setIntelligenceOverlay('corridors')}
+            className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
+              intelligenceOverlay === 'corridors'
+                ? 'bg-emerald-600 text-white font-semibold shadow-xs'
+                : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
+            }`}
+          >
+            Corridors
           </button>
         </div>
 

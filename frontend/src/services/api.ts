@@ -6,6 +6,12 @@ import type {
   Department,
   HeatmapPoint,
   HotspotInfo,
+  AgingAnalysis,
+  DepartmentPerformance,
+  CategoryTrend,
+  InternalNote,
+  StatusUpdateRequestItem,
+  EscalationItem,
 } from '../types/complaint';
 import { supabase } from './supabaseClient';
 
@@ -125,6 +131,7 @@ export async function getComplaints(filters?: {
   status?: string;
   department?: string;
   resolution_status?: string;
+  priority_level?: string;
   limit?: number;
 }): Promise<Complaint[]> {
   const params = new URLSearchParams();
@@ -133,6 +140,7 @@ export async function getComplaints(filters?: {
   if (filters?.status) params.append('status', filters.status);
   if (filters?.department) params.append('department', filters.department);
   if (filters?.resolution_status) params.append('resolution_status', filters.resolution_status);
+  if (filters?.priority_level) params.append('priority_level', filters.priority_level);
   if (filters?.limit) params.append('limit', filters.limit.toString());
 
   const url = `${API_BASE}/complaints${params.toString() ? '?' + params.toString() : ''}`;
@@ -273,3 +281,100 @@ export async function createComplaint(data: ComplaintCreate): Promise<Complaint>
 
   return res.json();
 }
+
+export async function getPriorityActions(): Promise<Complaint[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/priority-actions`, { headers });
+  return handleResponse<Complaint[]>(res, 'Failed to fetch priority actions.');
+}
+
+export async function getAgingAnalysis(): Promise<AgingAnalysis> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/aging`, { headers });
+  return handleResponse<AgingAnalysis>(res, 'Failed to fetch aging analysis.');
+}
+
+export async function getDepartmentPerformance(): Promise<DepartmentPerformance[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/departments`, { headers });
+  return handleResponse<DepartmentPerformance[]>(res, 'Failed to fetch department performance.');
+}
+
+export async function getCategoryTrends(): Promise<CategoryTrend[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/trends`, { headers });
+  return handleResponse<CategoryTrend[]>(res, 'Failed to fetch category trends.');
+}
+
+export async function assignComplaint(
+  id: string,
+  payload: { department: string; assigned_to: string; note?: string }
+): Promise<Complaint> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/assign`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<Complaint>(res, 'Failed to assign complaint.');
+}
+
+export async function addInternalNote(
+  id: string,
+  note: string
+): Promise<InternalNote> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/internal-notes`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ note }),
+  });
+  return handleResponse<InternalNote>(res, 'Failed to add internal note.');
+}
+
+export async function getInternalNotes(id: string): Promise<InternalNote[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/internal-notes`, { headers });
+  return handleResponse<InternalNote[]>(res, 'Failed to load internal notes.');
+}
+
+export async function createStatusUpdateRequest(
+  complaintId: string,
+  citizenMessage?: string
+): Promise<StatusUpdateRequestItem> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${complaintId}/status-request`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ citizen_message: citizenMessage }),
+  });
+  return handleResponse<StatusUpdateRequestItem>(res, 'Failed to submit status update request.');
+}
+
+export async function acknowledgeStatusUpdateRequest(
+  complaintId: string,
+  requestId: string,
+  responseNote?: string
+): Promise<StatusUpdateRequestItem> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${complaintId}/status-request/${requestId}/acknowledge`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ response_note: responseNote }),
+  });
+  return handleResponse<StatusUpdateRequestItem>(res, 'Failed to acknowledge status update request.');
+}
+
+export async function getEscalations(): Promise<EscalationItem[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/dashboard/escalations`, { headers });
+  return handleResponse<EscalationItem[]>(res, 'Failed to load escalations.');
+}
+
+export async function getStatusUpdateRequests(state?: string): Promise<StatusUpdateRequestItem[]> {
+  const headers = await getAuthHeaders();
+  const params = state ? `?state=${encodeURIComponent(state)}` : '';
+  const res = await fetch(`${API_BASE}/dashboard/status-requests${params}`, { headers });
+  return handleResponse<StatusUpdateRequestItem[]>(res, 'Failed to load status update requests.');
+}
+

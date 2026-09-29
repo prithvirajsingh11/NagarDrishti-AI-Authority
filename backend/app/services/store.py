@@ -5,7 +5,7 @@ import math
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 
 import httpx
 
@@ -27,6 +27,14 @@ from ..models.schemas import (
     HeatmapPoint,
     HotspotInfo,
     DailyTrendPoint,
+    AgingCategory,
+    AgingAnalysis,
+    DepartmentPerformance,
+    CategoryTrend,
+    AssignmentRecord,
+    InternalNote,
+    StatusUpdateRequestItem,
+    EscalationItem,
 )
 
 logger = logging.getLogger(__name__)
@@ -157,6 +165,30 @@ def parse_complaint_dict(item: Dict[str, Any]) -> Complaint:
                 parsed_history.append(h)
         data["status_history"] = parsed_history
 
+    if "assignment_history" in data and isinstance(data["assignment_history"], list):
+        data["assignment_history"] = [
+            AssignmentRecord(**ah) if isinstance(ah, dict) else ah
+            for ah in data["assignment_history"]
+        ]
+    else:
+        data["assignment_history"] = []
+
+    if "internal_notes" in data and isinstance(data["internal_notes"], list):
+        data["internal_notes"] = [
+            InternalNote(**note) if isinstance(note, dict) else note
+            for note in data["internal_notes"]
+        ]
+    else:
+        data["internal_notes"] = []
+
+    if "status_update_requests" in data and isinstance(data["status_update_requests"], list):
+        data["status_update_requests"] = [
+            StatusUpdateRequestItem(**sur) if isinstance(sur, dict) else sur
+            for sur in data["status_update_requests"]
+        ]
+    else:
+        data["status_update_requests"] = []
+
     return Complaint(**data)
 
 
@@ -250,8 +282,44 @@ def calculate_hotspots(complaints: List[Complaint]) -> List[HotspotInfo]:
         unresolved = sum(1 for r in reps if r.status != "RESOLVED")
         high_critical = sum(1 for r in reps if r.severity in ["HIGH", "CRITICAL"])
 
+        # Dominant department
+        dept_counts: Dict[str, int] = {}
+        for r in reps:
+            if r.department:
+                dept_counts[r.department] = dept_counts.get(r.department, 0) + 1
+        affected_dept = max(dept_counts, key=dept_counts.get) if dept_counts else "Municipal Works"
+
+        # Severity distribution
+        sev_dist = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
+        for r in reps:
+            sev = (r.severity or "MEDIUM").upper()
+            sev_dist[sev] = sev_dist.get(sev, 0) + 1
+
+        reopened_cnt = sum(
+            1 for r in reps
+            if r.status == "REOPENED" or r.citizen_reopened is True or r.citizen_verification_status == "REOPENED"
+        )
+
         title = title_map.get(dominant_cat, "MUNICIPAL CIVIC HOTSPOT")
-        action = action_map.get(dominant_cat, "Inspect affected municipal corridor")
+
+        # Deterministic suggested action based on real metrics
+        if dominant_cat == "pothole":
+            if unresolved >= 3:
+                action = f"Deploy emergency asphalt patching squad. {unresolved} unresolved potholes creating acute traffic hazard."
+            else:
+                action = "Schedule preventive road resurfacing inspection."
+        elif dominant_cat == "drain":
+            action = f"Desilt arterial stormwater lines and clear {unresolved} blocked intake gratings."
+        elif dominant_cat == "garbage":
+            action = f"Double municipal compactor rounds and inspect commercial dumping for {unresolved} waste piles."
+        elif dominant_cat == "streetlight":
+            action = f"Dispatch electrical repair crew to restore {unresolved} dark road fixtures."
+        else:
+            action = f"Conduct joint on-site inspection with local zonal officer for {unresolved} unresolved defects."
+
+        if reopened_cnt > 0:
+            action += f" Note: {reopened_cnt} incident(s) previously reopened by citizens — prioritize field re-inspection."
+
         radius_km = round(max(0.4, cl["max_dist_m"] / 1000.0), 1)
 
         recent_count = sum(1 for r in reps if r.created_at >= three_days_ago)
@@ -270,11 +338,417 @@ def calculate_hotspots(complaints: List[Complaint]) -> List[HotspotInfo]:
             longitude=round(cl["centroid_lng"], 5),
             radius_km=radius_km,
             repeated_count=repeated_count,
-            report_ids=[r.report_id for r in reps]
+            report_ids=[r.report_id for r in reps],
+            reopened_count=reopened_cnt,
+            affected_department=affected_dept,
+            severity_distribution=sev_dist,
         ))
 
     hotspot_list.sort(key=lambda h: h.total_reports, reverse=True)
     return hotspot_list
+
+
+def compute_priority(
+    complaint: Complaint,
+    all_complaints: List[Complaint],
+    now_utc: Optional[datetime] = None,
+) -> Tuple[float, str, str]:
+    """
+    Deterministic Municipal Priority Scoring Engine (Phase 6).
+    Formula specification:
+    
+    1. Base Severity Weight:
+       - CRITICAL: 40 points
+       - HIGH:     25 points
+       - MEDIUM:   12 points
+       - LOW:       5 points
+
+    2. Reopened Civic Defect Boost:
+       - If status == 'REOPENED' or citizen_reopened or citizen_verification_status == 'REOPENED':
+         +20 points (Citizen confirmed problem still persists after reported resolution)
+
+    3. Unresolved Duration (Complaint Age):
+       - If status == 'RESOLVED': 0 points (issue is closed)
+       - Age >= 7 days: +20 points (acute administrative aging)
+       - 3 to 7 days:   +12 points
+       - 1 to 3 days:   +6 points
+       - < 1 day:       +2 points
+
+    4. Nearby Unresolved Spatial Density (within 1400m radius corridor):
+       - Counts other unresolved complaints within 1.4km using Haversine distance
+       - >= 4 nearby unresolved: +15 points (high defect density / corridor hazard)
+       - 2 to 3 nearby:          +8 points
+       - 1 nearby:               +4 points
+
+    5. Lifecycle Status Weight:
+       - REOPENED:               +10 points
+       - REPORTED (unassigned):  +8 points (untriaged citizen intake)
+       - ASSIGNED / IN_PROGRESS: +5 points
+       - RESOLVED:                0 points
+
+    6. Problem Category Municipal Urgency Weight:
+       - pothole:     +5 points (direct vehicular collision / safety hazard)
+       - drain:       +4 points (sewage / flooding / public health risk)
+       - streetlight: +3 points (nighttime pedestrian / crime hazard)
+       - garbage:     +2 points (sanitary nuisance / vector risk)
+       - other:       +1 point
+
+    Special Case:
+       - If complaint is RESOLVED:
+         Score = 0.0, Level = "LOW", Explanation = "Resolved civic issue."
+
+    Score normalization:
+       - Capped at min 0, max 100.
+    
+    Priority Levels:
+       - Score >= 70: CRITICAL
+       - Score 50 - 69: HIGH
+       - Score 30 - 49: MEDIUM
+       - Score < 30:  LOW
+    """
+    if now_utc is None:
+        now_utc = datetime.now(timezone.utc)
+
+    if complaint.status == "RESOLVED":
+        return 0.0, "LOW", "Resolved civic complaint (no active field intervention required)."
+
+    factors = []
+    score = 0.0
+
+    # 1. Base Severity Weight
+    sev = (complaint.severity or "MEDIUM").upper()
+    if sev == "CRITICAL":
+        score += 40.0
+        factors.append("Critical severity (+40)")
+    elif sev == "HIGH":
+        score += 25.0
+        factors.append("High severity (+25)")
+    elif sev == "MEDIUM":
+        score += 12.0
+        factors.append("Medium severity (+12)")
+    else:
+        score += 5.0
+        factors.append("Low severity (+5)")
+
+    # 2. Reopened Civic Defect Boost
+    is_reopened = (
+        complaint.status == "REOPENED"
+        or complaint.citizen_reopened is True
+        or complaint.citizen_verification_status == "REOPENED"
+    )
+    if is_reopened:
+        score += 20.0
+        factors.append("Reopened by citizen (+20)")
+
+    # 3. Lifecycle Status Factor
+    if complaint.status == "REOPENED":
+        score += 10.0
+        factors.append("Reopened status (+10)")
+    elif complaint.status == "REPORTED":
+        score += 8.0
+        factors.append("Untriaged intake (+8)")
+    elif complaint.status in ("ASSIGNED", "IN_PROGRESS"):
+        score += 5.0
+        factors.append("Active field deployment (+5)")
+
+    # 4. Unresolved Duration (Age)
+    age_days = 0.0
+    if complaint.created_at:
+        try:
+            created_dt = datetime.fromisoformat(complaint.created_at.replace("Z", "+00:00"))
+            age_days = max(0.0, (now_utc - created_dt).total_seconds() / 86400.0)
+        except Exception:
+            pass
+
+    if age_days >= 7.0:
+        score += 20.0
+        factors.append(f"Unresolved for {age_days:.1f} days (+20)")
+    elif age_days >= 3.0:
+        score += 12.0
+        factors.append(f"Unresolved for {age_days:.1f} days (+12)")
+    elif age_days >= 1.0:
+        score += 6.0
+        factors.append(f"Unresolved for {age_days:.1f} days (+6)")
+    else:
+        score += 2.0
+        factors.append("Fresh intake < 24h (+2)")
+
+    # 5. Nearby Unresolved Spatial Density (within 1400m corridor)
+    if complaint.latitude is not None and complaint.longitude is not None:
+        nearby_unresolved = 0
+        for other in all_complaints:
+            if other.id == complaint.id or other.report_id == complaint.report_id:
+                continue
+            if other.status == "RESOLVED":
+                continue
+            if other.latitude is not None and other.longitude is not None:
+                dist = haversine_distance_meters(
+                    complaint.latitude, complaint.longitude,
+                    other.latitude, other.longitude
+                )
+                if dist <= 1400.0:
+                    nearby_unresolved += 1
+
+        if nearby_unresolved >= 4:
+            score += 15.0
+            factors.append(f"{nearby_unresolved} nearby unresolved reports (+15)")
+        elif nearby_unresolved >= 2:
+            score += 8.0
+            factors.append(f"{nearby_unresolved} nearby unresolved reports (+8)")
+        elif nearby_unresolved == 1:
+            score += 4.0
+            factors.append("1 nearby unresolved report (+4)")
+
+    # 6. Problem Category Municipal Urgency Weight
+    pt = (complaint.problem_type or "other").lower()
+    if pt == "pothole":
+        score += 5.0
+        factors.append("Road safety risk (+5)")
+    elif pt == "drain":
+        score += 4.0
+        factors.append("Drainage/flooding hazard (+4)")
+    elif pt == "streetlight":
+        score += 3.0
+        factors.append("Night visibility hazard (+3)")
+    elif pt == "garbage":
+        score += 2.0
+        factors.append("Sanitation accumulation (+2)")
+    else:
+        score += 1.0
+        factors.append("General infrastructure (+1)")
+
+    # Normalization capped at 100
+    normalized_score = min(100.0, max(0.0, round(score, 1)))
+
+    if normalized_score >= 70.0:
+        level = "CRITICAL"
+    elif normalized_score >= 50.0:
+        level = "HIGH"
+    elif normalized_score >= 30.0:
+        level = "MEDIUM"
+    else:
+        level = "LOW"
+
+    explanation = f"{level.capitalize()} priority because: " + " + ".join(factors)
+    return normalized_score, level, explanation
+
+
+def calculate_aging_analysis(
+    complaints: List[Complaint],
+    now_utc: Optional[datetime] = None,
+) -> AgingAnalysis:
+    """
+    Analyzes resolution turnaround and complaint aging for unresolved civic reports.
+    Buckets:
+      - 0–24 hours
+      - 1–3 days
+      - 3–7 days
+      - 7+ days
+    """
+    if now_utc is None:
+        now_utc = datetime.now(timezone.utc)
+
+    unresolved = [c for c in complaints if c.status != "RESOLVED"]
+    total_unresolved = len(unresolved)
+
+    bucket_defs = [
+        {"key": "0-24h", "label": "0–24 hours", "min_h": 0.0, "max_h": 24.0},
+        {"key": "1-3d", "label": "1–3 days", "min_h": 24.0, "max_h": 72.0},
+        {"key": "3-7d", "label": "3–7 days", "min_h": 72.0, "max_h": 168.0},
+        {"key": "7d+", "label": "7+ days", "min_h": 168.0, "max_h": float("inf")},
+    ]
+
+    bucket_counts = {b["key"]: 0 for b in bucket_defs}
+    bucket_depts = {b["key"]: {} for b in bucket_defs}
+
+    for c in unresolved:
+        age_hours = 0.0
+        if c.created_at:
+            try:
+                created_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                age_hours = max(0.0, (now_utc - created_dt).total_seconds() / 3600.0)
+            except Exception:
+                pass
+
+        matched_key = "7d+"
+        for b in bucket_defs:
+            if b["min_h"] <= age_hours < b["max_h"]:
+                matched_key = b["key"]
+                break
+
+        bucket_counts[matched_key] += 1
+        dept = c.department or "Unassigned"
+        bucket_depts[matched_key][dept] = bucket_depts[matched_key].get(dept, 0) + 1
+
+    categories = []
+    for b in bucket_defs:
+        k = b["key"]
+        cnt = bucket_counts[k]
+        pct = round((cnt / total_unresolved * 100.0), 1) if total_unresolved > 0 else 0.0
+        categories.append(AgingCategory(
+            label=b["label"],
+            count=cnt,
+            percentage=pct,
+            department_distribution=bucket_depts[k],
+            unresolved_count=cnt,
+        ))
+
+    oldest_count = bucket_counts["7d+"]
+    return AgingAnalysis(
+        total_unresolved=total_unresolved,
+        categories=categories,
+        oldest_unresolved_count=oldest_count,
+    )
+
+
+def calculate_department_performance(
+    complaints: List[Complaint],
+    departments: List[Department],
+) -> List[DepartmentPerformance]:
+    """
+    Computes department workload distribution, active resolution rates,
+    and average resolution turnaround times from actual complaint history.
+    """
+    perf_list = []
+    dept_names = [d.name for d in departments]
+    for c in complaints:
+        if c.department and c.department not in dept_names:
+            dept_names.append(c.department)
+
+    for dept_name in dept_names:
+        dept_complaints = [
+            c for c in complaints
+            if c.department and (dept_name.lower() in c.department.lower() or c.department.lower() in dept_name.lower())
+        ]
+        total = len(dept_complaints)
+        pending = sum(1 for c in dept_complaints if c.status == "REPORTED")
+        in_progress = sum(1 for c in dept_complaints if c.status in ("ASSIGNED", "IN_PROGRESS"))
+        resolved = sum(1 for c in dept_complaints if c.status == "RESOLVED")
+        reopened = sum(
+            1 for c in dept_complaints
+            if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+        )
+
+        res_durations = []
+        for c in dept_complaints:
+            if c.status == "RESOLVED" and c.resolved_at and c.created_at:
+                try:
+                    c_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                    r_dt = datetime.fromisoformat(c.resolved_at.replace("Z", "+00:00"))
+                    diff_h = (r_dt - c_dt).total_seconds() / 3600.0
+                    if diff_h >= 0:
+                        res_durations.append(diff_h)
+                except Exception:
+                    pass
+
+        avg_res_h = round(sum(res_durations) / len(res_durations), 1) if res_durations else None
+        res_rate = round((resolved / total * 100.0), 1) if total > 0 else 0.0
+
+        perf_list.append(DepartmentPerformance(
+            department=dept_name,
+            total=total,
+            pending=pending,
+            in_progress=in_progress,
+            resolved=resolved,
+            reopened=reopened,
+            avg_resolution_hours=avg_res_h,
+            resolution_rate=res_rate,
+        ))
+
+    perf_list.sort(key=lambda p: p.total, reverse=True)
+    return perf_list
+
+
+def calculate_category_trends(
+    complaints: List[Complaint],
+    now_utc: Optional[datetime] = None,
+) -> List[CategoryTrend]:
+    """
+    Computes 7-day and 30-day incident velocity trends per problem category.
+    Handles sparse or insufficient historical data transparently without fabrication.
+    """
+    if now_utc is None:
+        now_utc = datetime.now(timezone.utc)
+
+    t_now = now_utc
+    t_7d_ago = t_now - timedelta(days=7)
+    t_14d_ago = t_now - timedelta(days=14)
+    t_30d_ago = t_now - timedelta(days=30)
+    t_60d_ago = t_now - timedelta(days=60)
+
+    categories = ["pothole", "garbage", "streetlight", "drain", "other"]
+    trends = []
+
+    for cat in categories:
+        cat_complaints = [c for c in complaints if (c.problem_type or "other").lower() == cat]
+
+        count_7d = 0
+        count_prior_7d = 0
+        count_30d = 0
+        count_prior_30d = 0
+
+        for c in cat_complaints:
+            if not c.created_at:
+                continue
+            try:
+                dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                if t_7d_ago <= dt <= t_now:
+                    count_7d += 1
+                elif t_14d_ago <= dt < t_7d_ago:
+                    count_prior_7d += 1
+
+                if t_30d_ago <= dt <= t_now:
+                    count_30d += 1
+                elif t_60d_ago <= dt < t_30d_ago:
+                    count_prior_30d += 1
+            except Exception:
+                pass
+
+        trend_7d_pct = None
+        trend_30d_pct = None
+        direction = "insufficient_data"
+        status_label = "Insufficient data"
+
+        if count_prior_7d > 0:
+            trend_7d_pct = round(((count_7d - count_prior_7d) / count_prior_7d) * 100.0, 1)
+            if trend_7d_pct > 15.0:
+                direction = "increasing"
+                status_label = f"+{trend_7d_pct}% vs prior 7d"
+            elif trend_7d_pct < -15.0:
+                direction = "decreasing"
+                status_label = f"{trend_7d_pct}% vs prior 7d"
+            else:
+                direction = "stable"
+                status_label = f"{trend_7d_pct}% (stable)"
+        elif count_7d >= 2:
+            trend_7d_pct = 100.0
+            direction = "increasing"
+            status_label = f"{count_7d} reports (new surge)"
+        elif count_7d == 1:
+            trend_7d_pct = None
+            direction = "stable"
+            status_label = "1 report (baseline)"
+        else:
+            trend_7d_pct = None
+            direction = "insufficient_data"
+            status_label = "Insufficient data"
+
+        if count_prior_30d > 0:
+            trend_30d_pct = round(((count_30d - count_prior_30d) / count_prior_30d) * 100.0, 1)
+        elif count_30d >= 3:
+            trend_30d_pct = 100.0
+
+        trends.append(CategoryTrend(
+            category=cat,
+            count_7d=count_7d,
+            count_prior_7d=count_prior_7d,
+            trend_7d_pct=trend_7d_pct,
+            trend_30d_pct=trend_30d_pct,
+            direction=direction,
+            status_label=status_label,
+        ))
+
+    return trends
 
 
 def calculate_daily_trends(complaints: List[Complaint]) -> List[DailyTrendPoint]:
@@ -372,6 +846,14 @@ class CivicDataStore:
                                 c.citizen_verified_at = local_c.citizen_verified_at or c.citizen_verified_at
                                 c.reopened_at = local_c.reopened_at or c.reopened_at
                                 c.reopen_reason = local_c.reopen_reason or c.reopen_reason
+                                c.assigned_to = local_c.assigned_to or c.assigned_to
+                                c.assigned_at = local_c.assigned_at or c.assigned_at
+                                if len(local_c.assignment_history) > len(c.assignment_history):
+                                    c.assignment_history = local_c.assignment_history
+                                if len(local_c.internal_notes) > len(c.internal_notes):
+                                    c.internal_notes = local_c.internal_notes
+                                if len(local_c.status_update_requests) > len(c.status_update_requests):
+                                    c.status_update_requests = local_c.status_update_requests
                                 if len(local_c.status_history) > len(c.status_history):
                                     c.status_history = local_c.status_history
 
@@ -501,10 +983,35 @@ class CivicDataStore:
                 department="Municipal Roads (PWD)",
                 description="Hazardous pothole causing two-wheeler skids near metro gate.",
                 image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
+                status="ASSIGNED",
+                assigned_to="Officer Sharma (Road Unit)",
+                assigned_at=dt_off(3, 2),
+                assignment_history=[
+                    AssignmentRecord(
+                        id="asg-seed-001",
+                        complaint_id="NGD-2026-00101",
+                        previous_department=None,
+                        new_department="Municipal Roads (PWD)",
+                        previous_assignee=None,
+                        new_assignee="Officer Sharma (Road Unit)",
+                        changed_by="Chief Zonal Engineer",
+                        timestamp=dt_off(3, 2),
+                        note="Assigned to central night repair unit for asphalt milling",
+                    )
+                ],
+                internal_notes=[
+                    InternalNote(
+                        id="note-seed-001",
+                        complaint_id="NGD-2026-00101",
+                        author="Officer Sharma",
+                        author_role="authority",
+                        note="Field inspection completed. Hot-mix asphalt truck requisitioned for night shift.",
+                        timestamp=dt_off(2, 6),
+                    )
+                ],
                 duplicate_of=None,
                 created_at=dt_off(3, 4),
-                updated_at=dt_off(3, 4),
+                updated_at=dt_off(3, 2),
             ),
             Complaint(
                 id="c005",
@@ -708,6 +1215,44 @@ class CivicDataStore:
                 description="Pedestrians unable to access bus stop due to sewage flood.",
                 image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
                 status="IN_PROGRESS",
+                assigned_to="Engineer Verma (DJB Drainage Cell)",
+                assigned_at=dt_off(1, 8),
+                assignment_history=[
+                    AssignmentRecord(
+                        id="asg-seed-002",
+                        complaint_id="NGD-2026-00114",
+                        previous_department=None,
+                        new_department="Delhi Jal Board (DJB)",
+                        previous_assignee=None,
+                        new_assignee="Engineer Verma (DJB Drainage Cell)",
+                        changed_by="Zonal Sanitation Commissioner",
+                        timestamp=dt_off(1, 8),
+                        note="Heavy machinery and suction jetting team mobilized",
+                    )
+                ],
+                internal_notes=[
+                    InternalNote(
+                        id="note-seed-002",
+                        complaint_id="NGD-2026-00114",
+                        author="Engineer Verma",
+                        author_role="authority",
+                        note="High volume suction truck arriving at 23:00 to clear trunk stormwater line.",
+                        timestamp=dt_off(0, 7),
+                    )
+                ],
+                status_update_requests=[
+                    StatusUpdateRequestItem(
+                        id="sur-seed-002",
+                        complaint_id="NGD-2026-00114",
+                        issue_type="drain",
+                        location_name="Tolstoy Marg Bus Shelter, Janpath",
+                        current_status="IN_PROGRESS",
+                        request_date=dt_off(0, 2),
+                        citizen_message="Can we get an estimated time for suction pump deployment?",
+                        state="OPEN",
+                        citizen_notified=False,
+                    )
+                ],
                 duplicate_of=None,
                 created_at=dt_off(1, 10),
                 updated_at=dt_off(0, 6),
@@ -783,6 +1328,19 @@ class CivicDataStore:
                 citizen_reopened_at=dt_off(0, 5),
                 reopened_at=dt_off(0, 5),
                 reopen_reason="The pothole is still present beside the repaired section.",
+                status_update_requests=[
+                    StatusUpdateRequestItem(
+                        id="sur-seed-001",
+                        complaint_id="NGD-2026-00117",
+                        issue_type="pothole",
+                        location_name="Connaught Place Inner Circle Radial 1",
+                        current_status="REOPENED",
+                        request_date=dt_off(0, 3),
+                        citizen_message="The pothole was marked repaired but gravel came loose again. Please expedite.",
+                        state="OPEN",
+                        citizen_notified=False,
+                    )
+                ],
                 duplicate_of=None,
                 created_at=dt_off(5, 2),
                 updated_at=dt_off(0, 5),
@@ -893,9 +1451,19 @@ class CivicDataStore:
         status: Optional[str] = None,
         department: Optional[str] = None,
         resolution_status: Optional[str] = None,
+        priority_level: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> List[Complaint]:
         self._check_auto_reload()
+        now_utc = datetime.now(timezone.utc)
+
+        # Decorate with Phase 6 deterministic priority calculations
+        for c in self.complaints:
+            score, level, explanation = compute_priority(c, self.complaints, now_utc)
+            c.priority_score = score
+            c.priority_level = level  # type: ignore
+            c.priority_explanation = explanation
+
         results = self.complaints
 
         if problem_type:
@@ -906,6 +1474,8 @@ class CivicDataStore:
             results = [c for c in results if c.status.upper() == status.upper()]
         if department:
             results = [c for c in results if department.lower() in c.department.lower()]
+        if priority_level:
+            results = [c for c in results if (c.priority_level or "").upper() == priority_level.upper()]
         if resolution_status:
             rs = resolution_status.lower().strip()
             if rs in ("pending_resolution", "pending-resolution", "unresolved"):
@@ -941,8 +1511,13 @@ class CivicDataStore:
 
     def get_complaint(self, complaint_id: str) -> Optional[Complaint]:
         self._check_auto_reload()
+        now_utc = datetime.now(timezone.utc)
         for c in self.complaints:
             if c.id == complaint_id or c.report_id == complaint_id:
+                score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                c.priority_score = score
+                c.priority_level = level  # type: ignore
+                c.priority_explanation = explanation
                 return c
         return None
 
@@ -1243,6 +1818,15 @@ class CivicDataStore:
 
     def get_statistics(self) -> DashboardStatistics:
         self._check_auto_reload()
+        now_utc = datetime.now(timezone.utc)
+
+        # Decorate all complaints with deterministic Phase 6 priority engine
+        for c in self.complaints:
+            score, level, explanation = compute_priority(c, self.complaints, now_utc)
+            c.priority_score = score
+            c.priority_level = level  # type: ignore
+            c.priority_explanation = explanation
+
         total = len(self.complaints)
         high_critical = sum(1 for c in self.complaints if c.severity in ("HIGH", "CRITICAL"))
         pending = sum(1 for c in self.complaints if c.status == "REPORTED")
@@ -1276,6 +1860,14 @@ class CivicDataStore:
         hotspots = calculate_hotspots(self.complaints)
         daily_trends = calculate_daily_trends(self.complaints)
 
+        # Phase 6 Priority Actions: Most important unresolved complaints first
+        unresolved = [c for c in self.complaints if c.status != "RESOLVED"]
+        priority_actions = sorted(unresolved, key=lambda c: (c.priority_score or 0.0), reverse=True)[:10]
+
+        aging_analysis = calculate_aging_analysis(self.complaints, now_utc)
+        department_performance = calculate_department_performance(self.complaints, self.departments)
+        category_trends = calculate_category_trends(self.complaints, now_utc)
+
         return DashboardStatistics(
             total_reports=total,
             high_critical=high_critical,
@@ -1289,7 +1881,314 @@ class CivicDataStore:
             by_status=by_status,
             hotspots=hotspots,
             daily_trends=daily_trends,
+            priority_actions=priority_actions,
+            aging_analysis=aging_analysis,
+            department_performance=department_performance,
+            category_trends=category_trends,
         )
+
+    def get_priority_actions(self, limit: int = 10) -> List[Complaint]:
+        stats = self.get_statistics()
+        return stats.priority_actions[:limit]
+
+    def get_aging_analysis(self) -> AgingAnalysis:
+        stats = self.get_statistics()
+        return stats.aging_analysis or AgingAnalysis(total_unresolved=0, categories=[])
+
+    def get_department_performance(self) -> List[DepartmentPerformance]:
+        stats = self.get_statistics()
+        return stats.department_performance
+
+    def get_category_trends(self) -> List[CategoryTrend]:
+        stats = self.get_statistics()
+        return stats.category_trends
+
+    def assign_complaint(
+        self,
+        complaint_id: str,
+        department: str,
+        assigned_to: str,
+        note: Optional[str] = None,
+        changed_by: Optional[str] = None,
+    ) -> Optional[Complaint]:
+        self._check_auto_reload()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        updated_c = None
+
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                prev_dept = c.department
+                prev_assignee = c.assigned_to
+
+                c.department = department
+                c.assigned_to = assigned_to
+                c.assigned_at = now_iso
+                c.updated_at = now_iso
+
+                # Transition REPORTED -> ASSIGNED
+                if c.status == "REPORTED":
+                    c.status = "ASSIGNED"
+
+                actor_name = changed_by or "Municipal Authority Officer"
+
+                record = AssignmentRecord(
+                    id=str(uuid.uuid4()),
+                    complaint_id=c.report_id,
+                    previous_department=prev_dept,
+                    new_department=department,
+                    previous_assignee=prev_assignee,
+                    new_assignee=assigned_to,
+                    changed_by=actor_name,
+                    timestamp=now_iso,
+                    note=note,
+                )
+                c.assignment_history.append(record)
+
+                note_detail = f"Assigned to {department} — Team/Officer: {assigned_to}"
+                if note:
+                    note_detail += f" ({note})"
+                c.status_history.append(StatusHistoryItem(
+                    status="ASSIGNED",
+                    timestamp=now_iso,
+                    note=note_detail,
+                    actor=actor_name,
+                    actor_role="authority",
+                ))
+
+                updated_c = c
+                break
+
+        if updated_c:
+            self._save_to_storage()
+            client = self._get_supabase_client()
+            if client:
+                try:
+                    client.table("complaints").update({
+                        "department": updated_c.department,
+                        "status": updated_c.status,
+                        "updated_at": now_iso,
+                    }).eq("report_id", updated_c.report_id).execute()
+                except Exception as se:
+                    logger.warning(f"Could not sync assignment to Supabase: {se}")
+            return updated_c
+        return None
+
+    def add_internal_note(
+        self,
+        complaint_id: str,
+        note: str,
+        author: Optional[str] = None,
+        author_role: str = "authority",
+    ) -> Optional[InternalNote]:
+        self._check_auto_reload()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        author_name = author or "Municipal Authority Officer"
+
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                new_note = InternalNote(
+                    id=str(uuid.uuid4()),
+                    complaint_id=c.report_id,
+                    author=author_name,
+                    author_role=author_role,
+                    note=note,
+                    timestamp=now_iso,
+                )
+                c.internal_notes.append(new_note)
+                c.updated_at = now_iso
+
+                c.status_history.append(StatusHistoryItem(
+                    status="INTERNAL_NOTE",
+                    timestamp=now_iso,
+                    note=f"Internal note: {note}",
+                    actor=author_name,
+                    actor_role=author_role,
+                ))
+
+                self._save_to_storage()
+                return new_note
+        return None
+
+    def get_internal_notes(self, complaint_id: str) -> List[InternalNote]:
+        self._check_auto_reload()
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                return sorted(c.internal_notes, key=lambda n: n.timestamp)
+        return []
+
+    def create_status_update_request(
+        self,
+        complaint_id: str,
+        citizen_message: Optional[str] = None,
+    ) -> Optional[StatusUpdateRequestItem]:
+        self._check_auto_reload()
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                req = StatusUpdateRequestItem(
+                    id=str(uuid.uuid4()),
+                    complaint_id=c.report_id,
+                    issue_type=c.problem_type,
+                    location_name=c.location_name,
+                    current_status=c.status,
+                    request_date=now_iso,
+                    citizen_message=citizen_message,
+                    state="OPEN",
+                    citizen_notified=False,
+                )
+                c.status_update_requests.append(req)
+                c.updated_at = now_iso
+
+                c.status_history.append(StatusHistoryItem(
+                    status="STATUS_UPDATE_REQUESTED",
+                    timestamp=now_iso,
+                    note="Citizen requested status update" + (f': "{citizen_message}"' if citizen_message else ""),
+                    actor="Citizen User",
+                    actor_role="citizen",
+                ))
+
+                self._save_to_storage()
+                return req
+        return None
+
+    def acknowledge_status_update_request(
+        self,
+        complaint_id: str,
+        request_id: str,
+        acknowledged_by: Optional[str] = None,
+        response_note: Optional[str] = None,
+    ) -> Optional[StatusUpdateRequestItem]:
+        self._check_auto_reload()
+        now_iso = datetime.now(timezone.utc).isoformat()
+        actor_name = acknowledged_by or "Municipal Authority Officer"
+
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                for req in c.status_update_requests:
+                    if req.id == request_id or request_id == "latest":
+                        req.state = "ACKNOWLEDGED"
+                        req.acknowledged_at = now_iso
+                        req.acknowledged_by = actor_name
+                        req.citizen_notified = True
+                        req.response_note = response_note
+                        c.updated_at = now_iso
+
+                        note_text = f"Status update request acknowledged by {actor_name}"
+                        if response_note:
+                            note_text += f': "{response_note}"'
+                        else:
+                            note_text += " (Citizen notified)"
+
+                        c.status_history.append(StatusHistoryItem(
+                            status="STATUS_REQUEST_ACKNOWLEDGED",
+                            timestamp=now_iso,
+                            note=note_text,
+                            actor=actor_name,
+                            actor_role="authority",
+                        ))
+
+                        self._save_to_storage()
+                        return req
+        return None
+
+    def list_status_update_requests(
+        self,
+        state: Optional[str] = None,
+    ) -> List[StatusUpdateRequestItem]:
+        self._check_auto_reload()
+        requests: List[StatusUpdateRequestItem] = []
+
+        for c in self.complaints:
+            for req in c.status_update_requests:
+                req.current_status = c.status
+                if state:
+                    if req.state.upper() == state.upper():
+                        requests.append(req)
+                else:
+                    requests.append(req)
+
+        requests.sort(key=lambda r: r.request_date, reverse=True)
+        return requests
+
+    def get_escalations(self) -> List[EscalationItem]:
+        self._check_auto_reload()
+        now_utc = datetime.now(timezone.utc)
+
+        # Ensure priority scores and explanations are up-to-date using existing Phase 6 engine
+        for c in self.complaints:
+            score, level, explanation = compute_priority(c, self.complaints, now_utc)
+            c.priority_score = score
+            c.priority_level = level  # type: ignore
+            c.priority_explanation = explanation
+
+        hotspots = calculate_hotspots(self.complaints)
+        hotspot_report_ids = set()
+        hotspot_map = {}
+        for hs in hotspots:
+            if hs.total_reports >= 2:
+                for rid in hs.report_ids:
+                    hotspot_report_ids.add(rid)
+                    hotspot_map[rid] = hs
+
+        escalations: List[EscalationItem] = []
+
+        for c in self.complaints:
+            # Skip resolved complaints that have not been reopened
+            if c.status == "RESOLVED" and not (c.citizen_reopened or c.status == "REOPENED"):
+                continue
+
+            reasons: List[str] = []
+
+            # 1. Reopened complaint
+            if c.status == "REOPENED" or c.citizen_reopened is True:
+                if c.reopen_reason:
+                    reasons.append(f"Reopened by citizen: {c.reopen_reason}")
+                else:
+                    reasons.append("Reopened by citizen")
+
+            # 2. Aging 7+ days
+            age_days = 0.0
+            if c.created_at:
+                try:
+                    c_dt = datetime.fromisoformat(c.created_at.replace("Z", "+00:00"))
+                    age_days = max(0.0, (now_utc - c_dt).total_seconds() / 86400.0)
+                except Exception:
+                    pass
+            if age_days >= 7.0 and c.status != "RESOLVED":
+                reasons.append(f"{int(age_days)}+ days unresolved")
+
+            # 3. Status update request pending
+            open_requests = [r for r in c.status_update_requests if r.state == "OPEN"]
+            if open_requests:
+                reasons.append(f"Citizen requested status update ({len(open_requests)} pending)")
+
+            # 4. High / Critical priority
+            if (c.priority_score or 0) >= 50.0 or c.severity in ("HIGH", "CRITICAL") or (c.priority_level or "") in ("HIGH", "CRITICAL"):
+                reasons.append(f"High priority ({c.priority_level or c.severity} urgency)")
+
+            # 5. Hotspot corridor
+            if c.report_id in hotspot_report_ids:
+                hs = hotspot_map[c.report_id]
+                reasons.append(f"{hs.dominant_issue} (Hotspot corridor)")
+
+            if reasons:
+                escalations.append(EscalationItem(
+                    complaint=c,
+                    reasons=reasons,
+                    primary_reason=reasons[0],
+                    priority_score=c.priority_score or 0.0,
+                    priority_level=c.priority_level or "MEDIUM",
+                    days_unresolved=round(age_days, 1),
+                    has_open_status_request=len(open_requests) > 0,
+                    is_reopened=(c.status == "REOPENED" or c.citizen_reopened is True),
+                    assigned_to=c.assigned_to,
+                    department=c.department,
+                ))
+
+        # Sort escalations: highest priority score first, then days unresolved
+        escalations.sort(key=lambda e: (e.priority_score, e.days_unresolved), reverse=True)
+        return escalations
 
 
 # Global singleton instance

@@ -5,8 +5,9 @@ import { FilterBar } from '../components/FilterBar';
 import { ProblemIcon, getProblemLabel } from '../components/ProblemIcon';
 import { StatusBadge } from '../components/StatusBadge';
 import { SeverityBadge } from '../components/SeverityBadge';
+import { PriorityBadge } from '../components/PriorityBadge';
 
-type SortField = 'created_at' | 'severity' | 'status' | 'report_id';
+type SortField = 'created_at' | 'severity' | 'status' | 'report_id' | 'priority';
 type SortOrder = 'asc' | 'desc';
 
 interface ComplaintQueueProps {
@@ -24,6 +25,8 @@ interface ComplaintQueueProps {
   onDepartmentFilterChange: (val: string) => void;
   resolutionStatusFilter?: string;
   onResolutionStatusFilterChange?: (val: string) => void;
+  priorityLevelFilter?: string;
+  onPriorityLevelFilterChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   searchQuery: string;
@@ -46,13 +49,15 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
   onDepartmentFilterChange,
   resolutionStatusFilter = '',
   onResolutionStatusFilterChange,
+  priorityLevelFilter = '',
+  onPriorityLevelFilterChange,
   dateHorizon,
   onDateHorizonChange,
   searchQuery,
   onSearchQueryChange,
   onResetFilters,
 }) => {
-  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortField, setSortField] = useState<SortField>('priority');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const handleSort = (field: SortField) => {
@@ -77,6 +82,8 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
       comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
     } else if (sortField === 'severity') {
       comparison = (severityWeight[a.severity] || 0) - (severityWeight[b.severity] || 0);
+    } else if (sortField === 'priority') {
+      comparison = (a.priority_score ?? 0) - (b.priority_score ?? 0);
     } else if (sortField === 'status') {
       comparison = a.status.localeCompare(b.status);
     } else if (sortField === 'report_id') {
@@ -114,6 +121,8 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
         onDepartmentChange={onDepartmentFilterChange}
         resolutionStatus={resolutionStatusFilter}
         onResolutionStatusChange={onResolutionStatusFilterChange}
+        priorityLevel={priorityLevelFilter}
+        onPriorityLevelChange={onPriorityLevelFilterChange}
         dateHorizon={dateHorizon}
         onDateHorizonChange={onDateHorizonChange}
         search={searchQuery}
@@ -155,6 +164,15 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                     <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Incident Type</th>
                     <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Location / Ward</th>
                     <th className="py-3 px-4 uppercase text-[10px] tracking-wider font-semibold">Department</th>
+                    <th className="py-3 px-4">
+                      <button
+                        onClick={() => handleSort('priority')}
+                        className="flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer font-semibold uppercase text-[10px] tracking-wider"
+                      >
+                        <span>Priority</span>
+                        <ArrowUpDown className="w-3 h-3" />
+                      </button>
+                    </th>
                     <th className="py-3 px-4">
                       <button
                         onClick={() => handleSort('severity')}
@@ -209,7 +227,23 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                         {c.location_name || 'City Coordinates'}
                       </td>
                       <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                        {c.department || 'Unassigned'}
+                        <span className="font-medium text-slate-800 dark:text-slate-200 block">{c.department || 'Unassigned'}</span>
+                        {c.assigned_to ? (
+                          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-medium truncate block max-w-[150px]">
+                            👤 {c.assigned_to}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 italic block">
+                            Unassigned
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <PriorityBadge
+                          level={c.priority_level}
+                          score={c.priority_score}
+                          size="sm"
+                        />
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <SeverityBadge severity={c.severity} size="sm" />
@@ -275,7 +309,10 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                         {c.report_id}
                       </span>
                     </div>
-                    <SeverityBadge severity={c.severity} size="sm" />
+                    <div className="flex items-center gap-1.5">
+                      <PriorityBadge level={c.priority_level} score={c.priority_score} size="xs" />
+                      <SeverityBadge severity={c.severity} size="sm" />
+                    </div>
                   </div>
 
                   <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-1">

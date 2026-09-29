@@ -14,6 +14,10 @@ import {
   getDepartments,
   resolveComplaint,
   updateComplaintStatus,
+  assignComplaint,
+  addInternalNote,
+  acknowledgeStatusUpdateRequest,
+  getComplaintById,
 } from './services/api';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
@@ -53,6 +57,7 @@ function AuthorityAppContent() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [resolutionStatusFilter, setResolutionStatusFilter] = useState<string>('');
+  const [priorityLevelFilter, setPriorityLevelFilter] = useState<string>('');
   const [dateHorizon, setDateHorizon] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -177,6 +182,7 @@ function AuthorityAppContent() {
     setStatusFilter('');
     setDepartmentFilter('');
     setResolutionStatusFilter('');
+    setPriorityLevelFilter('');
     setDateHorizon('all');
     setSearchQuery('');
     setFocusedHotspot(null);
@@ -195,6 +201,9 @@ function AuthorityAppContent() {
         return false;
       }
       if (departmentFilter && c.department !== departmentFilter) {
+        return false;
+      }
+      if (priorityLevelFilter && c.priority_level !== priorityLevelFilter) {
         return false;
       }
       if (resolutionStatusFilter) {
@@ -237,7 +246,7 @@ function AuthorityAppContent() {
       }
       return true;
     });
-  }, [complaints, categoryFilter, severityFilter, statusFilter, departmentFilter, resolutionStatusFilter, dateHorizon, searchQuery]);
+  }, [complaints, categoryFilter, severityFilter, statusFilter, departmentFilter, priorityLevelFilter, resolutionStatusFilter, dateHorizon, searchQuery]);
 
   // Update status action handler with Phase 5 resolution support
   const handleUpdateStatus = async (
@@ -256,6 +265,43 @@ function AuthorityAppContent() {
       setSelectedComplaint(updated);
     }
     getDashboardStatistics().then((s) => setStats(s)).catch(() => {});
+  };
+
+  // Phase 7: Operational Case Assignment handler
+  const handleAssignComplaint = async (
+    id: string,
+    payload: { department: string; assigned_to: string; note?: string }
+  ) => {
+    const updated = await assignComplaint(id, payload);
+    setComplaints((prev) => prev.map((item) => (item.id === id ? updated : item)));
+    if (selectedComplaint && selectedComplaint.id === id) {
+      setSelectedComplaint(updated);
+    }
+    getDashboardStatistics().then((s) => setStats(s)).catch(() => {});
+  };
+
+  // Phase 7: Internal Confidential Note handler
+  const handleAddInternalNote = async (id: string, note: string) => {
+    await addInternalNote(id, note);
+    const refreshed = await getComplaintById(id);
+    setComplaints((prev) => prev.map((item) => (item.id === id ? refreshed : item)));
+    if (selectedComplaint && selectedComplaint.id === id) {
+      setSelectedComplaint(refreshed);
+    }
+  };
+
+  // Phase 7: Citizen Status Request Acknowledgment handler
+  const handleAcknowledgeStatusRequest = async (
+    complaintId: string,
+    requestId: string,
+    responseNote?: string
+  ) => {
+    await acknowledgeStatusUpdateRequest(complaintId, requestId, responseNote);
+    const refreshed = await getComplaintById(complaintId);
+    setComplaints((prev) => prev.map((item) => (item.id === complaintId ? refreshed : item)));
+    if (selectedComplaint && selectedComplaint.id === complaintId) {
+      setSelectedComplaint(refreshed);
+    }
   };
 
   // Handle Jump to Duplicate Original
@@ -388,6 +434,8 @@ function AuthorityAppContent() {
               onDepartmentFilterChange={setDepartmentFilter}
               resolutionStatusFilter={resolutionStatusFilter}
               onResolutionStatusFilterChange={setResolutionStatusFilter}
+              priorityLevelFilter={priorityLevelFilter}
+              onPriorityLevelFilterChange={setPriorityLevelFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}
@@ -414,6 +462,8 @@ function AuthorityAppContent() {
               onDepartmentFilterChange={setDepartmentFilter}
               resolutionStatusFilter={resolutionStatusFilter}
               onResolutionStatusFilterChange={setResolutionStatusFilter}
+              priorityLevelFilter={priorityLevelFilter}
+              onPriorityLevelFilterChange={setPriorityLevelFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}
@@ -443,6 +493,8 @@ function AuthorityAppContent() {
               onDepartmentFilterChange={setDepartmentFilter}
               resolutionStatusFilter={resolutionStatusFilter}
               onResolutionStatusFilterChange={setResolutionStatusFilter}
+              priorityLevelFilter={priorityLevelFilter}
+              onPriorityLevelFilterChange={setPriorityLevelFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}
@@ -471,6 +523,10 @@ function AuthorityAppContent() {
         onClose={() => setSelectedComplaint(null)}
         onUpdateStatus={handleUpdateStatus}
         onSelectDuplicate={handleSelectDuplicate}
+        onAssignComplaint={handleAssignComplaint}
+        onAddInternalNote={handleAddInternalNote}
+        onAcknowledgeStatusRequest={handleAcknowledgeStatusRequest}
+        departments={departments}
       />
 
       {/* Bottom Navigation Dock for Mobile (Screens < 1024px) */}

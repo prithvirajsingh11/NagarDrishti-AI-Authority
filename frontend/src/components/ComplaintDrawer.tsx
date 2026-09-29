@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   MapPin,
@@ -15,15 +15,25 @@ import {
   ShieldCheck,
   FileText,
   UserCheck,
+  UserPlus,
+  Lock,
+  MessageSquare,
+  Send,
+  History,
+  User,
 } from 'lucide-react';
-import type { Complaint, ComplaintStatus } from '../types/complaint';
+import type { Complaint, ComplaintStatus, Department } from '../types/complaint';
 import { ProblemIcon, getProblemLabel } from './ProblemIcon';
 import {
   resolveImageUrl,
   uploadResolutionEvidence,
+  assignComplaint as apiAssignComplaint,
+  addInternalNote as apiAddInternalNote,
+  acknowledgeStatusUpdateRequest as apiAcknowledgeStatus,
 } from '../services/api';
 import { StatusBadge } from './StatusBadge';
 import { SeverityBadge } from './SeverityBadge';
+import { PriorityBadge } from './PriorityBadge';
 
 interface ComplaintDrawerProps {
   complaint: Complaint | null;
@@ -34,6 +44,17 @@ interface ComplaintDrawerProps {
     resolution?: { resolution_image_url?: string; resolution_note?: string }
   ) => Promise<void>;
   onSelectDuplicate?: (duplicateReportId: string) => void;
+  onAssignComplaint?: (
+    id: string,
+    payload: { department: string; assigned_to: string; note?: string }
+  ) => Promise<void>;
+  onAddInternalNote?: (id: string, note: string) => Promise<void>;
+  onAcknowledgeStatusRequest?: (
+    complaintId: string,
+    requestId: string,
+    responseNote?: string
+  ) => Promise<void>;
+  departments?: Department[];
 }
 
 export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
@@ -41,6 +62,10 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
   onClose,
   onUpdateStatus,
   onSelectDuplicate,
+  onAssignComplaint,
+  onAddInternalNote,
+  onAcknowledgeStatusRequest,
+  departments,
 }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -53,6 +78,102 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
   const [resolutionError, setResolutionError] = useState<string | null>(null);
   const [isSubmittingResolution, setIsSubmittingResolution] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Phase 7: Case Assignment State
+  const [assignDept, setAssignDept] = useState(complaint?.department || '');
+  const [assignTo, setAssignTo] = useState(complaint?.assigned_to || '');
+  const [assignNote, setAssignNote] = useState('');
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [assignSuccessMsg, setAssignSuccessMsg] = useState<string | null>(null);
+
+  // Synchronize when complaint changes
+  useEffect(() => {
+    if (complaint) {
+      setAssignDept(complaint.department || '');
+      setAssignTo(complaint.assigned_to || '');
+      setAssignNote('');
+      setAssignSuccessMsg(null);
+    }
+  }, [complaint?.id, complaint?.department, complaint?.assigned_to]);
+
+  // Phase 7: Internal Confidential Note State
+  const [internalNoteInput, setInternalNoteInput] = useState('');
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+  const [noteSuccessMsg, setNoteSuccessMsg] = useState<string | null>(null);
+
+  // Phase 7: Citizen Status Requests State
+  const [ackResponseNotes, setAckResponseNotes] = useState<Record<string, string>>({});
+  const [acknowledgingIds, setAcknowledgingIds] = useState<Record<string, boolean>>({});
+
+  const handleAssignSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!complaint || !assignDept.trim() || !assignTo.trim()) return;
+    setIsAssigning(true);
+    setAssignSuccessMsg(null);
+    try {
+      if (onAssignComplaint) {
+        await onAssignComplaint(complaint.id, {
+          department: assignDept.trim(),
+          assigned_to: assignTo.trim(),
+          note: assignNote.trim() || undefined,
+        });
+      } else {
+        await apiAssignComplaint(complaint.id, {
+          department: assignDept.trim(),
+          assigned_to: assignTo.trim(),
+          note: assignNote.trim() || undefined,
+        });
+      }
+      setAssignSuccessMsg('Case assigned and logged to auditable history.');
+      setAssignNote('');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Assignment failed.');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
+
+  const handleInternalNoteSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!complaint || !internalNoteInput.trim()) return;
+    setIsSubmittingNote(true);
+    setNoteSuccessMsg(null);
+    try {
+      if (onAddInternalNote) {
+        await onAddInternalNote(complaint.id, internalNoteInput.trim());
+      } else {
+        await apiAddInternalNote(complaint.id, internalNoteInput.trim());
+      }
+      setInternalNoteInput('');
+      setNoteSuccessMsg('Internal note appended to confidential file.');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to add internal note.');
+    } finally {
+      setIsSubmittingNote(false);
+    }
+  };
+
+  const handleAcknowledgeRequest = async (requestId: string) => {
+    if (!complaint) return;
+    setAcknowledgingIds((prev) => ({ ...prev, [requestId]: true }));
+    try {
+      const responseNote = ackResponseNotes[requestId]?.trim() || undefined;
+      if (onAcknowledgeStatusRequest) {
+        await onAcknowledgeStatusRequest(complaint.id, requestId, responseNote);
+      } else {
+        await apiAcknowledgeStatus(complaint.id, requestId, responseNote);
+      }
+      setAckResponseNotes((prev) => {
+        const next = { ...prev };
+        delete next[requestId];
+        return next;
+      });
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to acknowledge status request.');
+    } finally {
+      setAcknowledgingIds((prev) => ({ ...prev, [requestId]: false }));
+    }
+  };
 
   if (!complaint) return null;
 
@@ -289,6 +410,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                     {complaint.report_id}
                   </span>
                   <StatusBadge status={complaint.status} size="sm" />
+                  <PriorityBadge level={complaint.priority_level} score={complaint.priority_score} size="xs" />
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">
                   {getProblemLabel(complaint.problem_type)} Incident
@@ -310,6 +432,21 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
             {errorMsg && (
               <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
                 {errorMsg}
+              </div>
+            )}
+
+            {/* Deterministic Municipal Priority Intelligence */}
+            {complaint.priority_explanation && (
+              <div className="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-blue-900 dark:text-blue-300">
+                    Municipal Priority Rationale
+                  </span>
+                  <PriorityBadge level={complaint.priority_level} score={complaint.priority_score} size="xs" />
+                </div>
+                <p className="text-[11px] text-blue-800 dark:text-blue-300/90 leading-relaxed">
+                  {complaint.priority_explanation}
+                </p>
               </div>
             )}
 
@@ -638,6 +775,307 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
               </div>
             </div>
 
+            {/* Case Assignment & Officer Dispatch (Phase 7) */}
+            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs space-y-3.5">
+              <div className="flex items-center justify-between pb-2.5 border-b border-slate-200/80 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                    Case Assignment & Officer Dispatch
+                  </h4>
+                </div>
+                {complaint.assigned_to ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
+                    Assigned
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+                    Unassigned
+                  </span>
+                )}
+              </div>
+
+              {/* Current Assignment Summary */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                    Current Department
+                  </span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
+                    {complaint.department || 'Not Assigned'}
+                  </span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 block">
+                    Assigned Officer / Squad
+                  </span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
+                    {complaint.assigned_to || 'None Assigned'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Assignment Form */}
+              <form onSubmit={handleAssignSubmit} className="space-y-2.5 pt-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Department
+                    </label>
+                    {departments && departments.length > 0 ? (
+                      <select
+                        value={assignDept}
+                        onChange={(e) => setAssignDept(e.target.value)}
+                        className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="">Select Department...</option>
+                        {departments.map((d) => (
+                          <option key={d.id || d.name} value={d.name}>
+                            {d.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        value={assignDept}
+                        onChange={(e) => setAssignDept(e.target.value)}
+                        placeholder="e.g., Municipal Roads (PWD)"
+                        className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                      Officer / Responsible Unit
+                    </label>
+                    <input
+                      type="text"
+                      value={assignTo}
+                      onChange={(e) => setAssignTo(e.target.value)}
+                      placeholder="e.g., Officer A (Bhopal Rapid Patch Squad)"
+                      className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block mb-1">
+                    Assignment / Dispatch Note <span className="text-slate-400 font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={assignNote}
+                    onChange={(e) => setAssignNote(e.target.value)}
+                    placeholder="e.g., Immediate night milling and hot asphalt filling required."
+                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  {assignSuccessMsg ? (
+                    <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                      ✓ {assignSuccessMsg}
+                    </span>
+                  ) : <span />}
+                  <button
+                    type="submit"
+                    disabled={isAssigning || !assignDept.trim() || !assignTo.trim()}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>{isAssigning ? 'Assigning...' : complaint.assigned_to ? 'Reassign Case' : 'Assign Case'}</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Auditable Assignment History */}
+              {complaint.assignment_history && complaint.assignment_history.length > 0 && (
+                <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                      <History className="w-3 h-3" />
+                      <span>Assignment History ({complaint.assignment_history.length})</span>
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    {complaint.assignment_history.map((rec, i) => (
+                      <div
+                        key={rec.id || i}
+                        className="p-2 rounded-xl bg-slate-100/70 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/60 text-[11px] space-y-0.5"
+                      >
+                        <div className="flex items-center justify-between font-semibold text-slate-800 dark:text-slate-200">
+                          <span>
+                            {rec.previous_assignee ? `${rec.previous_assignee} → ` : ''}
+                            {rec.new_assignee} ({rec.new_department})
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {new Date(rec.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        {rec.note && <p className="text-slate-600 dark:text-slate-300 italic">"{rec.note}"</p>}
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500">By {rec.changed_by}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Confidential Internal Notes (Phase 7) */}
+            <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <Lock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                    Internal Authority Notes
+                  </h4>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
+                  Confidential • Officers Only
+                </span>
+              </div>
+
+              {/* Notes Chronological List */}
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                {complaint.internal_notes && complaint.internal_notes.length > 0 ? (
+                  complaint.internal_notes.map((n, i) => (
+                    <div
+                      key={n.id || i}
+                      className="p-2.5 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs space-y-1"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 text-[11px] flex items-center gap-1.5">
+                          <User className="w-3 h-3 text-purple-500" />
+                          <span>{n.author}</span>
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })},{' '}
+                          {new Date(n.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="text-slate-700 dark:text-slate-300 leading-snug">{n.note}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
+                    No internal notes logged yet.
+                  </p>
+                )}
+              </div>
+
+              {/* Add Note Form */}
+              <form onSubmit={handleInternalNoteSubmit} className="space-y-2 pt-1">
+                <textarea
+                  value={internalNoteInput}
+                  onChange={(e) => setInternalNoteInput(e.target.value)}
+                  placeholder="Add confidential officer note (e.g., contractor coordination, procurement status)..."
+                  rows={2}
+                  className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-purple-500 resize-none"
+                />
+                <div className="flex items-center justify-between">
+                  {noteSuccessMsg ? (
+                    <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                      ✓ {noteSuccessMsg}
+                    </span>
+                  ) : <span />}
+                  <button
+                    type="submit"
+                    disabled={isSubmittingNote || !internalNoteInput.trim()}
+                    className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Send className="w-3 h-3" />
+                    <span>{isSubmittingNote ? 'Saving...' : 'Post Internal Note'}</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* Citizen Status Inquiries (Phase 7) */}
+            {complaint.status_update_requests && complaint.status_update_requests.length > 0 && (
+              <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/80 dark:border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                    <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                      Citizen Status Inquiries
+                    </h4>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {complaint.status_update_requests.length} Inquiry/Inquiries
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {complaint.status_update_requests.map((req) => {
+                    const isOpen = req.state === 'OPEN';
+                    return (
+                      <div
+                        key={req.id}
+                        className="p-3 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Requested {new Date(req.request_date || req.requested_at || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                              isOpen
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800/60'
+                                : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                            }`}
+                          >
+                            {req.state || 'OPEN'}
+                          </span>
+                        </div>
+
+                        {req.citizen_message && (
+                          <p className="text-slate-800 dark:text-slate-200 italic bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-200/60 dark:border-slate-800/60">
+                            "{req.citizen_message}"
+                          </p>
+                        )}
+
+                        {isOpen ? (
+                          <div className="space-y-1.5 pt-1">
+                            <input
+                              type="text"
+                              value={ackResponseNotes[req.id] || ''}
+                              onChange={(e) =>
+                                setAckResponseNotes((prev) => ({ ...prev, [req.id]: e.target.value }))
+                              }
+                              placeholder="Enter acknowledgment / progress update for citizen..."
+                              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-sky-500"
+                            />
+                            <div className="flex justify-end">
+                              <button
+                                type="button"
+                                onClick={() => handleAcknowledgeRequest(req.id)}
+                                disabled={acknowledgingIds[req.id]}
+                                className="px-3 py-1 bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1 cursor-pointer"
+                              >
+                                <Check className="w-3 h-3" />
+                                <span>{acknowledgingIds[req.id] ? 'Acknowledging...' : 'Acknowledge Request'}</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-[11px] text-emerald-700 dark:text-emerald-300 space-y-0.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1 font-medium">
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>Acknowledged by {req.acknowledged_by || 'Authority Officer'}</span>
+                            </div>
+                            {req.response_note && (
+                              <p className="text-slate-600 dark:text-slate-400 italic">"{req.response_note}"</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Auditable Civic Lifecycle Timeline */}
             <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs">
               <div className="flex items-center justify-between mb-3">
@@ -655,6 +1093,10 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                   const isReopenEvent = item.status === 'REOPENED';
                   const isConfirmEvent = item.status === 'CITIZEN_CONFIRMED';
                   const isResolveEvent = item.status === 'RESOLVED';
+                  const isAssignEvent = item.status === 'ASSIGNED';
+                  const isInternalNoteEvent = item.status === 'INTERNAL_NOTE';
+                  const isStatusReqEvent = item.status === 'STATUS_UPDATE_REQUESTED';
+                  const isStatusAckEvent = item.status === 'STATUS_REQUEST_ACKNOWLEDGED';
 
                   return (
                     <div key={idx} className="relative">
@@ -664,6 +1106,12 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                             ? 'border-rose-600 bg-rose-600 dark:border-rose-500 dark:bg-rose-500'
                             : isConfirmEvent || isResolveEvent
                             ? 'border-emerald-600 bg-emerald-600 dark:border-emerald-400 dark:bg-emerald-400'
+                            : isAssignEvent
+                            ? 'border-blue-600 bg-blue-600 dark:border-blue-400 dark:bg-blue-400'
+                            : isInternalNoteEvent
+                            ? 'border-purple-600 bg-purple-600 dark:border-purple-400 dark:bg-purple-400'
+                            : isStatusReqEvent || isStatusAckEvent
+                            ? 'border-sky-500 bg-sky-500 dark:border-sky-400 dark:bg-sky-400'
                             : isLast
                             ? 'border-slate-900 bg-slate-900 dark:border-slate-100 dark:bg-slate-100'
                             : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-950'
@@ -677,6 +1125,12 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                                 ? 'text-rose-600 dark:text-rose-400'
                                 : isConfirmEvent
                                 ? 'text-emerald-600 dark:text-emerald-400'
+                                : isAssignEvent
+                                ? 'text-blue-600 dark:text-blue-400'
+                                : isInternalNoteEvent
+                                ? 'text-purple-600 dark:text-purple-400'
+                                : isStatusReqEvent || isStatusAckEvent
+                                ? 'text-sky-600 dark:text-sky-400'
                                 : isLast
                                 ? 'text-slate-900 dark:text-slate-100'
                                 : 'text-slate-700 dark:text-slate-300'

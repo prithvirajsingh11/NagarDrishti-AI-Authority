@@ -28,6 +28,8 @@ interface MapIntelligenceProps {
   onDepartmentFilterChange: (val: string) => void;
   resolutionStatusFilter?: string;
   onResolutionStatusFilterChange?: (val: string) => void;
+  priorityLevelFilter?: string;
+  onPriorityLevelFilterChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   searchQuery: string;
@@ -55,6 +57,8 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
   onDepartmentFilterChange,
   resolutionStatusFilter = '',
   onResolutionStatusFilterChange,
+  priorityLevelFilter = '',
+  onPriorityLevelFilterChange,
   dateHorizon,
   onDateHorizonChange,
   searchQuery,
@@ -109,6 +113,8 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
           onDepartmentChange={onDepartmentFilterChange}
           resolutionStatus={resolutionStatusFilter}
           onResolutionStatusChange={onResolutionStatusFilterChange}
+          priorityLevel={priorityLevelFilter}
+          onPriorityLevelChange={onPriorityLevelFilterChange}
           dateHorizon={dateHorizon}
           onDateHorizonChange={onDateHorizonChange}
           search={searchQuery}
@@ -123,6 +129,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
         <LeafletMap
           complaints={complaints}
           heatmapPoints={heatmapPoints}
+          hotspots={hotspots}
           mapMode={mapMode}
           onMapModeChange={onMapModeChange}
           onSelectComplaint={onSelectComplaint}

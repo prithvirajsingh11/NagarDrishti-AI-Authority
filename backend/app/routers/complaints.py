@@ -11,6 +11,12 @@ from ..models.schemas import (
     ResolveComplaintRequest,
     ReopenComplaintRequest,
     StatusHistoryItem,
+    AssignComplaintRequest,
+    InternalNote,
+    CreateInternalNoteRequest,
+    StatusUpdateRequestItem,
+    CreateStatusUpdateRequest,
+    AcknowledgeStatusRequest,
 )
 from ..services.store import data_store
 from ..auth import require_authority, verify_token
@@ -28,6 +34,7 @@ def get_complaints(
     status: Optional[str] = Query(None, description="Filter by complaint lifecycle status"),
     department: Optional[str] = Query(None, description="Filter by department name substring"),
     resolution_status: Optional[str] = Query(None, description="Filter by resolution status"),
+    priority_level: Optional[str] = Query(None, description="Filter by priority level (CRITICAL, HIGH, MEDIUM, LOW)"),
     limit: Optional[int] = Query(None, description="Limit number of returned records"),
 ):
     """Retrieve filtered civic complaint records for authority triage."""
@@ -37,6 +44,7 @@ def get_complaints(
         status=status,
         department=department,
         resolution_status=resolution_status,
+        priority_level=priority_level,
         limit=limit,
     )
 
@@ -227,3 +235,90 @@ def get_complaint_history(
 def create_complaint(payload: ComplaintCreate):
     """Register a new citizen civic complaint."""
     return data_store.add_complaint(payload)
+
+
+@router.post("/{complaint_id}/assign", response_model=Complaint)
+def assign_complaint(
+    complaint_id: str,
+    payload: AssignComplaintRequest,
+    current_user: dict = Depends(require_authority),
+):
+    """Assign civic complaint to department and responsible officer/team."""
+    authority_name = current_user.get("full_name") or current_user.get("email") or "Municipal Authority Officer"
+    assigned = data_store.assign_complaint(
+        complaint_id=complaint_id,
+        department=payload.department,
+        assigned_to=payload.assigned_to,
+        note=payload.note,
+        changed_by=authority_name,
+    )
+    if not assigned:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    return assigned
+
+
+@router.post("/{complaint_id}/internal-notes", response_model=InternalNote)
+def add_internal_note(
+    complaint_id: str,
+    payload: CreateInternalNoteRequest,
+    current_user: dict = Depends(require_authority),
+):
+    """Add confidential internal authority note. Never visible to citizens."""
+    authority_name = current_user.get("full_name") or current_user.get("email") or "Municipal Authority Officer"
+    note = data_store.add_internal_note(
+        complaint_id=complaint_id,
+        note=payload.note,
+        author=authority_name,
+        author_role="authority",
+    )
+    if not note:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    return note
+
+
+@router.get("/{complaint_id}/internal-notes", response_model=List[InternalNote])
+def get_internal_notes(
+    complaint_id: str,
+    current_user: dict = Depends(require_authority),
+):
+    """Retrieve internal confidential notes for a complaint. Authority only."""
+    complaint = data_store.get_complaint(complaint_id)
+    if not complaint:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    return data_store.get_internal_notes(complaint_id)
+
+
+@router.post("/{complaint_id}/status-request", response_model=StatusUpdateRequestItem)
+def create_status_update_request(
+    complaint_id: str,
+    payload: CreateStatusUpdateRequest,
+):
+    """Citizen submits a request for a status update on a reported complaint."""
+    req = data_store.create_status_update_request(
+        complaint_id=complaint_id,
+        citizen_message=payload.citizen_message,
+    )
+    if not req:
+        raise HTTPException(status_code=404, detail="Complaint not found.")
+    return req
+
+
+@router.post("/{complaint_id}/status-request/{request_id}/acknowledge", response_model=StatusUpdateRequestItem)
+def acknowledge_status_update_request(
+    complaint_id: str,
+    request_id: str,
+    payload: AcknowledgeStatusRequest,
+    current_user: dict = Depends(require_authority),
+):
+    """Authority acknowledges citizen's status update request without altering complaint status."""
+    authority_name = current_user.get("full_name") or current_user.get("email") or "Municipal Authority Officer"
+    req = data_store.acknowledge_status_update_request(
+        complaint_id=complaint_id,
+        request_id=request_id,
+        acknowledged_by=authority_name,
+        response_note=payload.response_note,
+    )
+    if not req:
+        raise HTTPException(status_code=404, detail="Complaint or status request not found.")
+    return req
+

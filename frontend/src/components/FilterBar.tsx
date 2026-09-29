@@ -13,6 +13,8 @@ interface FilterBarProps {
   onDepartmentChange: (val: string) => void;
   resolutionStatus?: string;
   onResolutionStatusChange?: (val: string) => void;
+  priorityLevel?: string;
+  onPriorityLevelChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   search: string;
@@ -32,6 +34,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onDepartmentChange,
   resolutionStatus = '',
   onResolutionStatusChange,
+  priorityLevel = '',
+  onPriorityLevelChange,
   dateHorizon,
   onDateHorizonChange,
   search,
@@ -45,6 +49,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     status,
     department,
     resolutionStatus,
+    priorityLevel,
     dateHorizon !== 'all' ? dateHorizon : '',
     search,
   ].filter(Boolean).length;
@@ -91,6 +96,20 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <option value="HIGH">High</option>
           <option value="MEDIUM">Medium</option>
           <option value="LOW">Low</option>
+        </select>
+
+        {/* Priority Level Filter */}
+        <select
+          value={priorityLevel}
+          onChange={(e) => onPriorityLevelChange?.(e.target.value)}
+          aria-label="Filter by priority level"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+        >
+          <option value="">All Priorities</option>
+          <option value="CRITICAL">Critical Priority</option>
+          <option value="HIGH">High Priority</option>
+          <option value="MEDIUM">Medium Priority</option>
+          <option value="LOW">Low Priority</option>
         </select>
 
         {/* Status Filter */}
