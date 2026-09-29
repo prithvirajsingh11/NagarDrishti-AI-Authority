@@ -13,6 +13,9 @@ import { useTheme } from '../context/ThemeContext';
 export type MapMode = 'markers' | 'clusters' | 'heatmap';
 export type TileLayerMode = 'normal' | 'satellite' | '3d';
 
+export const DEFAULT_MAP_CENTER: [number, number] = [23.2599, 77.4126];
+export const DEFAULT_MAP_ZOOM = 12;
+
 interface LeafletMapProps {
   complaints: Complaint[];
   heatmapPoints?: HeatmapPoint[];
@@ -92,11 +95,10 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
-    // Default Municipal Center (Delhi)
-    const initialCenter: [number, number] = [28.6139, 77.209];
+    // Default Municipal Center (Bhopal, Madhya Pradesh)
     const map = L.map(containerRef.current, {
-      center: initialCenter,
-      zoom: 13,
+      center: DEFAULT_MAP_CENTER,
+      zoom: DEFAULT_MAP_ZOOM,
       zoomControl: true,
     });
 
