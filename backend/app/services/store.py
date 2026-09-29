@@ -9,7 +9,13 @@ from typing import Dict, List, Optional, Any
 
 import httpx
 
-from ..config import SHARED_DB_PATH, LOCAL_BACKUP_DB_PATH, USER_SITE_API_URL
+from ..config import (
+    SHARED_DB_PATH,
+    LOCAL_BACKUP_DB_PATH,
+    USER_SITE_API_URL,
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+)
 from ..models.schemas import (
     Complaint,
     ComplaintCreate,
@@ -198,11 +204,75 @@ class CivicDataStore:
     """
 
     def __init__(self):
+        self._supabase_client = None
+        self._last_supabase_sync: float = 0.0
         self.departments: List[Department] = copy.deepcopy(INITIAL_DEPARTMENTS)
         self.complaints: List[Complaint] = []
         self._last_mtime: float = 0.0
         self._report_seq = 119
         self._load_from_storage()
+
+    def _get_supabase_client(self):
+        if self._supabase_client is None and SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
+            try:
+                from supabase import create_client
+                self._supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+                logger.info("Connected to Supabase PostgreSQL database.")
+            except Exception as e:
+                logger.warning(f"Could not initialize Supabase client: {e}")
+        return self._supabase_client
+
+    def _sync_with_supabase(self) -> bool:
+        client = self._get_supabase_client()
+        if not client:
+            return False
+        try:
+            res = client.table("complaints").select("*").order("created_at", desc=True).execute()
+            if res.data is not None:
+                parsed = []
+                max_seq = 118
+                for item in res.data:
+                    try:
+                        if not isinstance(item.get("evidence"), list):
+                            item["evidence"] = []
+                        c = Complaint(**item)
+                        parsed.append(c)
+                        rep = str(c.report_id)
+                        if rep.startswith("NGD-2026-"):
+                            try:
+                                s = int(rep.split("-")[-1])
+                                if s > max_seq:
+                                    max_seq = s
+                            except ValueError:
+                                pass
+                    except Exception as parse_err:
+                        logger.warning(f"Error parsing complaint record from Supabase: {parse_err}")
+                if parsed:
+                    self.complaints = parsed
+                    self._report_seq = max_seq + 1
+                    self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
+                    logger.info(f"Loaded {len(parsed)} complaints directly from Supabase")
+
+                # Sync active departments
+                try:
+                    dept_res = client.table("departments").select("*").eq("is_active", True).execute()
+                    if dept_res.data:
+                        self.departments = [
+                            Department(
+                                id=str(d["id"]),
+                                name=d["name"],
+                                category=d.get("category", "other"),
+                                is_active=d.get("is_active", True),
+                            )
+                            for d in dept_res.data
+                        ]
+                except Exception as de:
+                    logger.warning(f"Could not sync departments from Supabase: {de}")
+
+                return True
+        except Exception as e:
+            logger.warning(f"Failed to sync with Supabase: {e}")
+        return False
 
     def _get_storage_targets(self) -> List[Path]:
         targets = []
@@ -217,7 +287,11 @@ class CivicDataStore:
         return targets
 
     def _load_from_storage(self):
-        """Loads complaints from the shared database file."""
+        """Loads complaints from Supabase or shared database file."""
+        if self._sync_with_supabase():
+            self._save_to_storage()
+            return
+
         targets = self._get_storage_targets()
         loaded = False
 
@@ -573,7 +647,12 @@ class CivicDataStore:
                 logger.warning(f"Failed to persist complaints to {target}: {e}")
 
     def _check_auto_reload(self):
-        """Checks if the shared database on disk was modified by the user site, and reloads."""
+        """Checks if Supabase or disk storage has updates, with 5s sync debounce."""
+        now = datetime.now(timezone.utc).timestamp()
+        if now - self._last_supabase_sync > 5.0:
+            if self._sync_with_supabase():
+                return
+
         targets = self._get_storage_targets()
         for target in targets:
             if target.exists():
@@ -660,13 +739,30 @@ class CivicDataStore:
 
     def update_complaint_status(self, complaint_id: str, new_status: ComplaintStatus) -> Optional[Complaint]:
         self._check_auto_reload()
+        updated_c = None
+        now_iso = datetime.now(timezone.utc).isoformat()
         for c in self.complaints:
             if c.id == complaint_id or c.report_id == complaint_id:
                 c.status = new_status
-                c.updated_at = datetime.now(timezone.utc).isoformat()
-                self._save_to_storage()
-                self._notify_user_site_status(c.report_id, new_status)
-                return c
+                c.updated_at = now_iso
+                updated_c = c
+                break
+
+        if updated_c:
+            client = self._get_supabase_client()
+            if client:
+                try:
+                    client.table("complaints").update({
+                        "status": new_status,
+                        "updated_at": now_iso
+                    }).eq("report_id", updated_c.report_id).execute()
+                    logger.info(f"Updated status for {updated_c.report_id} in Supabase")
+                except Exception as se:
+                    logger.warning(f"Failed to update status in Supabase: {se}")
+
+            self._save_to_storage()
+            self._notify_user_site_status(updated_c.report_id, new_status)
+            return updated_c
         return None
 
     def add_complaint(self, payload: ComplaintCreate) -> Complaint:
@@ -707,6 +803,32 @@ class CivicDataStore:
         )
         self.complaints.insert(0, new_complaint)
         self._save_to_storage()
+
+        client = self._get_supabase_client()
+        if client:
+            try:
+                client.table("complaints").insert({
+                    "id": new_complaint.id,
+                    "report_id": new_complaint.report_id,
+                    "problem_type": new_complaint.problem_type,
+                    "confidence": new_complaint.confidence,
+                    "severity": new_complaint.severity,
+                    "evidence": new_complaint.evidence,
+                    "latitude": new_complaint.latitude,
+                    "longitude": new_complaint.longitude,
+                    "location_name": new_complaint.location_name,
+                    "department": new_complaint.department,
+                    "description": new_complaint.description,
+                    "image_url": new_complaint.image_url,
+                    "status": new_complaint.status,
+                    "duplicate_of": new_complaint.duplicate_of,
+                    "created_at": new_complaint.created_at,
+                    "updated_at": new_complaint.updated_at,
+                }).execute()
+                logger.info(f"Inserted complaint {new_complaint.report_id} into Supabase")
+            except Exception as se:
+                logger.warning(f"Failed to insert complaint into Supabase: {se}")
+
         return new_complaint
 
     def get_heatmap_points(self) -> List[HeatmapPoint]:

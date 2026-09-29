@@ -1,8 +1,92 @@
 [
   {
-    "id": "9e813a66-933d-4682-b37d-5fc6a38d8ba3",
-    "report_id": "NGD-2026-00129",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "a9c4b6b4-1980-4217-a51e-92e22addfcbd",
+    "report_id": "NGD-2026-00240",
+    "problem_type": "pothole",
+    "confidence": 0.85,
+    "severity": "MEDIUM",
+    "evidence": [
+      "[DEMO FALLBACK] Road-surface asphalt defect identified",
+      "[DEMO FALLBACK] Active traffic lane depression pattern"
+    ],
+    "latitude": 23.214529,
+    "longitude": 77.458248,
+    "location_name": "Pinned Location (23.2145, 77.4582)",
+    "department": "Municipal Roads",
+    "description": "",
+    "image_url": "/api/complaints/image/915114f9327c468599daf0dd99dad630.png",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00239",
+    "created_at": "2026-09-28T19:45:54.885014+00:00",
+    "updated_at": "2026-09-28T19:45:54.885014+00:00"
+  },
+  {
+    "id": "8af2e9f2-19ab-49fe-b795-9c6670c96ffa",
+    "report_id": "NGD-2026-00239",
+    "problem_type": "pothole",
+    "confidence": 0.85,
+    "severity": "MEDIUM",
+    "evidence": [
+      "[DEMO FALLBACK] Road-surface asphalt defect identified",
+      "[DEMO FALLBACK] Active traffic lane depression pattern"
+    ],
+    "latitude": 23.214529,
+    "longitude": 77.458248,
+    "location_name": "Pinned Location (23.2145, 77.4582)",
+    "department": "Municipal Roads",
+    "description": "",
+    "image_url": "/api/complaints/image/2bf216a3b1d84de0bf0e043bd8d688ae.png",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-28T19:30:12.059605+00:00",
+    "updated_at": "2026-09-28T19:30:12.059605+00:00"
+  },
+  {
+    "id": "9fcf2673-db98-415f-a0a2-d59e6c35061e",
+    "report_id": "NGD-2026-00238",
+    "problem_type": "pothole",
+    "confidence": 0.98,
+    "severity": "HIGH",
+    "evidence": [
+      "Large depression in the asphalt road surface",
+      "Water accumulation filling the pothole cavity",
+      "Visible crumbling edges surrounding the crater"
+    ],
+    "latitude": 23.181474,
+    "longitude": 77.432842,
+    "location_name": "Adjusted Location (23.1815, 77.4328)",
+    "department": "Municipal Roads",
+    "description": "",
+    "image_url": "/api/complaints/image/5047179d5f76450abeec5682d0b08a7c.png",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00149",
+    "created_at": "2026-09-27T17:26:31.649794+00:00",
+    "updated_at": "2026-09-27T17:26:31.649794+00:00"
+  },
+  {
+    "id": "104c013d-b0f3-4ead-8b2f-f1fc60ea930b",
+    "report_id": "NGD-2026-00237",
+    "problem_type": "pothole",
+    "confidence": 0.85,
+    "severity": "MEDIUM",
+    "evidence": [
+      "[DEMO FALLBACK] Road-surface asphalt defect identified",
+      "[DEMO FALLBACK] Active traffic lane depression pattern"
+    ],
+    "latitude": 23.251437,
+    "longitude": 77.503652,
+    "location_name": "Citizen GPS Location (±35m accuracy)",
+    "department": "Municipal Roads",
+    "description": "",
+    "image_url": "/api/complaints/image/201788194fd94d399ddfb8815a9288cd.png",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T14:13:11.763541+00:00",
+    "updated_at": "2026-09-27T14:13:11.763541+00:00"
+  },
+  {
+    "id": "62863b57-6bbd-4f64-9d05-95b741bb0e87",
+    "report_id": "NGD-2026-00236",
     "problem_type": "pothole",
     "confidence": 0.9,
     "severity": "HIGH",
@@ -14,16 +98,15 @@
     "location_name": "Evidence Site",
     "department": "Municipal Roads",
     "description": "Image access verification",
-    "image_url": "/api/complaints/image/bb0716f144d94ed482b5801f46268e79.jpg",
+    "image_url": "/api/complaints/image/1a26deccb6374b6683402dd540a0681c.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.464803+00:00",
-    "updated_at": "2026-09-27T15:52:07.464803+00:00"
+    "duplicate_of": "NGD-2026-00224",
+    "created_at": "2026-09-27T12:55:20.938562+00:00",
+    "updated_at": "2026-09-27T12:55:20.938562+00:00"
   },
   {
-    "id": "3e49875c-cb4e-4f6c-a485-02a48f625b8a",
-    "report_id": "NGD-2026-00128",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "7e98be49-1e4e-4535-a554-349a2dca4bf7",
+    "report_id": "NGD-2026-00235",
     "problem_type": "pothole",
     "confidence": 0.88,
     "severity": "LOW",
@@ -37,14 +120,13 @@
     "description": "Mine alone",
     "image_url": "https://example.com/c1.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.458921+00:00",
-    "updated_at": "2026-09-27T15:52:07.458921+00:00"
+    "duplicate_of": "NGD-2026-00223",
+    "created_at": "2026-09-27T12:55:19.230332+00:00",
+    "updated_at": "2026-09-27T12:55:19.230332+00:00"
   },
   {
-    "id": "43846dbd-1e0e-4de5-ae91-c8196d2f9a8f",
-    "report_id": "NGD-2026-00127",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "9f0c1d37-19f8-48cc-94b6-c693f0953279",
+    "report_id": "NGD-2026-00234",
     "problem_type": "streetlight",
     "confidence": 0.9,
     "severity": "LOW",
@@ -58,14 +140,13 @@
     "description": "Status security test",
     "image_url": "https://example.com/light.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.452520+00:00",
-    "updated_at": "2026-09-27T15:52:07.452520+00:00"
+    "duplicate_of": "NGD-2026-00222",
+    "created_at": "2026-09-27T12:55:18.180653+00:00",
+    "updated_at": "2026-09-27T12:55:18.180653+00:00"
   },
   {
-    "id": "18a1579e-223e-475b-af12-90894318ee28",
-    "report_id": "NGD-2026-00126",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "6a6fa906-e306-4220-8ad4-dc89335ac61a",
+    "report_id": "NGD-2026-00233",
     "problem_type": "drain",
     "confidence": 0.9,
     "severity": "MEDIUM",
@@ -79,14 +160,13 @@
     "description": "Private complaint of citizen 1",
     "image_url": "https://example.com/drain1.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.448805+00:00",
-    "updated_at": "2026-09-27T15:52:07.448805+00:00"
+    "duplicate_of": "NGD-2026-00221",
+    "created_at": "2026-09-27T12:55:17.443704+00:00",
+    "updated_at": "2026-09-27T12:55:17.443704+00:00"
   },
   {
-    "id": "629f52ea-60fa-4b1b-851f-9585e611e3a5",
-    "report_id": "NGD-2026-00125",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "e7e28e1c-fab7-4045-879d-7c3d3eff3965",
+    "report_id": "NGD-2026-00232",
     "problem_type": "garbage",
     "confidence": 0.9,
     "severity": "LOW",
@@ -100,14 +180,13 @@
     "description": "Read own complaint test",
     "image_url": "https://example.com/litter.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.444475+00:00",
-    "updated_at": "2026-09-27T15:52:07.444475+00:00"
+    "duplicate_of": "NGD-2026-00220",
+    "created_at": "2026-09-27T12:55:16.690675+00:00",
+    "updated_at": "2026-09-27T12:55:16.690675+00:00"
   },
   {
-    "id": "6ba0b78b-f4b5-4952-85f8-babde96ce751",
-    "report_id": "NGD-2026-00124",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "65dd39bf-78cd-4041-af71-78389ac099cf",
+    "report_id": "NGD-2026-00231",
     "problem_type": "pothole",
     "confidence": 0.9,
     "severity": "HIGH",
@@ -121,14 +200,13 @@
     "description": "Owner verification test",
     "image_url": "https://example.com/pothole_owner.jpg",
     "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.441770+00:00",
-    "updated_at": "2026-09-27T15:52:07.441770+00:00"
+    "duplicate_of": "NGD-2026-00219",
+    "created_at": "2026-09-27T12:55:15.680123+00:00",
+    "updated_at": "2026-09-27T12:55:15.680123+00:00"
   },
   {
-    "id": "8a6d5ba2-f186-4912-bd9e-118e16eafba7",
-    "report_id": "NGD-2026-00123",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "146f83dd-12d8-48c5-ae52-deb689de624a",
+    "report_id": "NGD-2026-00230",
     "problem_type": "garbage",
     "confidence": 0.95,
     "severity": "MEDIUM",
@@ -143,13 +221,12 @@
     "image_url": "https://example.com/waste.jpg",
     "status": "RESOLVED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.421050+00:00",
-    "updated_at": "2026-09-27T15:52:07.427566+00:00"
+    "created_at": "2026-09-27T12:55:14.095815+00:00",
+    "updated_at": "2026-09-27T12:55:14.554363+00:00"
   },
   {
-    "id": "f6e4f751-4882-4f6c-834c-272a7bad0711",
-    "report_id": "NGD-2026-00122",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "40b64a14-b99f-4c1e-9178-e1f9f0e2a91f",
+    "report_id": "NGD-2026-00229",
     "problem_type": "pothole",
     "confidence": 0.89,
     "severity": "HIGH",
@@ -163,14 +240,1373 @@
     "description": "Duplicate report",
     "image_url": "https://example.com/pothole2.jpg",
     "status": "REPORTED",
-    "duplicate_of": "NGD-2026-00121",
-    "created_at": "2026-09-27T15:52:07.418565+00:00",
-    "updated_at": "2026-09-27T15:52:07.418565+00:00"
+    "duplicate_of": "NGD-2026-00228",
+    "created_at": "2026-09-27T12:55:13.322083+00:00",
+    "updated_at": "2026-09-27T12:55:13.322083+00:00"
   },
   {
-    "id": "60b2efe6-3d44-466a-be84-c07c908de287",
-    "report_id": "NGD-2026-00121",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "bce8d3b6-caf6-4dbe-88f2-a55fd5045a7e",
+    "report_id": "NGD-2026-00228",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00217",
+    "created_at": "2026-09-27T12:55:12.587939+00:00",
+    "updated_at": "2026-09-27T12:55:12.587939+00:00"
+  },
+  {
+    "id": "39100841-54dc-4153-92e1-ecdcba6b02c2",
+    "report_id": "NGD-2026-00227",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00215",
+    "created_at": "2026-09-27T12:55:07.973715+00:00",
+    "updated_at": "2026-09-27T12:55:07.973715+00:00"
+  },
+  {
+    "id": "8624ceed-3304-4cb4-8f04-8e677e8a1398",
+    "report_id": "NGD-2026-00226",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00214",
+    "created_at": "2026-09-27T12:55:04.959089+00:00",
+    "updated_at": "2026-09-27T12:55:05.596242+00:00"
+  },
+  {
+    "id": "56adc4dc-6a4c-454d-affa-5ba36daa0c6e",
+    "report_id": "NGD-2026-00225",
+    "problem_type": "drain",
+    "confidence": 0.92,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Blocked gutter"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.21,
+    "location_name": "Barakhamba Road",
+    "department": "Drainage & Sewerage",
+    "description": "Drain overflowing onto sidewalk",
+    "image_url": "https://example.com/drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00213",
+    "created_at": "2026-09-27T12:55:01.909906+00:00",
+    "updated_at": "2026-09-27T12:55:01.909906+00:00"
+  },
+  {
+    "id": "60cbf5dc-4b20-47c1-9f9c-0f8a84c997cb",
+    "report_id": "NGD-2026-00224",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/e69a18a740ff4e9eb122660e00c041d9.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00212",
+    "created_at": "2026-09-27T12:54:40.426628+00:00",
+    "updated_at": "2026-09-27T12:54:40.426628+00:00"
+  },
+  {
+    "id": "b1983bcf-d5d4-4da2-b65f-f7f50f69a4bf",
+    "report_id": "NGD-2026-00223",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00211",
+    "created_at": "2026-09-27T12:54:38.715572+00:00",
+    "updated_at": "2026-09-27T12:54:38.715572+00:00"
+  },
+  {
+    "id": "9b42a0ff-55b9-4024-952f-d501d28175f6",
+    "report_id": "NGD-2026-00222",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00210",
+    "created_at": "2026-09-27T12:54:37.605526+00:00",
+    "updated_at": "2026-09-27T12:54:37.605526+00:00"
+  },
+  {
+    "id": "f1f02072-b92b-4698-9162-06ae5e5b381c",
+    "report_id": "NGD-2026-00221",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00209",
+    "created_at": "2026-09-27T12:54:36.828643+00:00",
+    "updated_at": "2026-09-27T12:54:36.828643+00:00"
+  },
+  {
+    "id": "31cc13f6-bd0a-47e2-8ad6-11ebdfc3077f",
+    "report_id": "NGD-2026-00220",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00208",
+    "created_at": "2026-09-27T12:54:35.934307+00:00",
+    "updated_at": "2026-09-27T12:54:35.934307+00:00"
+  },
+  {
+    "id": "5a8d98ca-1573-44cc-a25f-2cd56f4ff9ba",
+    "report_id": "NGD-2026-00219",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00207",
+    "created_at": "2026-09-27T12:54:35.140447+00:00",
+    "updated_at": "2026-09-27T12:54:35.140447+00:00"
+  },
+  {
+    "id": "e3b620ef-16a8-4dd3-96b8-8c0bc991b978",
+    "report_id": "NGD-2026-00218",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T12:54:33.516485+00:00",
+    "updated_at": "2026-09-27T12:54:33.998658+00:00"
+  },
+  {
+    "id": "4fdc7034-56e0-4b00-836b-5332e73a3c84",
+    "report_id": "NGD-2026-00217",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00216",
+    "created_at": "2026-09-27T12:54:32.562039+00:00",
+    "updated_at": "2026-09-27T12:54:32.562039+00:00"
+  },
+  {
+    "id": "c4a59c80-9976-4649-8499-33af9cb8e4ba",
+    "report_id": "NGD-2026-00216",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00205",
+    "created_at": "2026-09-27T12:54:31.752613+00:00",
+    "updated_at": "2026-09-27T12:54:31.752613+00:00"
+  },
+  {
+    "id": "e8f971e8-cf01-4bc2-99ba-585b290458d3",
+    "report_id": "NGD-2026-00215",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00203",
+    "created_at": "2026-09-27T12:54:27.398308+00:00",
+    "updated_at": "2026-09-27T12:54:27.398308+00:00"
+  },
+  {
+    "id": "c514327c-ddb4-43ff-8303-38185e8577cc",
+    "report_id": "NGD-2026-00214",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00202",
+    "created_at": "2026-09-27T12:54:24.515062+00:00",
+    "updated_at": "2026-09-27T12:54:24.914376+00:00"
+  },
+  {
+    "id": "e27017d7-27dc-4906-8b5f-9983e9e8e526",
+    "report_id": "NGD-2026-00213",
+    "problem_type": "drain",
+    "confidence": 0.92,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Blocked gutter"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.21,
+    "location_name": "Barakhamba Road",
+    "department": "Drainage & Sewerage",
+    "description": "Drain overflowing onto sidewalk",
+    "image_url": "https://example.com/drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T12:54:19.980528+00:00",
+    "updated_at": "2026-09-27T12:54:19.980528+00:00"
+  },
+  {
+    "id": "7e8c5998-6b1c-4310-a959-d3fe816622df",
+    "report_id": "NGD-2026-00212",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/8ac328e6c91a4a368fd5ce7b02c1dae0.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00201",
+    "created_at": "2026-09-27T12:48:48.166696+00:00",
+    "updated_at": "2026-09-27T12:48:48.166696+00:00"
+  },
+  {
+    "id": "bf0f7084-a260-44a6-a082-82128738a160",
+    "report_id": "NGD-2026-00211",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00200",
+    "created_at": "2026-09-27T12:48:46.473726+00:00",
+    "updated_at": "2026-09-27T12:48:46.473726+00:00"
+  },
+  {
+    "id": "11b45ed6-245f-4205-9250-228fdf5365e9",
+    "report_id": "NGD-2026-00210",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00199",
+    "created_at": "2026-09-27T12:48:45.098906+00:00",
+    "updated_at": "2026-09-27T12:48:45.098906+00:00"
+  },
+  {
+    "id": "f806c112-599f-47f9-8341-9285cd76b2f7",
+    "report_id": "NGD-2026-00209",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00198",
+    "created_at": "2026-09-27T12:48:44.200306+00:00",
+    "updated_at": "2026-09-27T12:48:44.200306+00:00"
+  },
+  {
+    "id": "1328ec5b-28d5-4b29-b36f-599d29b812cb",
+    "report_id": "NGD-2026-00208",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00197",
+    "created_at": "2026-09-27T12:48:43.419444+00:00",
+    "updated_at": "2026-09-27T12:48:43.419444+00:00"
+  },
+  {
+    "id": "988dd374-8749-4d5e-8b1f-fe11a0046be4",
+    "report_id": "NGD-2026-00207",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00196",
+    "created_at": "2026-09-27T12:48:42.394685+00:00",
+    "updated_at": "2026-09-27T12:48:42.394685+00:00"
+  },
+  {
+    "id": "211bb706-24a9-4b75-ab93-8e88d92114b8",
+    "report_id": "NGD-2026-00206",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T12:48:40.73745+00:00",
+    "updated_at": "2026-09-27T12:48:41.165794+00:00"
+  },
+  {
+    "id": "77a533a0-b89c-4760-989b-0592398b5085",
+    "report_id": "NGD-2026-00205",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00204",
+    "created_at": "2026-09-27T12:48:39.995479+00:00",
+    "updated_at": "2026-09-27T12:48:39.995479+00:00"
+  },
+  {
+    "id": "95d12575-7e31-401b-b2fb-b5e581809117",
+    "report_id": "NGD-2026-00204",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00194",
+    "created_at": "2026-09-27T12:48:39.248602+00:00",
+    "updated_at": "2026-09-27T12:48:39.248602+00:00"
+  },
+  {
+    "id": "d7dfbcf2-c124-4bf9-9add-0865ce20f1b7",
+    "report_id": "NGD-2026-00203",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00192",
+    "created_at": "2026-09-27T12:48:34.999478+00:00",
+    "updated_at": "2026-09-27T12:48:34.999478+00:00"
+  },
+  {
+    "id": "d6b6a028-6509-4391-bf18-20c91ae7c860",
+    "report_id": "NGD-2026-00202",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00191",
+    "created_at": "2026-09-27T12:48:29.330273+00:00",
+    "updated_at": "2026-09-27T12:48:31.993084+00:00"
+  },
+  {
+    "id": "2c6472ae-01cd-4918-8d53-ed99ec8a115b",
+    "report_id": "NGD-2026-00201",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/4a363531b8a84276a89d2ab11af5f8a3.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00190",
+    "created_at": "2026-09-27T12:14:49.226953+00:00",
+    "updated_at": "2026-09-27T12:14:49.226953+00:00"
+  },
+  {
+    "id": "40afd343-2fdc-4385-96eb-896bfefc3aba",
+    "report_id": "NGD-2026-00200",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00189",
+    "created_at": "2026-09-27T12:14:47.26132+00:00",
+    "updated_at": "2026-09-27T12:14:47.26132+00:00"
+  },
+  {
+    "id": "76b8c798-e1c9-42e7-bd7c-917870ec2e0d",
+    "report_id": "NGD-2026-00199",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00188",
+    "created_at": "2026-09-27T12:14:46.085976+00:00",
+    "updated_at": "2026-09-27T12:14:46.085976+00:00"
+  },
+  {
+    "id": "6ffe0c52-5f57-4e5e-b132-1c76b2a6dae1",
+    "report_id": "NGD-2026-00198",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00187",
+    "created_at": "2026-09-27T12:14:45.286616+00:00",
+    "updated_at": "2026-09-27T12:14:45.286616+00:00"
+  },
+  {
+    "id": "977e0ef5-1ab2-4914-993f-9dc5779e9573",
+    "report_id": "NGD-2026-00197",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00186",
+    "created_at": "2026-09-27T12:14:44.485479+00:00",
+    "updated_at": "2026-09-27T12:14:44.485479+00:00"
+  },
+  {
+    "id": "22de873e-80f7-4659-8a3a-258684bcec84",
+    "report_id": "NGD-2026-00196",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00185",
+    "created_at": "2026-09-27T12:14:43.655923+00:00",
+    "updated_at": "2026-09-27T12:14:43.655923+00:00"
+  },
+  {
+    "id": "31690cd4-2270-49a5-af78-213e26954634",
+    "report_id": "NGD-2026-00195",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T12:14:41.640532+00:00",
+    "updated_at": "2026-09-27T12:14:42.434964+00:00"
+  },
+  {
+    "id": "add59bd8-8568-4304-9458-aed1a709d44b",
+    "report_id": "NGD-2026-00194",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00193",
+    "created_at": "2026-09-27T12:14:40.737984+00:00",
+    "updated_at": "2026-09-27T12:14:40.737984+00:00"
+  },
+  {
+    "id": "4f6cfdbf-4a89-4baa-9306-46a64dabf3c1",
+    "report_id": "NGD-2026-00193",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00183",
+    "created_at": "2026-09-27T12:14:39.502587+00:00",
+    "updated_at": "2026-09-27T12:14:39.502587+00:00"
+  },
+  {
+    "id": "a036d413-527c-4619-9eee-b9aaaf7adb2b",
+    "report_id": "NGD-2026-00192",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00181",
+    "created_at": "2026-09-27T12:14:34.82305+00:00",
+    "updated_at": "2026-09-27T12:14:34.82305+00:00"
+  },
+  {
+    "id": "765028a8-7a85-4dd2-b8f0-090a9d1afa80",
+    "report_id": "NGD-2026-00191",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00180",
+    "created_at": "2026-09-27T12:14:27.469093+00:00",
+    "updated_at": "2026-09-27T12:14:31.085841+00:00"
+  },
+  {
+    "id": "26cfc7b8-e183-4771-9d23-de7a7c4db3f3",
+    "report_id": "NGD-2026-00190",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/b047b34711b945c491f033fe2a2b10de.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00179",
+    "created_at": "2026-09-27T08:55:58.742175+00:00",
+    "updated_at": "2026-09-27T08:55:58.742175+00:00"
+  },
+  {
+    "id": "1c4f8eb5-f06d-4fd6-a9eb-1971842ad322",
+    "report_id": "NGD-2026-00189",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00178",
+    "created_at": "2026-09-27T08:55:56.92502+00:00",
+    "updated_at": "2026-09-27T08:55:56.92502+00:00"
+  },
+  {
+    "id": "52c414ba-97d0-444b-9737-1554e0129e1b",
+    "report_id": "NGD-2026-00188",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00177",
+    "created_at": "2026-09-27T08:55:55.675208+00:00",
+    "updated_at": "2026-09-27T08:55:55.675208+00:00"
+  },
+  {
+    "id": "3ab406a8-35ec-4911-8767-25c2fdca1b34",
+    "report_id": "NGD-2026-00187",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00176",
+    "created_at": "2026-09-27T08:55:54.866335+00:00",
+    "updated_at": "2026-09-27T08:55:54.866335+00:00"
+  },
+  {
+    "id": "4d12b571-52d2-4193-8a53-a8842ac00bad",
+    "report_id": "NGD-2026-00186",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00175",
+    "created_at": "2026-09-27T08:55:54.073739+00:00",
+    "updated_at": "2026-09-27T08:55:54.073739+00:00"
+  },
+  {
+    "id": "800ae6a9-3ea0-4973-bd23-0838b2d956d2",
+    "report_id": "NGD-2026-00185",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00174",
+    "created_at": "2026-09-27T08:55:53.275235+00:00",
+    "updated_at": "2026-09-27T08:55:53.275235+00:00"
+  },
+  {
+    "id": "9923ea2b-08af-4d18-b952-4437fc8e9713",
+    "report_id": "NGD-2026-00184",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:55:51.310291+00:00",
+    "updated_at": "2026-09-27T08:55:52.360938+00:00"
+  },
+  {
+    "id": "39f45e5e-d75e-41da-a2d9-a3c89c0f875f",
+    "report_id": "NGD-2026-00183",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00182",
+    "created_at": "2026-09-27T08:55:50.519957+00:00",
+    "updated_at": "2026-09-27T08:55:50.519957+00:00"
+  },
+  {
+    "id": "d7b1e9ac-d082-4658-9d0e-b7e36dcbb5e7",
+    "report_id": "NGD-2026-00182",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00172",
+    "created_at": "2026-09-27T08:55:49.436241+00:00",
+    "updated_at": "2026-09-27T08:55:49.436241+00:00"
+  },
+  {
+    "id": "6a6909b0-adfa-41bd-a3aa-b9c0a9e7e968",
+    "report_id": "NGD-2026-00181",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00170",
+    "created_at": "2026-09-27T08:55:44.493038+00:00",
+    "updated_at": "2026-09-27T08:55:44.493038+00:00"
+  },
+  {
+    "id": "36bdeee5-577e-46ed-bfb6-1406836a8045",
+    "report_id": "NGD-2026-00180",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00169",
+    "created_at": "2026-09-27T08:55:39.342326+00:00",
+    "updated_at": "2026-09-27T08:55:41.816531+00:00"
+  },
+  {
+    "id": "1c45f7e5-911d-46ef-bc0f-b3ca4d73241e",
+    "report_id": "NGD-2026-00179",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/0da9cf37acbd4e15ae9366f072e84d63.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00168",
+    "created_at": "2026-09-27T08:09:38.504666+00:00",
+    "updated_at": "2026-09-27T08:09:38.504666+00:00"
+  },
+  {
+    "id": "a1d27356-413f-4d26-80b7-a116a149ef0c",
+    "report_id": "NGD-2026-00178",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00167",
+    "created_at": "2026-09-27T08:09:36.776216+00:00",
+    "updated_at": "2026-09-27T08:09:36.776216+00:00"
+  },
+  {
+    "id": "98c10f08-e79a-4f94-863a-879dde721a82",
+    "report_id": "NGD-2026-00177",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00166",
+    "created_at": "2026-09-27T08:09:35.511314+00:00",
+    "updated_at": "2026-09-27T08:09:35.511314+00:00"
+  },
+  {
+    "id": "50dbd472-0dac-4620-961f-841cb205f1eb",
+    "report_id": "NGD-2026-00176",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00165",
+    "created_at": "2026-09-27T08:09:34.787145+00:00",
+    "updated_at": "2026-09-27T08:09:34.787145+00:00"
+  },
+  {
+    "id": "072e220d-6129-4b94-ac4b-10cc6b72636f",
+    "report_id": "NGD-2026-00175",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00164",
+    "created_at": "2026-09-27T08:09:34.043367+00:00",
+    "updated_at": "2026-09-27T08:09:34.043367+00:00"
+  },
+  {
+    "id": "ea827098-89bd-48bf-913c-9c992c1842fe",
+    "report_id": "NGD-2026-00174",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00163",
+    "created_at": "2026-09-27T08:09:33.3146+00:00",
+    "updated_at": "2026-09-27T08:09:33.3146+00:00"
+  },
+  {
+    "id": "3b012680-9335-4e0d-a9af-09f414575f54",
+    "report_id": "NGD-2026-00173",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:09:31.814684+00:00",
+    "updated_at": "2026-09-27T08:09:32.463401+00:00"
+  },
+  {
+    "id": "f16f9a3e-0b0d-4894-a6c1-3f2cb46b16c7",
+    "report_id": "NGD-2026-00172",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00171",
+    "created_at": "2026-09-27T08:09:31.078287+00:00",
+    "updated_at": "2026-09-27T08:09:31.078287+00:00"
+  },
+  {
+    "id": "c375498d-0c8a-4c86-be5e-dce238ccf25a",
+    "report_id": "NGD-2026-00171",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.73,
+    "longitude": 77.33,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00161",
+    "created_at": "2026-09-27T08:09:30.350303+00:00",
+    "updated_at": "2026-09-27T08:09:30.350303+00:00"
+  },
+  {
+    "id": "d830126c-695d-495c-955e-d58ca0e07a35",
+    "report_id": "NGD-2026-00170",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00159",
+    "created_at": "2026-09-27T08:09:25.835393+00:00",
+    "updated_at": "2026-09-27T08:09:25.835393+00:00"
+  },
+  {
+    "id": "0af6b438-9959-4c7b-88c7-22f5fc16104d",
+    "report_id": "NGD-2026-00169",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00158",
+    "created_at": "2026-09-27T08:09:21.552805+00:00",
+    "updated_at": "2026-09-27T08:09:23.984043+00:00"
+  },
+  {
+    "id": "120c7d45-18de-43da-98dc-f08551a1b2e1",
+    "report_id": "NGD-2026-00168",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Road cavity"
+    ],
+    "latitude": 28.613,
+    "longitude": 77.213,
+    "location_name": "Evidence Site",
+    "department": "Municipal Roads",
+    "description": "Image access verification",
+    "image_url": "/api/complaints/image/41076351d736406e9a93f6906e30f1e4.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:13.552448+00:00",
+    "updated_at": "2026-09-27T08:05:13.552448+00:00"
+  },
+  {
+    "id": "41e7c02c-d8af-46ec-b490-d7c48b92a802",
+    "report_id": "NGD-2026-00167",
+    "problem_type": "pothole",
+    "confidence": 0.88,
+    "severity": "LOW",
+    "evidence": [
+      "Small rut"
+    ],
+    "latitude": 28.6111,
+    "longitude": 77.2111,
+    "location_name": "Citizen 1 Rut",
+    "department": "Municipal Roads",
+    "description": "Mine alone",
+    "image_url": "https://example.com/c1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:11.656246+00:00",
+    "updated_at": "2026-09-27T08:05:11.656246+00:00"
+  },
+  {
+    "id": "e5264976-9b8b-481c-8c27-9a6074af2b99",
+    "report_id": "NGD-2026-00166",
+    "problem_type": "streetlight",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Unlit fixture"
+    ],
+    "latitude": 28.621,
+    "longitude": 77.221,
+    "location_name": "Streetlight Site",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Status security test",
+    "image_url": "https://example.com/light.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:10.277156+00:00",
+    "updated_at": "2026-09-27T08:05:10.277156+00:00"
+  },
+  {
+    "id": "13e4a035-c73e-4df6-a3ee-3e07e558b25c",
+    "report_id": "NGD-2026-00165",
+    "problem_type": "drain",
+    "confidence": 0.9,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Clogged drain"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.22,
+    "location_name": "Drain Site",
+    "department": "Drainage / Sanitation",
+    "description": "Private complaint of citizen 1",
+    "image_url": "https://example.com/drain1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:09.480024+00:00",
+    "updated_at": "2026-09-27T08:05:09.480024+00:00"
+  },
+  {
+    "id": "a6073984-53e9-46ef-9552-4df6546ee726",
+    "report_id": "NGD-2026-00164",
+    "problem_type": "garbage",
+    "confidence": 0.9,
+    "severity": "LOW",
+    "evidence": [
+      "Litter pile"
+    ],
+    "latitude": 28.61,
+    "longitude": 77.2,
+    "location_name": "Litter Zone",
+    "department": "Sanitation",
+    "description": "Read own complaint test",
+    "image_url": "https://example.com/litter.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:08.663298+00:00",
+    "updated_at": "2026-09-27T08:05:08.663298+00:00"
+  },
+  {
+    "id": "96885a92-d985-4842-9fd0-0268f872a9e3",
+    "report_id": "NGD-2026-00163",
+    "problem_type": "pothole",
+    "confidence": 0.9,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.618,
+    "longitude": 77.208,
+    "location_name": "Connaught Place",
+    "department": "Municipal Roads",
+    "description": "Owner verification test",
+    "image_url": "https://example.com/pothole_owner.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:07.286733+00:00",
+    "updated_at": "2026-09-27T08:05:07.286733+00:00"
+  },
+  {
+    "id": "070b750f-5f74-4ad5-b8ae-3195915b5981",
+    "report_id": "NGD-2026-00162",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T08:05:05.440909+00:00",
+    "updated_at": "2026-09-27T08:05:06.390012+00:00"
+  },
+  {
+    "id": "b1e41ca0-0b24-4b74-bce4-488bcb58878f",
+    "report_id": "NGD-2026-00161",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.73005,
+    "longitude": 77.33005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00160",
+    "created_at": "2026-09-27T08:05:04.633407+00:00",
+    "updated_at": "2026-09-27T08:05:04.633407+00:00"
+  },
+  {
+    "id": "4de8beed-1f0b-4fba-90ef-6fe758d76fbd",
+    "report_id": "NGD-2026-00160",
     "problem_type": "pothole",
     "confidence": 0.91,
     "severity": "HIGH",
@@ -185,13 +1621,356 @@
     "image_url": "https://example.com/pothole1.jpg",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.416733+00:00",
-    "updated_at": "2026-09-27T15:52:07.416733+00:00"
+    "created_at": "2026-09-27T08:05:03.837537+00:00",
+    "updated_at": "2026-09-27T08:05:03.837537+00:00"
   },
   {
-    "id": "9abb89bc-d5f5-4c92-be87-9a3be46c274d",
-    "report_id": "NGD-2026-00120",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "bb9f349d-ebb1-4fe4-addc-b8f2184820fc",
+    "report_id": "NGD-2026-00159",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00151",
+    "created_at": "2026-09-27T08:04:58.850342+00:00",
+    "updated_at": "2026-09-27T08:04:58.850342+00:00"
+  },
+  {
+    "id": "b8d67bba-2d7b-406d-870f-82b36585f710",
+    "report_id": "NGD-2026-00158",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00150",
+    "created_at": "2026-09-27T08:04:54.25898+00:00",
+    "updated_at": "2026-09-27T08:04:56.679715+00:00"
+  },
+  {
+    "id": "9edb3ac6-3f87-4aeb-baa6-18247e572349",
+    "report_id": "NGD-2026-00157",
+    "problem_type": "streetlight",
+    "confidence": 0.99,
+    "severity": "HIGH",
+    "evidence": [
+      "Damaged and broken streetlight fixture hanging off the pole arm",
+      "Exposed internal wiring dangling below the damaged lamp housing"
+    ],
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "location_name": "Connaught Place, New Delhi",
+    "department": "Electrical / Municipal Lighting",
+    "description": "",
+    "image_url": "/api/complaints/image/f657298e710e44d1894f02453e7a1d70.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T07:47:18.268839+00:00",
+    "updated_at": "2026-09-27T07:47:18.268839+00:00"
+  },
+  {
+    "id": "cb3b6a3d-4ac0-44ed-a40d-35e663c2feef",
+    "report_id": "NGD-2026-00156",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Street depression"
+    ],
+    "latitude": 28.614,
+    "longitude": 77.2095,
+    "location_name": "Test User Report Location",
+    "department": "Municipal Roads",
+    "description": "User created complaint to verify retention across resets",
+    "image_url": "https://example.com/user_pothole.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00147",
+    "created_at": "2026-09-27T07:19:02.127801+00:00",
+    "updated_at": "2026-09-27T07:19:02.127801+00:00"
+  },
+  {
+    "id": "d3ceca34-447d-4871-a095-7b84af781dac",
+    "report_id": "NGD-2026-00155",
+    "problem_type": "streetlight",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Exposed high-voltage wire at pedestrian crossing"
+    ],
+    "latitude": 28.625,
+    "longitude": 77.205,
+    "location_name": "Ashoka Road Pedestrian Crossing",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Urgent sparking hazard",
+    "image_url": "/api/complaints/image/wire_hazard.jpg",
+    "status": "ASSIGNED",
+    "duplicate_of": "NGD-2026-00146",
+    "created_at": "2026-09-27T07:19:00.961675+00:00",
+    "updated_at": "2026-09-27T07:19:01.255988+00:00"
+  },
+  {
+    "id": "5f21f334-883b-428c-9b2e-2aa8ab06f12e",
+    "report_id": "NGD-2026-00154",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T07:18:59.54915+00:00",
+    "updated_at": "2026-09-27T07:19:00.069678+00:00"
+  },
+  {
+    "id": "a017d539-d697-441a-8443-4719ed2a93d4",
+    "report_id": "NGD-2026-00153",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.62005,
+    "longitude": 77.21005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00152",
+    "created_at": "2026-09-27T07:18:58.968943+00:00",
+    "updated_at": "2026-09-27T07:18:58.968943+00:00"
+  },
+  {
+    "id": "1605bd3d-64dd-47d1-8826-a89f00831aab",
+    "report_id": "NGD-2026-00152",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.21,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00144",
+    "created_at": "2026-09-27T07:18:58.0948+00:00",
+    "updated_at": "2026-09-27T07:18:58.0948+00:00"
+  },
+  {
+    "id": "2232e583-01cf-4a7b-9aee-ab1471d18339",
+    "report_id": "NGD-2026-00151",
+    "problem_type": "drain",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Blocked gutter causing foul overflow"
+    ],
+    "latitude": 28.615,
+    "longitude": 77.21,
+    "location_name": "Janpath Road",
+    "department": "Drainage / Sanitation",
+    "description": "Citizen adjusted category and marked critical due to health hazard.",
+    "image_url": "/api/complaints/image/test-drain.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00142",
+    "created_at": "2026-09-27T07:18:53.714687+00:00",
+    "updated_at": "2026-09-27T07:18:53.714687+00:00"
+  },
+  {
+    "id": "33f0a27e-bdd7-47fd-9276-52a38c9af046",
+    "report_id": "NGD-2026-00150",
+    "problem_type": "pothole",
+    "confidence": 0.92,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.612,
+    "longitude": 77.208,
+    "location_name": "Test Pothole Site",
+    "department": "Municipal Roads",
+    "description": "Urgent repair needed",
+    "image_url": "https://example.com/test.jpg",
+    "status": "IN_PROGRESS",
+    "duplicate_of": "NGD-2026-00141",
+    "created_at": "2026-09-27T07:18:48.69117+00:00",
+    "updated_at": "2026-09-27T07:18:51.306567+00:00"
+  },
+  {
+    "id": "0a274f75-72f7-497b-9de6-d8e57368560f",
+    "report_id": "NGD-2026-00149",
+    "problem_type": "pothole",
+    "confidence": 0.98,
+    "severity": "HIGH",
+    "evidence": [
+      "Large depression in the asphalt road surface",
+      "Standing water accumulated inside the crater",
+      "Rough edges and degraded pavement around the hole"
+    ],
+    "latitude": 23.181079,
+    "longitude": 77.432928,
+    "location_name": "Adjusted Location (23.1811, 77.4329)",
+    "department": "Municipal Roads",
+    "description": "",
+    "image_url": "/api/complaints/image/84415e03f66b4498920d369fdd556fd8.png",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T06:50:50.654719+00:00",
+    "updated_at": "2026-09-27T06:50:50.654719+00:00"
+  },
+  {
+    "id": "d02d95ae-58b1-4772-b407-e561784ddbf5",
+    "report_id": "NGD-2026-00148",
+    "problem_type": "garbage",
+    "confidence": 0.98,
+    "severity": "HIGH",
+    "evidence": [
+      "Large pile of solid municipal waste and litter accumulated along the side of the road and wall",
+      "Various plastic bags, debris, and organic waste spread extensively across the street edge"
+    ],
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "location_name": "Connaught Place, New Delhi",
+    "department": "Sanitation",
+    "description": "",
+    "image_url": "/api/complaints/image/1a3f6779213a4a7092196eb116f1afe3.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00120",
+    "created_at": "2026-09-27T06:48:46.402675+00:00",
+    "updated_at": "2026-09-27T06:48:46.402675+00:00"
+  },
+  {
+    "id": "fc62cfe7-026c-4f42-b572-3438d61d9058",
+    "report_id": "NGD-2026-00147",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Street depression"
+    ],
+    "latitude": 28.614,
+    "longitude": 77.2095,
+    "location_name": "Test User Report Location",
+    "department": "Municipal Roads",
+    "description": "User created complaint to verify retention across resets",
+    "image_url": "https://example.com/user_pothole.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00140",
+    "created_at": "2026-09-27T06:16:46.632047+00:00",
+    "updated_at": "2026-09-27T06:16:46.632047+00:00"
+  },
+  {
+    "id": "5ddb3983-d723-4701-8540-c8b35d5cdfc7",
+    "report_id": "NGD-2026-00146",
+    "problem_type": "streetlight",
+    "confidence": 0.88,
+    "severity": "CRITICAL",
+    "evidence": [
+      "Exposed high-voltage wire at pedestrian crossing"
+    ],
+    "latitude": 28.625,
+    "longitude": 77.205,
+    "location_name": "Ashoka Road Pedestrian Crossing",
+    "department": "Electrical / Municipal Lighting",
+    "description": "Urgent sparking hazard",
+    "image_url": "/api/complaints/image/wire_hazard.jpg",
+    "status": "ASSIGNED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T06:16:45.293861+00:00",
+    "updated_at": "2026-09-27T06:16:46.24018+00:00"
+  },
+  {
+    "id": "10d747d8-64f1-412a-a86f-15f30629dcec",
+    "report_id": "NGD-2026-00145",
+    "problem_type": "garbage",
+    "confidence": 0.95,
+    "severity": "MEDIUM",
+    "evidence": [
+      "Overflowing waste"
+    ],
+    "latitude": 28.64,
+    "longitude": 77.23,
+    "location_name": "Market Area",
+    "department": "Sanitation",
+    "description": "Lifecycle test",
+    "image_url": "https://example.com/waste.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T06:16:43.914743+00:00",
+    "updated_at": "2026-09-27T06:16:44.885763+00:00"
+  },
+  {
+    "id": "58641837-b803-4a20-a21c-dd21333ab4b5",
+    "report_id": "NGD-2026-00144",
+    "problem_type": "pothole",
+    "confidence": 0.89,
+    "severity": "HIGH",
+    "evidence": [
+      "Road depression"
+    ],
+    "latitude": 28.62005,
+    "longitude": 77.21005,
+    "location_name": "Connaught Place Radial 1 nearby",
+    "department": "Municipal Roads",
+    "description": "Duplicate report",
+    "image_url": "https://example.com/pothole2.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00143",
+    "created_at": "2026-09-27T06:16:43.339437+00:00",
+    "updated_at": "2026-09-27T06:16:43.339437+00:00"
+  },
+  {
+    "id": "d2e8d469-e0db-492b-98d3-df670bf80072",
+    "report_id": "NGD-2026-00143",
+    "problem_type": "pothole",
+    "confidence": 0.91,
+    "severity": "HIGH",
+    "evidence": [
+      "Asphalt crater"
+    ],
+    "latitude": 28.62,
+    "longitude": 77.21,
+    "location_name": "Connaught Place Radial 1",
+    "department": "Municipal Roads",
+    "description": "Original report",
+    "image_url": "https://example.com/pothole1.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-09-27T06:16:42.692803+00:00",
+    "updated_at": "2026-09-27T06:16:42.692803+00:00"
+  },
+  {
+    "id": "79a6a33d-01a1-434b-ae3d-cfa7db14a45c",
+    "report_id": "NGD-2026-00142",
     "problem_type": "drain",
     "confidence": 0.88,
     "severity": "CRITICAL",
@@ -206,13 +1985,12 @@
     "image_url": "/api/complaints/image/test-drain.jpg",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:07.401256+00:00",
-    "updated_at": "2026-09-27T15:52:07.401256+00:00"
+    "created_at": "2026-09-27T06:16:39.11264+00:00",
+    "updated_at": "2026-09-27T06:16:39.11264+00:00"
   },
   {
-    "id": "b3bb0032-006b-4430-b753-83ee59b56b28",
-    "report_id": "NGD-2026-00119",
-    "citizen_id": "11111111-1111-1111-1111-111111111111",
+    "id": "e4dfeec7-e863-4006-8875-4527ef6904fe",
+    "report_id": "NGD-2026-00141",
     "problem_type": "pothole",
     "confidence": 0.92,
     "severity": "HIGH",
@@ -227,335 +2005,49 @@
     "image_url": "https://example.com/test.jpg",
     "status": "IN_PROGRESS",
     "duplicate_of": null,
-    "created_at": "2026-09-27T15:52:06.997376+00:00",
-    "updated_at": "2026-09-27T15:52:07.000934+00:00"
+    "created_at": "2026-09-27T06:16:34.951571+00:00",
+    "updated_at": "2026-09-27T06:16:37.298826+00:00"
   },
   {
-    "id": "c001",
-    "report_id": "NGD-2026-00101",
-    "problem_type": "pothole",
-    "confidence": 0.94,
-    "severity": "HIGH",
-    "evidence": [
-      "Large cavity visible in active road lane",
-      "Cracked asphalt with water pooling"
-    ],
-    "latitude": 28.6315,
-    "longitude": 77.2167,
-    "location_name": "Connaught Place Outer Circle near Radial 2",
-    "department": "Municipal Roads",
-    "description": "Hazardous pothole causing two-wheeler skids near metro gate.",
-    "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-24T11:26:31.591786+00:00",
-    "updated_at": "2026-09-27T15:30:28.622729+00:00"
-  },
-  {
-    "id": "c005",
-    "report_id": "NGD-2026-00105",
-    "problem_type": "pothole",
-    "confidence": 0.82,
-    "severity": "MEDIUM",
-    "evidence": [
-      "Asphalt wear and shallow road rutting"
-    ],
-    "latitude": 28.6322,
-    "longitude": 77.2175,
-    "location_name": "Near Shivaji Stadium Terminal",
-    "department": "Municipal Roads",
-    "description": "Road surface cracking and minor pothole developing.",
-    "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-    "status": "RESOLVED",
-    "duplicate_of": null,
-    "created_at": "2026-09-22T09:26:31.591786+00:00",
-    "updated_at": "2026-09-26T13:26:31.591786+00:00"
-  },
-  {
-    "id": "c008",
-    "report_id": "NGD-2026-00108",
-    "problem_type": "pothole",
-    "confidence": 0.91,
-    "severity": "CRITICAL",
-    "evidence": [
-      "Deep road collapse cave-in exposing base gravel",
-      "Severe vehicular obstruction"
-    ],
-    "latitude": 28.631,
-    "longitude": 77.216,
-    "location_name": "Radial Road 3, Connaught Place",
-    "department": "Municipal Roads",
-    "description": "Cave-in on inner lane, traffic backed up.",
-    "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-    "status": "IN_PROGRESS",
-    "duplicate_of": null,
-    "created_at": "2026-09-26T07:26:31.591786+00:00",
-    "updated_at": "2026-09-27T11:26:31.591786+00:00"
-  },
-  {
-    "id": "c009",
-    "report_id": "NGD-2026-00109",
-    "problem_type": "pothole",
-    "confidence": 0.93,
-    "severity": "HIGH",
-    "evidence": [
-      "Cavity in road lane matching recent report"
-    ],
-    "latitude": 28.6316,
-    "longitude": 77.2168,
-    "location_name": "Connaught Place Outer Circle, Metro Gate 4",
-    "department": "Municipal Roads",
-    "description": "Duplicate report submitted by nearby pedestrian.",
-    "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": "NGD-2026-00101",
-    "created_at": "2026-09-27T12:26:31.591786+00:00",
-    "updated_at": "2026-09-27T12:26:31.591786+00:00"
-  },
-  {
-    "id": "c002",
-    "report_id": "NGD-2026-00102",
-    "problem_type": "garbage",
-    "confidence": 0.91,
-    "severity": "CRITICAL",
-    "evidence": [
-      "Solid waste accumulation blocking entire pedestrian pavement",
-      "Overflowing open municipal bin"
-    ],
-    "latitude": 28.652,
-    "longitude": 77.1905,
-    "location_name": "Ajmal Khan Road Market, Karol Bagh",
-    "department": "Sanitation",
-    "description": "Severe stench and pedestrian pathway completely obstructed.",
-    "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-    "status": "ASSIGNED",
-    "duplicate_of": null,
-    "created_at": "2026-09-23T13:26:31.591786+00:00",
-    "updated_at": "2026-09-25T14:26:31.591786+00:00"
-  },
-  {
-    "id": "c010",
-    "report_id": "NGD-2026-00110",
-    "problem_type": "garbage",
-    "confidence": 0.89,
-    "severity": "HIGH",
-    "evidence": [
-      "Debris pile spilling onto main commercial road",
-      "Scattered organic waste"
-    ],
-    "latitude": 28.6532,
-    "longitude": 77.1912,
-    "location_name": "Arya Samaj Road crossing, Karol Bagh",
-    "department": "Sanitation",
-    "description": "Commercial waste dumped overnight near vegetable market.",
-    "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-25T10:26:31.591786+00:00",
-    "updated_at": "2026-09-25T10:26:31.591786+00:00"
-  },
-  {
-    "id": "c011",
-    "report_id": "NGD-2026-00111",
-    "problem_type": "garbage",
-    "confidence": 0.85,
-    "severity": "MEDIUM",
-    "evidence": [
-      "Accumulated packaging waste outside electronics shops"
-    ],
-    "latitude": 28.6515,
-    "longitude": 77.1895,
-    "location_name": "Gaffar Market Entry Gate, Karol Bagh",
-    "department": "Sanitation",
-    "description": "Cardboard and plastic bags piling up.",
-    "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-    "status": "IN_PROGRESS",
-    "duplicate_of": null,
-    "created_at": "2026-09-24T08:26:31.591786+00:00",
-    "updated_at": "2026-09-27T10:26:31.591786+00:00"
-  },
-  {
-    "id": "c003",
-    "report_id": "NGD-2026-00103",
-    "problem_type": "streetlight",
-    "confidence": 0.88,
-    "severity": "MEDIUM",
-    "evidence": [
-      "Damaged light fixture head hanging unlit",
-      "Pole bent slightly at base"
-    ],
-    "latitude": 28.628,
-    "longitude": 77.206,
-    "location_name": "Gole Market Road, Sector 4",
-    "department": "Electrical / Municipal Lighting",
-    "description": "Dark spot on road during night, posing safety hazard for pedestrians.",
-    "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-    "status": "IN_PROGRESS",
-    "duplicate_of": null,
-    "created_at": "2026-09-23T06:26:31.591786+00:00",
-    "updated_at": "2026-09-26T11:26:31.591786+00:00"
-  },
-  {
-    "id": "c012",
-    "report_id": "NGD-2026-00112",
-    "problem_type": "streetlight",
-    "confidence": 0.92,
-    "severity": "HIGH",
-    "evidence": [
-      "Streetlight lamp shattered with loose dangling wires"
-    ],
-    "latitude": 28.6292,
-    "longitude": 77.205,
-    "location_name": "Bhai Veer Singh Marg, Gole Market",
-    "department": "Electrical / Municipal Lighting",
-    "description": "Three consecutive light poles dark at school crossing.",
-    "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-26T12:26:31.591786+00:00",
-    "updated_at": "2026-09-26T12:26:31.591786+00:00"
-  },
-  {
-    "id": "c013",
-    "report_id": "NGD-2026-00113",
-    "problem_type": "streetlight",
-    "confidence": 0.95,
-    "severity": "CRITICAL",
-    "evidence": [
-      "Pole bent at 45 degree angle across sidewalk",
-      "Live electrical wiring visible"
-    ],
-    "latitude": 28.6275,
-    "longitude": 77.207,
-    "location_name": "Peshwa Road Junction, Gole Market",
-    "department": "Electrical / Municipal Lighting",
-    "description": "Accident vehicle struck pole, sparks reported during rainfall.",
-    "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-    "status": "RESOLVED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T09:26:31.591786+00:00",
-    "updated_at": "2026-09-27T15:35:30.099007+00:00"
-  },
-  {
-    "id": "c004",
-    "report_id": "NGD-2026-00104",
-    "problem_type": "drain",
-    "confidence": 0.95,
-    "severity": "HIGH",
-    "evidence": [
-      "Open stormwater gutter overflowing onto road surface",
-      "Debris clogging inlet grate"
-    ],
-    "latitude": 28.6185,
-    "longitude": 77.221,
-    "location_name": "Janpath Lane near Central Cottage",
-    "department": "Drainage / Sanitation",
-    "description": "Foul drain water spilling over the asphalt.",
-    "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-25T07:26:31.591786+00:00",
-    "updated_at": "2026-09-25T07:26:31.591786+00:00"
-  },
-  {
-    "id": "c014",
-    "report_id": "NGD-2026-00114",
-    "problem_type": "drain",
-    "confidence": 0.93,
-    "severity": "CRITICAL",
-    "evidence": [
-      "Complete drain canal overflow flooding bus stop",
-      "Black sewage water backup"
-    ],
-    "latitude": 28.6195,
-    "longitude": 77.2225,
-    "location_name": "Tolstoy Marg Bus Shelter, Janpath",
-    "department": "Drainage / Sanitation",
-    "description": "Pedestrians unable to access bus stop due to sewage flood.",
-    "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-    "status": "IN_PROGRESS",
-    "duplicate_of": null,
-    "created_at": "2026-09-26T05:26:31.591786+00:00",
-    "updated_at": "2026-09-27T09:26:31.591786+00:00"
-  },
-  {
-    "id": "c015",
-    "report_id": "NGD-2026-00115",
-    "problem_type": "drain",
-    "confidence": 0.81,
-    "severity": "LOW",
-    "evidence": [
-      "Minor curb runoff pooling near storm grate"
-    ],
-    "latitude": 28.6178,
-    "longitude": 77.2198,
-    "location_name": "Windsor Place Roundabout, Janpath",
-    "department": "Drainage / Sanitation",
-    "description": "Drain grate cleaned and water receding.",
-    "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-    "status": "RESOLVED",
-    "duplicate_of": null,
-    "created_at": "2026-09-21T11:26:31.591786+00:00",
-    "updated_at": "2026-09-25T13:26:31.591786+00:00"
-  },
-  {
-    "id": "c016",
-    "report_id": "NGD-2026-00116",
-    "problem_type": "other",
-    "confidence": 0.76,
-    "severity": "LOW",
-    "evidence": [
-      "Damaged metal divider barricade on sidewalk boundary"
-    ],
-    "latitude": 28.625,
-    "longitude": 77.212,
-    "location_name": "Sansad Marg near Patel Chowk",
-    "department": "Manual Review",
-    "description": "Barricade leaning into footpath.",
-    "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-    "status": "REPORTED",
-    "duplicate_of": null,
-    "created_at": "2026-09-27T14:26:31.591786+00:00",
-    "updated_at": "2026-09-27T14:26:31.591786+00:00"
-  },
-  {
-    "id": "c017",
-    "report_id": "NGD-2026-00117",
+    "id": "fafc3714-d139-4f1c-bf6f-8f0f37af501c",
+    "report_id": "NGD-2026-00140",
     "problem_type": "pothole",
     "confidence": 0.85,
-    "severity": "LOW",
+    "severity": "MEDIUM",
     "evidence": [
-      "Minor road surface crack repaved"
+      "[DEMO FALLBACK] Road-surface asphalt defect identified",
+      "[DEMO FALLBACK] Active traffic lane depression pattern"
     ],
-    "latitude": 28.631,
-    "longitude": 77.2162,
-    "location_name": "Connaught Place Inner Circle Radial 1",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "location_name": "Connaught Place, New Delhi",
     "department": "Municipal Roads",
-    "description": "Crack in road sealed by maintenance team.",
-    "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-    "status": "RESOLVED",
-    "duplicate_of": null,
-    "created_at": "2026-09-22T13:26:31.591786+00:00",
-    "updated_at": "2026-09-26T14:26:31.591786+00:00"
+    "description": "",
+    "image_url": "/api/complaints/image/eb6dc77cd2114cbd808bee133b8f85df.jpg",
+    "status": "REPORTED",
+    "duplicate_of": "NGD-2026-00139",
+    "created_at": "2026-09-27T06:10:23.775545+00:00",
+    "updated_at": "2026-09-27T06:10:23.775545+00:00"
   },
   {
-    "id": "c018",
-    "report_id": "NGD-2026-00118",
+    "id": "655fe85d-de0f-437d-b13e-8c212cd7326d",
+    "report_id": "NGD-2026-00120",
     "problem_type": "garbage",
-    "confidence": 0.92,
-    "severity": "HIGH",
+    "confidence": 0.98,
+    "severity": "MEDIUM",
     "evidence": [
-      "Commercial waste pile spilling across alley"
+      "Extensive accumulation of solid municipal waste and plastic bags along the roadside wall",
+      "Debris and refuse visibly encroach onto the edge of the street"
     ],
-    "latitude": 28.6472,
-    "longitude": 77.1915,
-    "location_name": "Ajmal Khan Market Back Alley, Karol Bagh",
+    "latitude": 28.6139,
+    "longitude": 77.209,
+    "location_name": "Connaught Place, New Delhi",
     "department": "Sanitation",
-    "description": "Urgent clearing needed for morning market access.",
-    "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
+    "description": "",
+    "image_url": "/api/complaints/image/4a64c3104c1248bba0401b0efd2e1a42.jpg",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T11:26:31.591786+00:00",
-    "updated_at": "2026-09-27T11:26:31.591786+00:00"
+    "created_at": "2026-09-27T05:57:20.519695+00:00",
+    "updated_at": "2026-09-27T05:57:20.519695+00:00"
   }
 ]

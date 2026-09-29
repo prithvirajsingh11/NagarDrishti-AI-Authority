@@ -1,6 +1,25 @@
 import os
 from pathlib import Path
 
+# Load .env file automatically
+_backend_dir = Path(__file__).resolve().parent.parent
+_root_dir = _backend_dir.parent
+
+for _env_path in [_backend_dir / ".env", _root_dir / ".env"]:
+    if _env_path.exists():
+        try:
+            with open(_env_path, "r", encoding="utf-8") as _f:
+                for _line in _f:
+                    _line = _line.strip()
+                    if _line and not _line.startswith("#") and "=" in _line:
+                        _k, _v = _line.split("=", 1)
+                        _k = _k.strip()
+                        _v = _v.strip().strip('"').strip("'")
+                        if _k and _k not in os.environ:
+                            os.environ[_k] = _v
+        except Exception:
+            pass
+
 PORT = int(os.getenv("PORT", "8000"))
 HOST = os.getenv("HOST", "0.0.0.0")
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
@@ -13,30 +32,26 @@ CORS_ORIGINS = [
     if origin.strip()
 ]
 
-# Connection to user site (NagarDrishti-AI)
-USER_SITE_REPO_PATH = os.getenv(
-    "USER_SITE_REPO_PATH",
-    "/Users/tejasvnigam/nagardrishti/NagarDrishti-AI"
+# Supabase configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://otjbonkovzciglttxfzz.supabase.co")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv(
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90amJvbmtvdnpjaWdsdHR4Znp6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDQ4MTIzNiwiZXhwIjoyMTA2MDU3MjM2fQ.udnE-Uf2CwwIydLe1igAcyLoSCZO0gsMN_T9YGAnsxA"
 )
-USER_SITE_API_URL = os.getenv("USER_SITE_API_URL", "").rstrip("/")
+STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "complaint-images")
 
-# Shared database JSON path (connecting authority portal directly to user site data)
+# Connection to user site (NagarDrishti-AI)
+USER_SITE_API_URL = os.getenv("USER_SITE_API_URL", "").rstrip("/")
 SHARED_DB_PATH = os.getenv(
     "SHARED_DB_PATH",
-    os.path.join(USER_SITE_REPO_PATH, "backend", "data", "complaints_db.json")
-    if os.path.exists(USER_SITE_REPO_PATH)
-    else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "complaints_db.json")
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "complaints_db.json")
 )
 
+# Local fallback paths
 LOCAL_BACKUP_DB_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "complaints_db.json"
 )
-
-# Uploads directory from user site
 UPLOAD_DIR = os.getenv(
     "UPLOAD_DIR",
-    os.path.join(USER_SITE_REPO_PATH, "backend", "uploads")
-    if os.path.exists(USER_SITE_REPO_PATH)
-    else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
 )
-
