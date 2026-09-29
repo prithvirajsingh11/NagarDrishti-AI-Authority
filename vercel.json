@@ -11,6 +11,13 @@
       "framework": "vite"
     }
   },
+  "redirects": [
+    {
+      "source": "/(dashboard|login|reports|map|hotspots|access-denied)/?",
+      "destination": "/#/$1",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",

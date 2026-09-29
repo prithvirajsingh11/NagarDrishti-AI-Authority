@@ -73,17 +73,23 @@ function AuthorityAppContent() {
   // Navigate helper
   const navigateTo = useCallback((route: AppRoute) => {
     setCurrentRoute(route);
-    if (window.location.pathname !== route) {
-      window.history.pushState({}, '', route);
+    const targetHash = route === '/' ? '' : `#${route.startsWith('/') ? route : `/${route}`}`;
+    if (window.location.hash !== targetHash) {
+      if (!targetHash && window.location.hash) {
+        window.history.pushState({}, '', window.location.pathname);
+      } else {
+        window.location.hash = targetHash;
+      }
     }
   }, []);
 
   // Sync routing from URL path / hash
   useEffect(() => {
     const parseRoute = (): AppRoute => {
-      const path = window.location.pathname;
-      const hash = window.location.hash.replace('#', '');
-      const target = hash ? `/${hash}` : path;
+      const hashRaw = window.location.hash.replace(/^#\/?/, '');
+      const pathRaw = window.location.pathname.replace(/^\//, '');
+      const cleanPath = pathRaw === 'index.html' ? '' : pathRaw;
+      const target = hashRaw ? `/${hashRaw}` : (cleanPath ? `/${cleanPath}` : '/');
 
       if (target === '/login' || target === '/access-denied') {
         return target;
