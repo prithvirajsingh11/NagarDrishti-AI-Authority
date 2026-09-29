@@ -3,7 +3,16 @@ from pydantic import BaseModel, Field
 
 ProblemType = Literal["pothole", "garbage", "streetlight", "drain", "other"]
 SeverityLevel = Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-ComplaintStatus = Literal["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"]
+ComplaintStatus = Literal["REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REOPENED"]
+CitizenVerificationStatus = Literal["PENDING", "CONFIRMED", "REOPENED"]
+
+
+class StatusHistoryItem(BaseModel):
+    status: str
+    timestamp: str
+    note: Optional[str] = None
+    actor: Optional[str] = None
+    actor_role: Optional[str] = None
 
 
 class Department(BaseModel):
@@ -44,10 +53,35 @@ class Complaint(BaseModel):
     duplicate_of: Optional[str] = None
     created_at: str
     updated_at: str
+    resolution_image_url: Optional[str] = None
+    resolution_image_path: Optional[str] = None
+    resolution_note: Optional[str] = None
+    resolved_at: Optional[str] = None
+    resolved_by: Optional[str] = None
+    citizen_verification_status: Optional[CitizenVerificationStatus] = None
+    citizen_resolution_confirmed: Optional[bool] = None
+    citizen_resolution_confirmed_at: Optional[str] = None
+    citizen_verified_at: Optional[str] = None
+    citizen_reopened: Optional[bool] = None
+    citizen_reopened_at: Optional[str] = None
+    reopened_at: Optional[str] = None
+    reopen_reason: Optional[str] = None
+    status_history: List[StatusHistoryItem] = Field(default_factory=list)
 
 
 class StatusUpdate(BaseModel):
     status: ComplaintStatus
+    resolution_image_url: Optional[str] = None
+    resolution_note: Optional[str] = None
+
+
+class ResolveComplaintRequest(BaseModel):
+    resolution_image_url: Optional[str] = None
+    resolution_note: Optional[str] = None
+
+
+class ReopenComplaintRequest(BaseModel):
+    reason: Optional[str] = ""
 
 
 class HotspotInfo(BaseModel):
@@ -78,6 +112,8 @@ class DashboardStatistics(BaseModel):
     pending: int
     in_progress: int
     resolved: int
+    awaiting_verification: int = 0
+    reopened: int = 0
     by_category: Dict[str, int]
     by_severity: Dict[str, int]
     by_status: Dict[str, int]

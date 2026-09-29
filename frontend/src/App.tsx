@@ -12,6 +12,7 @@ import {
   getDashboardHeatmap,
   getDashboardStatistics,
   getDepartments,
+  resolveComplaint,
   updateComplaintStatus,
 } from './services/api';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
@@ -51,6 +52,7 @@ function AuthorityAppContent() {
   const [severityFilter, setSeverityFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
+  const [resolutionStatusFilter, setResolutionStatusFilter] = useState<string>('');
   const [dateHorizon, setDateHorizon] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -174,6 +176,7 @@ function AuthorityAppContent() {
     setSeverityFilter('');
     setStatusFilter('');
     setDepartmentFilter('');
+    setResolutionStatusFilter('');
     setDateHorizon('all');
     setSearchQuery('');
     setFocusedHotspot(null);
@@ -193,6 +196,20 @@ function AuthorityAppContent() {
       }
       if (departmentFilter && c.department !== departmentFilter) {
         return false;
+      }
+      if (resolutionStatusFilter) {
+        const resFilter = resolutionStatusFilter.toLowerCase();
+        if (resFilter === 'pending_resolution') {
+          if (c.status === 'RESOLVED') return false;
+        } else if (resFilter === 'resolved') {
+          if (c.status !== 'RESOLVED') return false;
+        } else if (resFilter === 'awaiting_verification') {
+          if (c.status !== 'RESOLVED' || c.citizen_verification_status !== 'PENDING') return false;
+        } else if (resFilter === 'citizen_confirmed') {
+          if (c.citizen_verification_status !== 'CONFIRMED') return false;
+        } else if (resFilter === 'reopened') {
+          if (c.status !== 'REOPENED' && c.citizen_verification_status !== 'REOPENED') return false;
+        }
       }
       if (dateHorizon !== 'all') {
         const itemDate = new Date(c.created_at).getTime();
@@ -220,11 +237,20 @@ function AuthorityAppContent() {
       }
       return true;
     });
-  }, [complaints, categoryFilter, severityFilter, statusFilter, departmentFilter, dateHorizon, searchQuery]);
+  }, [complaints, categoryFilter, severityFilter, statusFilter, departmentFilter, resolutionStatusFilter, dateHorizon, searchQuery]);
 
-  // Update status action handler
-  const handleUpdateStatus = async (id: string, newStatus: ComplaintStatus) => {
-    const updated = await updateComplaintStatus(id, newStatus);
+  // Update status action handler with Phase 5 resolution support
+  const handleUpdateStatus = async (
+    id: string,
+    newStatus: ComplaintStatus,
+    resolutionData?: { resolution_image_url?: string; resolution_note?: string }
+  ) => {
+    let updated: Complaint;
+    if (newStatus === 'RESOLVED' && resolutionData?.resolution_image_url) {
+      updated = await resolveComplaint(id, resolutionData.resolution_image_url, resolutionData.resolution_note);
+    } else {
+      updated = await updateComplaintStatus(id, newStatus);
+    }
     setComplaints((prev) => prev.map((item) => (item.id === id ? updated : item)));
     if (selectedComplaint && selectedComplaint.id === id) {
       setSelectedComplaint(updated);
@@ -360,6 +386,8 @@ function AuthorityAppContent() {
               onStatusFilterChange={setStatusFilter}
               departmentFilter={departmentFilter}
               onDepartmentFilterChange={setDepartmentFilter}
+              resolutionStatusFilter={resolutionStatusFilter}
+              onResolutionStatusFilterChange={setResolutionStatusFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}
@@ -384,6 +412,8 @@ function AuthorityAppContent() {
               onStatusFilterChange={setStatusFilter}
               departmentFilter={departmentFilter}
               onDepartmentFilterChange={setDepartmentFilter}
+              resolutionStatusFilter={resolutionStatusFilter}
+              onResolutionStatusFilterChange={setResolutionStatusFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}
@@ -411,6 +441,8 @@ function AuthorityAppContent() {
               onStatusFilterChange={setStatusFilter}
               departmentFilter={departmentFilter}
               onDepartmentFilterChange={setDepartmentFilter}
+              resolutionStatusFilter={resolutionStatusFilter}
+              onResolutionStatusFilterChange={setResolutionStatusFilter}
               dateHorizon={dateHorizon}
               onDateHorizonChange={setDateHorizon}
               searchQuery={searchQuery}

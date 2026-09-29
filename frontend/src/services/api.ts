@@ -124,6 +124,7 @@ export async function getComplaints(filters?: {
   severity?: string;
   status?: string;
   department?: string;
+  resolution_status?: string;
   limit?: number;
 }): Promise<Complaint[]> {
   const params = new URLSearchParams();
@@ -131,6 +132,7 @@ export async function getComplaints(filters?: {
   if (filters?.severity) params.append('severity', filters.severity);
   if (filters?.status) params.append('status', filters.status);
   if (filters?.department) params.append('department', filters.department);
+  if (filters?.resolution_status) params.append('resolution_status', filters.resolution_status);
   if (filters?.limit) params.append('limit', filters.limit.toString());
 
   const url = `${API_BASE}/complaints${params.toString() ? '?' + params.toString() : ''}`;
@@ -147,15 +149,82 @@ export async function getComplaintById(id: string): Promise<Complaint> {
 
 export async function updateComplaintStatus(
   id: string,
-  status: ComplaintStatus
+  status: ComplaintStatus,
+  resolution?: { resolution_image_url?: string; resolution_note?: string }
 ): Promise<Complaint> {
   const headers = await getJsonAuthHeaders();
   const res = await fetch(`${API_BASE}/complaints/${id}/status`, {
     method: 'PATCH',
     headers,
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({
+      status,
+      resolution_image_url: resolution?.resolution_image_url,
+      resolution_note: resolution?.resolution_note,
+    }),
   });
   return handleResponse<Complaint>(res, 'Failed to update complaint status.');
+}
+
+export async function uploadResolutionEvidence(
+  file: File
+): Promise<{ image_url: string; filename: string }> {
+  const headers = await getAuthHeaders();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_BASE}/complaints/upload-resolution-evidence`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+    },
+    body: formData,
+  });
+  return handleResponse<{ image_url: string; filename: string }>(
+    res,
+    'Failed to upload resolution evidence.'
+  );
+}
+
+export async function resolveComplaint(
+  id: string,
+  resolution_image_url: string,
+  resolution_note?: string
+): Promise<Complaint> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/resolve`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      resolution_image_url,
+      resolution_note: resolution_note || '',
+    }),
+  });
+  return handleResponse<Complaint>(res, 'Failed to mark complaint as resolved.');
+}
+
+export async function confirmComplaintResolution(id: string): Promise<Complaint> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/confirm-resolution`, {
+    method: 'POST',
+    headers,
+  });
+  return handleResponse<Complaint>(res, 'Failed to confirm complaint resolution.');
+}
+
+export async function reopenComplaint(id: string, reason?: string): Promise<Complaint> {
+  const headers = await getJsonAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/reopen`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ reason: reason || '' }),
+  });
+  return handleResponse<Complaint>(res, 'Failed to submit reopen request.');
+}
+
+export async function getComplaintHistory(id: string): Promise<any[]> {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}/complaints/${id}/history`, { headers });
+  return handleResponse<any[]>(res, 'Failed to retrieve complaint history.');
 }
 
 export async function getDashboardStatistics(): Promise<DashboardStatistics> {

@@ -26,6 +26,8 @@ interface MapIntelligenceProps {
   onStatusFilterChange: (val: string) => void;
   departmentFilter: string;
   onDepartmentFilterChange: (val: string) => void;
+  resolutionStatusFilter?: string;
+  onResolutionStatusFilterChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   searchQuery: string;
@@ -51,6 +53,8 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
   onStatusFilterChange,
   departmentFilter,
   onDepartmentFilterChange,
+  resolutionStatusFilter = '',
+  onResolutionStatusFilterChange,
   dateHorizon,
   onDateHorizonChange,
   searchQuery,
@@ -103,6 +107,8 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
           onStatusChange={onStatusFilterChange}
           department={departmentFilter}
           onDepartmentChange={onDepartmentFilterChange}
+          resolutionStatus={resolutionStatusFilter}
+          onResolutionStatusChange={onResolutionStatusFilterChange}
           dateHorizon={dateHorizon}
           onDateHorizonChange={onDateHorizonChange}
           search={searchQuery}

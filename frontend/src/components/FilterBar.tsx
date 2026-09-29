@@ -11,6 +11,8 @@ interface FilterBarProps {
   onStatusChange: (val: string) => void;
   department: string;
   onDepartmentChange: (val: string) => void;
+  resolutionStatus?: string;
+  onResolutionStatusChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   search: string;
@@ -28,6 +30,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   onStatusChange,
   department,
   onDepartmentChange,
+  resolutionStatus = '',
+  onResolutionStatusChange,
   dateHorizon,
   onDateHorizonChange,
   search,
@@ -40,6 +44,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     severity,
     status,
     department,
+    resolutionStatus,
     dateHorizon !== 'all' ? dateHorizon : '',
     search,
   ].filter(Boolean).length;
@@ -100,6 +105,22 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           <option value="ASSIGNED">Assigned</option>
           <option value="IN_PROGRESS">In Progress</option>
           <option value="RESOLVED">Resolved</option>
+          <option value="REOPENED">Reopened</option>
+        </select>
+
+        {/* Resolution Status Filter */}
+        <select
+          value={resolutionStatus}
+          onChange={(e) => onResolutionStatusChange?.(e.target.value)}
+          aria-label="Filter by resolution status"
+          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+        >
+          <option value="">All Resolutions</option>
+          <option value="pending_resolution">Pending Resolution</option>
+          <option value="resolved">Resolved</option>
+          <option value="awaiting_verification">Awaiting Citizen Verification</option>
+          <option value="citizen_confirmed">Citizen Confirmed</option>
+          <option value="reopened">Reopened</option>
         </select>
 
         {/* Department Filter */}

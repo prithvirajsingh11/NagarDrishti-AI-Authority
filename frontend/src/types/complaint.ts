@@ -2,7 +2,17 @@ export type ProblemType = 'pothole' | 'garbage' | 'streetlight' | 'drain' | 'oth
 
 export type SeverityLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
-export type ComplaintStatus = 'REPORTED' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED';
+export type ComplaintStatus = 'REPORTED' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED' | 'REOPENED';
+
+export type CitizenVerificationStatus = 'PENDING' | 'CONFIRMED' | 'REOPENED';
+
+export interface StatusHistoryItem {
+  status: string;
+  timestamp: string;
+  note?: string | null;
+  actor?: string | null;
+  actor_role?: string | null;
+}
 
 export interface CivicDetectionResult {
   problem_type: ProblemType;
@@ -47,6 +57,20 @@ export interface Complaint {
   duplicate_of?: string | null;
   created_at: string;
   updated_at: string;
+  resolution_image_url?: string | null;
+  resolution_image_path?: string | null;
+  resolution_note?: string | null;
+  resolved_at?: string | null;
+  resolved_by?: string | null;
+  citizen_verification_status?: CitizenVerificationStatus | null;
+  citizen_resolution_confirmed?: boolean | null;
+  citizen_resolution_confirmed_at?: string | null;
+  citizen_verified_at?: string | null;
+  citizen_reopened?: boolean;
+  citizen_reopened_at?: string | null;
+  reopened_at?: string | null;
+  reopen_reason?: string | null;
+  status_history?: StatusHistoryItem[];
 }
 
 export interface Department {
@@ -84,6 +108,8 @@ export interface DashboardStatistics {
   pending: number;
   in_progress: number;
   resolved: number;
+  awaiting_verification?: number;
+  reopened?: number;
   by_category: Record<string, number>;
   by_severity: Record<string, number>;
   by_status: Record<string, number>;

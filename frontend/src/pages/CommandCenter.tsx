@@ -56,6 +56,8 @@ interface CommandCenterProps {
   onStatusFilterChange: (val: string) => void;
   departmentFilter: string;
   onDepartmentFilterChange: (val: string) => void;
+  resolutionStatusFilter?: string;
+  onResolutionStatusFilterChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   searchQuery: string;
@@ -84,6 +86,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   onStatusFilterChange,
   departmentFilter,
   onDepartmentFilterChange,
+  resolutionStatusFilter = '',
+  onResolutionStatusFilterChange,
   dateHorizon,
   onDateHorizonChange,
   searchQuery,
@@ -130,6 +134,44 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
   return (
     <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-7xl mx-auto transition-colors">
+      {/* High-Visibility Reopened Alert Indicator */}
+      {(stats?.reopened ?? 0) > 0 && (
+        <div
+          onClick={() => {
+            if (onResolutionStatusFilterChange) {
+              onResolutionStatusFilterChange('reopened');
+            }
+            onNavigateToReports();
+          }}
+          className="bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-rose-400 dark:hover:border-rose-700 transition-all shadow-xs group"
+          role="alert"
+          aria-label="Reopened complaints indicator"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-rose-800 dark:text-rose-200">
+                  ⚠ Reopened Complaints
+                </h4>
+                <span className="px-2 py-0.5 text-xs font-mono font-bold bg-rose-600 text-white rounded-full">
+                  {stats?.reopened}
+                </span>
+              </div>
+              <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">
+                Citizen reported that issue still exists after resolution. Field re-inspection required.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-semibold text-rose-700 dark:text-rose-300 group-hover:translate-x-0.5 transition-transform shrink-0">
+            <span>Filter Reopened</span>
+            <ArrowRight className="w-4 h-4" />
+          </div>
+        </div>
+      )}
+
       {/* Repeated Problem Intelligence Banner */}
       {stats?.hotspots && stats.hotspots.length > 0 && (
         <RepeatedProblemBanner
@@ -138,8 +180,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         />
       )}
 
-      {/* 5 Minimalist KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
+      {/* Minimalist KPI Cards including Phase 5 Metrics */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-3.5">
         {/* Total Reports */}
         <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
@@ -196,8 +238,22 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Active crew dispatched</span>
         </div>
 
+        {/* Awaiting Verification */}
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-all">
+          <div className="flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-400">
+            <span className="font-medium">Awaiting Verification</span>
+            <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-indigo-600 dark:text-indigo-400 mt-2">
+            {stats?.awaiting_verification ?? (loading ? '...' : 0)}
+          </p>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Pending citizen sign-off</span>
+        </div>
+
         {/* Resolved */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all col-span-2 sm:col-span-1">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400">
             <span className="font-medium">Resolved</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
@@ -208,6 +264,32 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             {stats?.resolved ?? (loading ? '...' : 0)}
           </p>
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Completed resolutions</span>
+        </div>
+
+        {/* Reopened */}
+        <div
+          onClick={() => {
+            if (onResolutionStatusFilterChange) {
+              onResolutionStatusFilterChange('reopened');
+            }
+            onNavigateToReports();
+          }}
+          className={`bg-white dark:bg-slate-900/80 border ${
+            (stats?.reopened ?? 0) > 0
+              ? 'border-rose-300 dark:border-rose-800/80 hover:border-rose-400'
+              : 'border-slate-200/90 dark:border-slate-800/80 hover:border-slate-300'
+          } rounded-2xl p-4 shadow-2xs transition-all cursor-pointer`}
+        >
+          <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
+            <span className="font-medium">Reopened</span>
+            <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+              <AlertTriangle className="w-3.5 h-3.5" />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-2">
+            {stats?.reopened ?? (loading ? '...' : 0)}
+          </p>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Citizen flagged unresolved</span>
         </div>
       </div>
 
@@ -221,6 +303,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         onStatusChange={onStatusFilterChange}
         department={departmentFilter}
         onDepartmentChange={onDepartmentFilterChange}
+        resolutionStatus={resolutionStatusFilter}
+        onResolutionStatusChange={onResolutionStatusFilterChange}
         dateHorizon={dateHorizon}
         onDateHorizonChange={onDateHorizonChange}
         search={searchQuery}

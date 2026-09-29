@@ -467,7 +467,7 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
     );
 
     // Verify 0 reports rendered across KPI cards, not fake numbers
-    expect(screen.getAllByText('0').length).toBe(5);
+    expect(screen.getAllByText('0').length).toBe(7);
     expect(screen.getAllByText('No civic reports yet').length).toBeGreaterThanOrEqual(1);
     unmountCommandCenter();
 

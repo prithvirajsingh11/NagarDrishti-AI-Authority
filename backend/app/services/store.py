@@ -20,6 +20,8 @@ from ..models.schemas import (
     Complaint,
     ComplaintCreate,
     ComplaintStatus,
+    CitizenVerificationStatus,
+    StatusHistoryItem,
     DashboardStatistics,
     Department,
     HeatmapPoint,
@@ -37,6 +39,125 @@ INITIAL_DEPARTMENTS: List[Department] = [
     Department(id="dept-4", name="Delhi Jal Board (DJB)", category="Drainage & Water", is_active=True),
     Department(id="dept-5", name="Delhi Traffic Police & Civic Oversight", category="Traffic & Hazards", is_active=True),
 ]
+
+
+def build_default_history(item_dict: Dict[str, Any]) -> List[StatusHistoryItem]:
+    """Generates an auditable civic lifecycle history timeline for complaint record."""
+    history: List[StatusHistoryItem] = []
+    created = item_dict.get("created_at") or datetime.now(timezone.utc).isoformat()
+    updated = item_dict.get("updated_at") or created
+    status = item_dict.get("status", "REPORTED")
+    problem = str(item_dict.get("problem_type", "civic issue")).capitalize()
+    confidence = int(item_dict.get("confidence", 0.92) * 100)
+    dept = item_dict.get("department") or "Municipal Directorate"
+
+    # Step 1: REPORT
+    history.append(StatusHistoryItem(
+        status="REPORTED",
+        timestamp=created,
+        note="Citizen submitted civic report",
+        actor="Citizen User",
+        actor_role="citizen",
+    ))
+    # Step 2: AI VERIFIED
+    history.append(StatusHistoryItem(
+        status="AI_VERIFIED",
+        timestamp=created,
+        note=f"{problem} detected ({confidence}% vision confidence)",
+        actor="NagarDrishti Vision AI",
+        actor_role="ai",
+    ))
+    # Step 3: ASSIGNED
+    if status in ("ASSIGNED", "IN_PROGRESS", "RESOLVED", "REOPENED") or dept:
+        history.append(StatusHistoryItem(
+            status="ASSIGNED",
+            timestamp=created,
+            note=f"Assigned to {dept}",
+            actor="Municipal Dispatch",
+            actor_role="authority",
+        ))
+    # Step 4: IN PROGRESS
+    if status in ("IN_PROGRESS", "RESOLVED", "REOPENED"):
+        history.append(StatusHistoryItem(
+            status="IN_PROGRESS",
+            timestamp=updated,
+            note="Repair squad dispatched and work started on-site",
+            actor=item_dict.get("resolved_by") or "Field Maintenance Squad",
+            actor_role="authority",
+        ))
+    # Step 5: RESOLVED
+    if status in ("RESOLVED", "REOPENED") or item_dict.get("resolved_at"):
+        history.append(StatusHistoryItem(
+            status="RESOLVED",
+            timestamp=item_dict.get("resolved_at") or updated,
+            note=item_dict.get("resolution_note") or "Defect rectified and resolution evidence uploaded",
+            actor=item_dict.get("resolved_by") or "Municipal Authority Officer",
+            actor_role="authority",
+        ))
+    # Step 6: CITIZEN VERIFICATION
+    if item_dict.get("citizen_resolution_confirmed") is True or item_dict.get("citizen_verification_status") == "CONFIRMED":
+        history.append(StatusHistoryItem(
+            status="CITIZEN_CONFIRMED",
+            timestamp=item_dict.get("citizen_resolution_confirmed_at") or item_dict.get("citizen_verified_at") or updated,
+            note="Citizen confirmed resolution",
+            actor="Citizen User",
+            actor_role="citizen",
+        ))
+    elif item_dict.get("citizen_reopened") is True or status == "REOPENED" or item_dict.get("citizen_verification_status") == "REOPENED":
+        history.append(StatusHistoryItem(
+            status="REOPENED",
+            timestamp=item_dict.get("citizen_reopened_at") or item_dict.get("reopened_at") or updated,
+            note=item_dict.get("reopen_reason") or "Citizen reported issue still exists",
+            actor="Citizen User",
+            actor_role="citizen",
+        ))
+    elif status == "RESOLVED":
+        history.append(StatusHistoryItem(
+            status="CITIZEN_VERIFICATION_PENDING",
+            timestamp=item_dict.get("resolved_at") or updated,
+            note="Pending citizen verification",
+            actor="Citizen Verification Cell",
+            actor_role="system",
+        ))
+
+    return history
+
+
+def parse_complaint_dict(item: Dict[str, Any]) -> Complaint:
+    """Parses a dictionary into a validated Complaint model with Phase 5 fields and history."""
+    data = dict(item)
+    if not isinstance(data.get("evidence"), list):
+        data["evidence"] = []
+
+    res_img = data.get("resolution_image_url") or data.get("resolution_image_path")
+    if res_img:
+        data["resolution_image_url"] = res_img
+        data["resolution_image_path"] = res_img
+
+    if data.get("citizen_resolution_confirmed") is True:
+        data["citizen_verification_status"] = "CONFIRMED"
+    elif data.get("citizen_reopened") is True or data.get("status") == "REOPENED":
+        data["citizen_verification_status"] = "REOPENED"
+    elif data.get("status") == "RESOLVED" and not data.get("citizen_verification_status"):
+        data["citizen_verification_status"] = "PENDING"
+
+    if "citizen_resolution_confirmed_at" in data and not data.get("citizen_verified_at"):
+        data["citizen_verified_at"] = data["citizen_resolution_confirmed_at"]
+    if "citizen_reopened_at" in data and not data.get("reopened_at"):
+        data["reopened_at"] = data["citizen_reopened_at"]
+
+    if not data.get("status_history") or len(data["status_history"]) == 0:
+        data["status_history"] = build_default_history(data)
+    else:
+        parsed_history = []
+        for h in data["status_history"]:
+            if isinstance(h, dict):
+                parsed_history.append(StatusHistoryItem(**h))
+            else:
+                parsed_history.append(h)
+        data["status_history"] = parsed_history
+
+    return Complaint(**data)
 
 
 def haversine_distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -230,13 +351,33 @@ class CivicDataStore:
             res = client.table("complaints").select("*").order("created_at", desc=True).execute()
             if res.data is not None:
                 parsed = []
+                existing_report_ids = set()
+                local_by_rep = {c.report_id: c for c in self.complaints}
+                local_by_id = {c.id: c for c in self.complaints}
+
                 max_seq = 118
                 for item in res.data:
                     try:
-                        if not isinstance(item.get("evidence"), list):
-                            item["evidence"] = []
-                        c = Complaint(**item)
+                        c = parse_complaint_dict(item)
+                        # If local store has recent updates, preserve them
+                        local_c = local_by_rep.get(c.report_id) or local_by_id.get(c.id)
+                        if local_c:
+                            if local_c.updated_at >= c.updated_at:
+                                c.status = local_c.status
+                                c.resolved_at = local_c.resolved_at or c.resolved_at
+                                c.resolved_by = local_c.resolved_by or c.resolved_by
+                                c.resolution_image_url = local_c.resolution_image_url or c.resolution_image_url
+                                c.resolution_note = local_c.resolution_note or c.resolution_note
+                                c.citizen_verification_status = local_c.citizen_verification_status or c.citizen_verification_status
+                                c.citizen_verified_at = local_c.citizen_verified_at or c.citizen_verified_at
+                                c.reopened_at = local_c.reopened_at or c.reopened_at
+                                c.reopen_reason = local_c.reopen_reason or c.reopen_reason
+                                if len(local_c.status_history) > len(c.status_history):
+                                    c.status_history = local_c.status_history
+
                         parsed.append(c)
+                        existing_report_ids.add(c.report_id)
+                        existing_report_ids.add(c.id)
                         rep = str(c.report_id)
                         if rep.startswith("NGD-2026-"):
                             try:
@@ -247,10 +388,17 @@ class CivicDataStore:
                                 pass
                     except Exception as parse_err:
                         logger.warning(f"Error parsing complaint record from Supabase: {parse_err}")
+
+                # Ensure base seed complaints exist for authority testing and verification
+                for s in self._get_seed_records():
+                    if s.id not in existing_report_ids and s.report_id not in existing_report_ids:
+                        local_s = local_by_rep.get(s.report_id) or local_by_id.get(s.id)
+                        parsed.append(local_s if local_s else s)
+
                 self.complaints = parsed
                 self._report_seq = max_seq + 1
                 self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
-                logger.info(f"Loaded {len(parsed)} complaints directly from Supabase")
+                logger.info(f"Loaded {len(parsed)} complaints (Supabase + seeds)")
                 self._save_to_storage()
 
                 # Sync active departments
@@ -305,7 +453,7 @@ class CivicDataStore:
                         max_seq = 118
                         for item in data:
                             try:
-                                c = Complaint(**item)
+                                c = parse_complaint_dict(item)
                                 parsed.append(c)
                                 rep = str(c.report_id)
                                 if rep.startswith("NGD-2026-"):
@@ -332,8 +480,8 @@ class CivicDataStore:
             self._seed_initial_records()
             self._save_to_storage()
 
-    def _seed_initial_records(self):
-        """Seeds the 16 authentic Delhi civic complaints matching NagarDrishti-AI."""
+    def _get_seed_records(self) -> List[Complaint]:
+        """Returns the 18 authentic Delhi/Bhopal civic complaints matching NagarDrishti-AI."""
         now_utc = datetime.now(timezone.utc)
 
         def dt_off(d: int, h: int = 0) -> str:
@@ -372,6 +520,14 @@ class CivicDataStore:
                 description="Road surface cracking and minor pothole developing.",
                 image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
                 status="RESOLVED",
+                resolution_image_url="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
+                resolution_image_path="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
+                resolution_note="Cold asphalt mix compacted and steam rolled across 4 sq meters to level road surface.",
+                resolved_at=dt_off(1, 2),
+                resolved_by="Municipal Roads (PWD Officer)",
+                citizen_verification_status="PENDING",
+                citizen_resolution_confirmed=None,
+                citizen_reopened=False,
                 duplicate_of=None,
                 created_at=dt_off(5, 6),
                 updated_at=dt_off(1, 2),
@@ -570,9 +726,19 @@ class CivicDataStore:
                 description="Drain grate cleaned and water receding.",
                 image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
                 status="RESOLVED",
+                resolution_image_url="https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
+                resolution_image_path="https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
+                resolution_note="Stormwater grating desilted, solid trash cleared and drain flushing completed.",
+                resolved_at=dt_off(2, 2),
+                resolved_by="Delhi Jal Board Zonal Super",
+                citizen_verification_status="CONFIRMED",
+                citizen_resolution_confirmed=True,
+                citizen_resolution_confirmed_at=dt_off(1, 12),
+                citizen_verified_at=dt_off(1, 12),
+                citizen_reopened=False,
                 duplicate_of=None,
                 created_at=dt_off(6, 4),
-                updated_at=dt_off(2, 2),
+                updated_at=dt_off(1, 12),
             ),
             Complaint(
                 id="c016",
@@ -605,10 +771,21 @@ class CivicDataStore:
                 department="Municipal Roads (PWD)",
                 description="Crack in road sealed by maintenance team.",
                 image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="RESOLVED",
+                status="REOPENED",
+                resolution_image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
+                resolution_image_path="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
+                resolution_note="Crack in road sealed by municipal maintenance squad.",
+                resolved_at=dt_off(2, 1),
+                resolved_by="Municipal Roads (PWD Squad 4)",
+                citizen_verification_status="REOPENED",
+                citizen_resolution_confirmed=False,
+                citizen_reopened=True,
+                citizen_reopened_at=dt_off(0, 5),
+                reopened_at=dt_off(0, 5),
+                reopen_reason="The pothole is still present beside the repaired section.",
                 duplicate_of=None,
                 created_at=dt_off(5, 2),
-                updated_at=dt_off(1, 1),
+                updated_at=dt_off(0, 5),
             ),
             Complaint(
                 id="c018",
@@ -629,7 +806,14 @@ class CivicDataStore:
                 updated_at=dt_off(0, 4),
             ),
         ]
-        self.complaints = seed_data
+        for c in seed_data:
+            if not c.status_history:
+                c.status_history = build_default_history(c.model_dump())
+        return seed_data
+
+    def _seed_initial_records(self):
+        """Seeds the authentic civic complaints matching NagarDrishti-AI."""
+        self.complaints = self._get_seed_records()
         self._report_seq = 119
 
     def _save_to_storage(self):
@@ -708,6 +892,7 @@ class CivicDataStore:
         severity: Optional[str] = None,
         status: Optional[str] = None,
         department: Optional[str] = None,
+        resolution_status: Optional[str] = None,
         limit: Optional[int] = None,
     ) -> List[Complaint]:
         self._check_auto_reload()
@@ -721,6 +906,30 @@ class CivicDataStore:
             results = [c for c in results if c.status.upper() == status.upper()]
         if department:
             results = [c for c in results if department.lower() in c.department.lower()]
+        if resolution_status:
+            rs = resolution_status.lower().strip()
+            if rs in ("pending_resolution", "pending-resolution", "unresolved"):
+                results = [c for c in results if c.status in ("REPORTED", "ASSIGNED", "IN_PROGRESS")]
+            elif rs == "resolved":
+                results = [c for c in results if c.status == "RESOLVED"]
+            elif rs in ("awaiting_verification", "awaiting-verification", "pending_verification"):
+                results = [
+                    c for c in results
+                    if c.status == "RESOLVED" and (
+                        c.citizen_verification_status == "PENDING"
+                        or (c.citizen_resolution_confirmed is None and not c.citizen_reopened)
+                    )
+                ]
+            elif rs in ("citizen_confirmed", "confirmed"):
+                results = [
+                    c for c in results
+                    if c.citizen_verification_status == "CONFIRMED" or c.citizen_resolution_confirmed is True
+                ]
+            elif rs in ("reopened", "citizen_reopened"):
+                results = [
+                    c for c in results
+                    if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+                ]
 
         # Sort newest first
         results = sorted(results, key=lambda x: x.created_at, reverse=True)
@@ -737,7 +946,14 @@ class CivicDataStore:
                 return c
         return None
 
-    def update_complaint_status(self, complaint_id: str, new_status: ComplaintStatus) -> Optional[Complaint]:
+    def update_complaint_status(
+        self,
+        complaint_id: str,
+        new_status: ComplaintStatus,
+        resolution_image_url: Optional[str] = None,
+        resolution_note: Optional[str] = None,
+        resolved_by: Optional[str] = None,
+    ) -> Optional[Complaint]:
         self._check_auto_reload()
         updated_c = None
         now_iso = datetime.now(timezone.utc).isoformat()
@@ -745,6 +961,127 @@ class CivicDataStore:
             if c.id == complaint_id or c.report_id == complaint_id:
                 c.status = new_status
                 c.updated_at = now_iso
+
+                if new_status == "RESOLVED":
+                    if resolution_image_url:
+                        c.resolution_image_url = resolution_image_url
+                        c.resolution_image_path = resolution_image_url
+                    if resolution_note is not None:
+                        c.resolution_note = resolution_note
+                    if not c.resolved_at:
+                        c.resolved_at = now_iso
+                    if resolved_by:
+                        c.resolved_by = resolved_by
+                    c.citizen_verification_status = "PENDING"
+                    c.citizen_resolution_confirmed = None
+                    c.citizen_reopened = False
+
+                    c.status_history.append(StatusHistoryItem(
+                        status="RESOLVED",
+                        timestamp=now_iso,
+                        note=c.resolution_note or "Civic defect rectified and resolution evidence uploaded",
+                        actor=c.resolved_by or "Municipal Authority Officer",
+                        actor_role="authority",
+                    ))
+                elif new_status == "IN_PROGRESS":
+                    c.status_history.append(StatusHistoryItem(
+                        status="IN_PROGRESS",
+                        timestamp=now_iso,
+                        note="Repair work resumed on-site by municipal team",
+                        actor=resolved_by or "Municipal Authority Officer",
+                        actor_role="authority",
+                    ))
+                elif new_status == "ASSIGNED":
+                    c.status_history.append(StatusHistoryItem(
+                        status="ASSIGNED",
+                        timestamp=now_iso,
+                        note=f"Assigned to {c.department}",
+                        actor="Municipal Dispatch",
+                        actor_role="authority",
+                    ))
+                elif new_status == "REOPENED":
+                    c.citizen_verification_status = "REOPENED"
+                    c.citizen_reopened = True
+                    c.citizen_reopened_at = now_iso
+                    c.reopened_at = now_iso
+                    c.status_history.append(StatusHistoryItem(
+                        status="REOPENED",
+                        timestamp=now_iso,
+                        note=c.reopen_reason or "Complaint transitioned to REOPENED",
+                        actor="Municipal Authority / Citizen",
+                        actor_role="authority",
+                    ))
+
+                updated_c = c
+                break
+
+        if updated_c:
+            client = self._get_supabase_client()
+            if client:
+                try:
+                    payload_to_supabase: Dict[str, Any] = {
+                        "status": new_status,
+                        "updated_at": now_iso,
+                    }
+                    if updated_c.resolved_at:
+                        payload_to_supabase["resolved_at"] = updated_c.resolved_at
+                    if updated_c.resolution_image_url:
+                        payload_to_supabase["resolution_image_url"] = updated_c.resolution_image_url
+                    if updated_c.reopen_reason:
+                        payload_to_supabase["reopen_reason"] = updated_c.reopen_reason
+                    client.table("complaints").update(payload_to_supabase).eq("report_id", updated_c.report_id).execute()
+                    logger.info(f"Updated status for {updated_c.report_id} in Supabase")
+                except Exception as se:
+                    try:
+                        client.table("complaints").update({
+                            "status": new_status,
+                            "updated_at": now_iso,
+                        }).eq("report_id", updated_c.report_id).execute()
+                        logger.info(f"Updated core status for {updated_c.report_id} in Supabase")
+                    except Exception as se2:
+                        logger.warning(f"Failed to update status in Supabase: {se2}")
+
+            self._save_to_storage()
+            self._notify_user_site_status(updated_c.report_id, new_status)
+            return updated_c
+        return None
+
+    def resolve_complaint(
+        self,
+        complaint_id: str,
+        resolution_image_url: str,
+        resolution_note: Optional[str] = None,
+        resolved_by: Optional[str] = None,
+    ) -> Optional[Complaint]:
+        return self.update_complaint_status(
+            complaint_id=complaint_id,
+            new_status="RESOLVED",
+            resolution_image_url=resolution_image_url,
+            resolution_note=resolution_note,
+            resolved_by=resolved_by or "Municipal Authority Officer",
+        )
+
+    def confirm_resolution(self, complaint_id: str) -> Optional[Complaint]:
+        self._check_auto_reload()
+        updated_c = None
+        now_iso = datetime.now(timezone.utc).isoformat()
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                if c.status != "RESOLVED":
+                    return None
+                c.citizen_resolution_confirmed = True
+                c.citizen_resolution_confirmed_at = now_iso
+                c.citizen_verified_at = now_iso
+                c.citizen_verification_status = "CONFIRMED"
+                c.citizen_reopened = False
+                c.updated_at = now_iso
+                c.status_history.append(StatusHistoryItem(
+                    status="CITIZEN_CONFIRMED",
+                    timestamp=now_iso,
+                    note="Citizen confirmed resolution",
+                    actor="Citizen User",
+                    actor_role="citizen",
+                ))
                 updated_c = c
                 break
 
@@ -753,15 +1090,67 @@ class CivicDataStore:
             if client:
                 try:
                     client.table("complaints").update({
-                        "status": new_status,
-                        "updated_at": now_iso
+                        "citizen_resolution_confirmed": True,
+                        "citizen_resolution_confirmed_at": now_iso,
+                        "updated_at": now_iso,
                     }).eq("report_id", updated_c.report_id).execute()
-                    logger.info(f"Updated status for {updated_c.report_id} in Supabase")
-                except Exception as se:
-                    logger.warning(f"Failed to update status in Supabase: {se}")
-
+                except Exception:
+                    try:
+                        client.table("complaints").update({
+                            "status": "RESOLVED",
+                            "updated_at": now_iso,
+                        }).eq("report_id", updated_c.report_id).execute()
+                    except Exception as se:
+                        logger.warning(f"Could not update confirmation in Supabase: {se}")
             self._save_to_storage()
-            self._notify_user_site_status(updated_c.report_id, new_status)
+            return updated_c
+        return None
+
+    def reopen_complaint(self, complaint_id: str, reason: str = "") -> Optional[Complaint]:
+        self._check_auto_reload()
+        updated_c = None
+        now_iso = datetime.now(timezone.utc).isoformat()
+        for c in self.complaints:
+            if c.id == complaint_id or c.report_id == complaint_id:
+                if c.status != "RESOLVED":
+                    return None
+                c.status = "REOPENED"
+                c.citizen_reopened = True
+                c.citizen_reopened_at = now_iso
+                c.reopened_at = now_iso
+                c.reopen_reason = reason or "Citizen reported that this issue is still unresolved."
+                c.citizen_resolution_confirmed = False
+                c.citizen_verification_status = "REOPENED"
+                c.updated_at = now_iso
+                # Note: Prior resolution image and timestamp remain PRESERVED!
+                c.status_history.append(StatusHistoryItem(
+                    status="REOPENED",
+                    timestamp=now_iso,
+                    note=c.reopen_reason,
+                    actor="Citizen User",
+                    actor_role="citizen",
+                ))
+                updated_c = c
+                break
+
+        if updated_c:
+            client = self._get_supabase_client()
+            if client:
+                try:
+                    client.table("complaints").update({
+                        "status": "REOPENED",
+                        "reopen_reason": updated_c.reopen_reason,
+                        "updated_at": now_iso,
+                    }).eq("report_id", updated_c.report_id).execute()
+                except Exception:
+                    try:
+                        client.table("complaints").update({
+                            "status": "REOPENED",
+                            "updated_at": now_iso,
+                        }).eq("report_id", updated_c.report_id).execute()
+                    except Exception as se:
+                        logger.warning(f"Could not update reopen in Supabase: {se}")
+            self._save_to_storage()
             return updated_c
         return None
 
@@ -859,6 +1248,17 @@ class CivicDataStore:
         pending = sum(1 for c in self.complaints if c.status == "REPORTED")
         in_prog = sum(1 for c in self.complaints if c.status in ("ASSIGNED", "IN_PROGRESS"))
         resolved = sum(1 for c in self.complaints if c.status == "RESOLVED")
+        awaiting_verif = sum(
+            1 for c in self.complaints
+            if c.status == "RESOLVED" and (
+                c.citizen_verification_status == "PENDING"
+                or (c.citizen_resolution_confirmed is None and not c.citizen_reopened)
+            )
+        )
+        reopened = sum(
+            1 for c in self.complaints
+            if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+        )
 
         by_category = {"pothole": 0, "garbage": 0, "streetlight": 0, "drain": 0, "other": 0}
         for c in self.complaints:
@@ -868,9 +1268,10 @@ class CivicDataStore:
         for c in self.complaints:
             by_severity[c.severity] = by_severity.get(c.severity, 0) + 1
 
-        by_status = {"REPORTED": 0, "ASSIGNED": 0, "IN_PROGRESS": 0, "RESOLVED": 0}
+        by_status = {"REPORTED": 0, "ASSIGNED": 0, "IN_PROGRESS": 0, "RESOLVED": 0, "REOPENED": 0}
         for c in self.complaints:
-            by_status[c.status] = by_status.get(c.status, 0) + 1
+            st = c.status.upper()
+            by_status[st] = by_status.get(st, 0) + 1
 
         hotspots = calculate_hotspots(self.complaints)
         daily_trends = calculate_daily_trends(self.complaints)
@@ -881,6 +1282,8 @@ class CivicDataStore:
             pending=pending,
             in_progress=in_prog,
             resolved=resolved,
+            awaiting_verification=awaiting_verif,
+            reopened=reopened,
             by_category=by_category,
             by_severity=by_severity,
             by_status=by_status,

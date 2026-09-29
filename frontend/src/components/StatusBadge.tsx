@@ -30,6 +30,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
       cls: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/50',
       dot: 'bg-emerald-500 dark:bg-emerald-400',
     },
+    REOPENED: {
+      label: 'Reopened',
+      cls: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50',
+      dot: 'bg-rose-500 dark:bg-rose-400 animate-pulse',
+    },
   };
 
   const c = configs[norm] || configs.REPORTED;

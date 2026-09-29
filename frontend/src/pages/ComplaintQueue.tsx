@@ -22,6 +22,8 @@ interface ComplaintQueueProps {
   onStatusFilterChange: (val: string) => void;
   departmentFilter: string;
   onDepartmentFilterChange: (val: string) => void;
+  resolutionStatusFilter?: string;
+  onResolutionStatusFilterChange?: (val: string) => void;
   dateHorizon: string;
   onDateHorizonChange: (val: string) => void;
   searchQuery: string;
@@ -42,6 +44,8 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
   onStatusFilterChange,
   departmentFilter,
   onDepartmentFilterChange,
+  resolutionStatusFilter = '',
+  onResolutionStatusFilterChange,
   dateHorizon,
   onDateHorizonChange,
   searchQuery,
@@ -108,6 +112,8 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
         onStatusChange={onStatusFilterChange}
         department={departmentFilter}
         onDepartmentChange={onDepartmentFilterChange}
+        resolutionStatus={resolutionStatusFilter}
+        onResolutionStatusChange={onResolutionStatusFilterChange}
         dateHorizon={dateHorizon}
         onDateHorizonChange={onDateHorizonChange}
         search={searchQuery}
@@ -209,7 +215,24 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                         <SeverityBadge severity={c.severity} size="sm" />
                       </td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
-                        <StatusBadge status={c.status} size="sm" />
+                        <div className="flex flex-col items-start gap-1">
+                          <StatusBadge status={c.status} size="sm" />
+                          {c.status === 'RESOLVED' && c.citizen_verification_status === 'PENDING' && (
+                            <span className="text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                              Awaiting Citizen
+                            </span>
+                          )}
+                          {c.citizen_verification_status === 'CONFIRMED' && (
+                            <span className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                              ✓ Confirmed
+                            </span>
+                          )}
+                          {(c.status === 'REOPENED' || c.citizen_verification_status === 'REOPENED') && (
+                            <span className="text-[10px] font-medium text-rose-600 dark:text-rose-400">
+                              ⚠ Reopened
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap font-mono text-[11px]">
                         {new Date(c.created_at).toLocaleDateString([], {
@@ -223,7 +246,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                             e.stopPropagation();
                             onSelectComplaint(c);
                           }}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:text-slate-900 dark:text-slate-300 dark:hover:white bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                         >
                           <Eye className="w-3 h-3 text-slate-500" />
                           <span>Inspect</span>
@@ -260,7 +283,24 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                   </p>
 
                   <div className="flex items-center justify-between pt-1">
-                    <StatusBadge status={c.status} size="sm" />
+                    <div className="flex items-center gap-1.5">
+                      <StatusBadge status={c.status} size="sm" />
+                      {c.status === 'RESOLVED' && c.citizen_verification_status === 'PENDING' && (
+                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                          Awaiting Citizen
+                        </span>
+                      )}
+                      {c.citizen_verification_status === 'CONFIRMED' && (
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                          ✓ Confirmed
+                        </span>
+                      )}
+                      {(c.status === 'REOPENED' || c.citizen_verification_status === 'REOPENED') && (
+                        <span className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">
+                          ⚠ Reopened
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[11px] font-mono text-slate-400">
                       {new Date(c.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                     </span>
