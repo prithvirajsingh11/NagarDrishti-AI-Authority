@@ -247,11 +247,11 @@ class CivicDataStore:
                                 pass
                     except Exception as parse_err:
                         logger.warning(f"Error parsing complaint record from Supabase: {parse_err}")
-                if parsed:
-                    self.complaints = parsed
-                    self._report_seq = max_seq + 1
-                    self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
-                    logger.info(f"Loaded {len(parsed)} complaints directly from Supabase")
+                self.complaints = parsed
+                self._report_seq = max_seq + 1
+                self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
+                logger.info(f"Loaded {len(parsed)} complaints directly from Supabase")
+                self._save_to_storage()
 
                 # Sync active departments
                 try:
