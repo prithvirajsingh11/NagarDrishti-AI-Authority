@@ -34,10 +34,7 @@ CORS_ORIGINS = [
 
 # Supabase configuration
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://otjbonkovzciglttxfzz.supabase.co")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv(
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90amJvbmtvdnpjaWdsdHR4Znp6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDQ4MTIzNiwiZXhwIjoyMTA2MDU3MjM2fQ.udnE-Uf2CwwIydLe1igAcyLoSCZO0gsMN_T9YGAnsxA"
-)
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "complaint-images")
 
 # Connection to user site (NagarDrishti-AI)
