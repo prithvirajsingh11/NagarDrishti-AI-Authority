@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpDown, Eye, Inbox } from 'lucide-react';
+import { ArrowUpDown, Eye, Inbox, MapPin, ArrowRight } from 'lucide-react';
 import type { Complaint, Department } from '../types/complaint';
 import { downloadComplaintsCsv } from '../services/api';
 import { FilterBar } from '../components/FilterBar';
@@ -314,58 +314,114 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
               </table>
             </div>
 
-            {/* Mobile Card List (under md) */}
-            <div className="md:hidden divide-y divide-slate-100 dark:divide-slate-800/80">
-              {sortedComplaints.map((c) => (
-                <div
-                  key={c.id}
-                  onClick={() => onSelectComplaint(c)}
-                  className="p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors cursor-pointer space-y-2.5"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
-                        <ProblemIcon type={c.problem_type} className="w-3.5 h-3.5" />
-                      </div>
-                      <span className="font-mono text-xs font-semibold text-slate-900 dark:text-slate-100">
-                        {c.report_id}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <PriorityBadge level={c.priority_level} score={c.priority_score} size="xs" />
-                      <SeverityBadge severity={c.severity} size="sm" />
-                    </div>
-                  </div>
-
-                  <p className="text-xs text-slate-700 dark:text-slate-300 line-clamp-1">
-                    {c.location_name || 'City Coordinates'}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <StatusBadge status={c.status} size="sm" />
-                      {c.status === 'RESOLVED' && c.citizen_verification_status === 'PENDING' && (
-                        <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
-                          Awaiting Citizen
-                        </span>
+            {/* Mobile Card List (under md) with Quick Sort Toolbar */}
+            <div className="md:hidden">
+              {/* Quick Sort Bar for Mobile */}
+              <div className="p-3 bg-slate-50/70 dark:bg-slate-950/60 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-1 overflow-x-auto text-[11px]">
+                <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 mr-1">
+                  Sort:
+                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {(
+                    [
+                      { field: 'priority' as SortField, label: 'Priority', ariaLabel: 'Order by urgency level' },
+                      { field: 'severity' as SortField, label: 'Severity', ariaLabel: 'Order by severity grade' },
+                      { field: 'status' as SortField, label: 'Status', ariaLabel: 'Order by lifecycle status' },
+                      { field: 'created_at' as SortField, label: 'Date', ariaLabel: 'Order by submission date' },
+                    ] as const
+                  ).map((s) => (
+                    <button
+                      key={s.field}
+                      type="button"
+                      aria-label={s.ariaLabel}
+                      onClick={() => handleSort(s.field)}
+                      className={`px-2 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer touch-manipulation ${
+                        sortField === s.field
+                          ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold shadow-2xs'
+                          : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
+                      }`}
+                    >
+                      <span>{s.label}</span>
+                      {sortField === s.field && (
+                        <span className="text-[9px] font-mono">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                       )}
-                      {c.citizen_verification_status === 'CONFIRMED' && (
-                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                          ✓ Confirmed
-                        </span>
-                      )}
-                      {(c.status === 'REOPENED' || c.citizen_verification_status === 'REOPENED') && (
-                        <span className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">
-                          ⚠ Reopened
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-mono text-slate-400">
-                      {new Date(c.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Individual Compact Complaint Cards */}
+              <div className="p-3 space-y-3">
+                {sortedComplaints.map((c) => (
+                  <div
+                    key={c.id}
+                    onClick={() => onSelectComplaint(c)}
+                    className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs active:scale-[0.99] transition-all cursor-pointer space-y-3 touch-manipulation"
+                  >
+                    {/* Top Row: Incident Title & Severity/Priority Badges */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-300">
+                          <ProblemIcon type={c.problem_type} className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 capitalize truncate leading-snug">
+                            {getProblemLabel(c.problem_type)}
+                          </h4>
+                          <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
+                            {c.report_id}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <PriorityBadge level={c.priority_level} score={c.priority_score} size="xs" />
+                        <SeverityBadge severity={c.severity} size="sm" />
+                      </div>
+                    </div>
+
+                    {/* Location & Department */}
+                    <div className="space-y-1 text-xs text-slate-600 dark:text-slate-300">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{c.location_name || 'City Coordinates'}</span>
+                      </div>
+                      {c.department && (
+                        <div className="text-[11px] text-slate-400 pl-5 truncate">
+                          Dept: <span className="text-slate-700 dark:text-slate-300 font-medium">{c.department}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Row: Status Badge & View Details Action */}
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <StatusBadge status={c.status} size="sm" />
+                        {c.status === 'RESOLVED' && c.citizen_verification_status === 'PENDING' && (
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                            Awaiting Citizen
+                          </span>
+                        )}
+                        {c.citizen_verification_status === 'CONFIRMED' && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                            ✓ Confirmed
+                          </span>
+                        )}
+                        {(c.status === 'REOPENED' || c.citizen_verification_status === 'REOPENED') && (
+                          <span className="text-[10px] text-rose-600 dark:text-rose-400 font-medium">
+                            ⚠ Reopened
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 shrink-0">
+                        <span>View Details</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </>
         )}

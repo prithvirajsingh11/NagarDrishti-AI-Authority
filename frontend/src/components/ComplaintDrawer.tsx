@@ -420,7 +420,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="w-10 h-10 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center cursor-pointer"
               aria-label="Close details"
             >
               <X className="w-4 h-4" />
@@ -449,7 +449,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 text-xs">
                 <div className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80">
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider block">Category & Severity</span>
                   <div className="flex items-center gap-1.5 mt-0.5 font-medium text-slate-900 dark:text-slate-100 capitalize">
@@ -1254,12 +1254,12 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
           </div>
 
           {/* Drawer Footer Actions */}
-          <div className="p-4 sm:p-5 border-t border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 sm:p-5 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-slate-200/90 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xs flex flex-wrap items-center justify-between gap-3 shrink-0">
             <span className="text-xs text-slate-500 dark:text-slate-400">
               Current: <strong className="text-slate-900 dark:text-slate-100 font-semibold">{complaint.status}</strong>
             </span>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               {nextActions.map((target) => {
                 const isResolveAction = target === 'RESOLVED';
                 return (
@@ -1267,7 +1267,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                     key={target}
                     onClick={() => handleStatusChange(target)}
                     disabled={isUpdating}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-xl shadow-2xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer ${
+                    className={`flex-1 sm:flex-none justify-center px-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl shadow-2xs transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer ${
                       isResolveAction
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500'
                         : 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900'
@@ -1290,7 +1290,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
       {/* Confirmation Dialog Modal: Mark as Resolved */}
       {isResolveModalOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150">
+          <div className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between">
               <div>

@@ -13,6 +13,7 @@ import {
   Download,
   ShieldCheck,
   Info,
+  MapPin,
 } from 'lucide-react';
 import {
   Area,
@@ -344,10 +345,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const activeTimePoints = React.useMemo(() => {
-    if (!timeAnalytics) return trendData.map((d) => ({ ...d, day_label: d.day_label || d.date.slice(5) }));
-    if (timeMetricView === 'resolved') return timeAnalytics.resolved_over_time;
-    if (timeMetricView === 'reopened') return timeAnalytics.reopened_over_time;
-    return timeAnalytics.received_over_time;
+    if (!timeAnalytics) return (trendData || []).map((d) => ({ ...d, day_label: d.day_label || (d.date ? d.date.slice(5) : '') }));
+    if (timeMetricView === 'resolved') return timeAnalytics.resolved_over_time || [];
+    if (timeMetricView === 'reopened') return timeAnalytics.reopened_over_time || [];
+    return timeAnalytics.received_over_time || [];
   }, [timeAnalytics, timeMetricView, trendData]);
 
   const activeCurveColor = timeMetricView === 'resolved'
@@ -390,7 +391,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             Intake → AI Vision → GIS → Priority → Dispatch → Evidence → Citizen Sign-off
           </span>
         </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] font-semibold py-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x text-[11px] font-semibold py-1">
           {[
             { step: '1', title: 'Citizen Reports', desc: 'Direct Intake' },
             { step: '2', title: 'AI Classification', desc: 'Gemini Vision' },
@@ -466,89 +467,89 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       )}
 
       {/* Minimalist KPI Cards including Phase 5 Metrics */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-3.5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5 sm:gap-3.5">
         {/* Total Reports */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span className="font-medium">Total Reports</span>
-            <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+            <span className="font-medium text-[11px] sm:text-xs">Total Reports</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
               <Layers className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-slate-900 dark:text-slate-100 mt-1.5 sm:mt-2">
             {totalReportsCount}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">All logged incidents</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">All logged incidents</span>
         </div>
 
         {/* Critical & High */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-rose-200 dark:hover:border-rose-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-rose-200 dark:hover:border-rose-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
-            <span className="font-medium">Critical & High</span>
-            <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+            <span className="font-medium text-[11px] sm:text-xs">Critical & High</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
               <AlertTriangle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-1.5 sm:mt-2">
             {stats?.high_critical ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Requires urgent triage</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Requires urgent triage</span>
         </div>
 
         {/* Pending Triage */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-amber-200 dark:hover:border-amber-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-amber-200 dark:hover:border-amber-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
-            <span className="font-medium">Pending Triage</span>
-            <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+            <span className="font-medium text-[11px] sm:text-xs">Pending Triage</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-amber-600 dark:text-amber-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-amber-600 dark:text-amber-400 mt-1.5 sm:mt-2">
             {stats?.pending ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Awaiting department</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Awaiting department</span>
         </div>
 
         {/* In Progress */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-sky-200 dark:hover:border-sky-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-sky-200 dark:hover:border-sky-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-sky-700 dark:text-sky-400">
-            <span className="font-medium">In Progress</span>
-            <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
+            <span className="font-medium text-[11px] sm:text-xs">In Progress</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
               <Building2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-sky-600 dark:text-sky-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-sky-600 dark:text-sky-400 mt-1.5 sm:mt-2">
             {stats?.in_progress ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Active crew dispatched</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Active crew dispatched</span>
         </div>
 
         {/* Awaiting Verification */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-400">
-            <span className="font-medium">Awaiting Verification</span>
-            <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+            <span className="font-medium text-[11px] sm:text-xs truncate">Awaiting Verification</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
               <Clock className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-indigo-600 dark:text-indigo-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-indigo-600 dark:text-indigo-400 mt-1.5 sm:mt-2">
             {stats?.awaiting_verification ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Pending citizen sign-off</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Pending citizen sign-off</span>
         </div>
 
         {/* Resolved */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all">
           <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400">
-            <span className="font-medium">Resolved</span>
-            <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+            <span className="font-medium text-[11px] sm:text-xs">Resolved</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
               <CheckCircle2 className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-emerald-600 dark:text-emerald-400 mt-1.5 sm:mt-2">
             {stats?.resolved ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Completed resolutions</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Completed resolutions</span>
         </div>
 
         {/* Reopened */}
@@ -563,18 +564,18 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             (stats?.reopened ?? 0) > 0
               ? 'border-rose-300 dark:border-rose-800/80 hover:border-rose-400'
               : 'border-slate-200/90 dark:border-slate-800/80 hover:border-slate-300'
-          } rounded-2xl p-4 shadow-2xs transition-all cursor-pointer`}
+          } rounded-2xl p-3 sm:p-4 shadow-2xs transition-all cursor-pointer`}
         >
           <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
-            <span className="font-medium">Reopened</span>
-            <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+            <span className="font-medium text-[11px] sm:text-xs">Reopened</span>
+            <div className="p-1 sm:p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
               <AlertTriangle className="w-3.5 h-3.5" />
             </div>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-2">
+          <p className="text-xl sm:text-2xl lg:text-3xl font-bold font-mono tracking-tight text-rose-600 dark:text-rose-400 mt-1.5 sm:mt-2">
             {stats?.reopened ?? (loading ? '...' : 0)}
           </p>
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">Citizen flagged unresolved</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate block">Citizen flagged unresolved</span>
         </div>
       </div>
 
@@ -800,8 +801,8 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </button>
         </div>
 
-        {/* Priority Rows Table */}
-        <div className="overflow-x-auto">
+        {/* Priority Rows Table (Desktop md+) */}
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] uppercase font-bold tracking-wider">
@@ -890,6 +891,67 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Priority Mobile Cards (< md) */}
+        <div className="md:hidden space-y-2.5">
+          {priorityActions.length > 0 ? (
+            priorityActions.map((c) => {
+              const isReopened = c.status === 'REOPENED' || c.citizen_reopened === true;
+              return (
+                <div
+                  key={`mobile-priority-${c.id}`}
+                  onClick={() => onSelectComplaint(c)}
+                  className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 space-y-2.5 active:bg-slate-100 dark:active:bg-slate-800/80 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                        <ProblemIcon type={c.problem_type} className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 capitalize block leading-tight">
+                          {getProblemLabel(c.problem_type)}
+                        </span>
+                        <span className="font-mono text-[10px] text-slate-400">
+                          {c.report_id}
+                        </span>
+                      </div>
+                    </div>
+                    <PriorityBadge
+                      level={c.priority_level || 'HIGH'}
+                      score={c.priority_score}
+                      size="xs"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{c.location_name}</span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-[11px]">
+                    <div className="flex items-center gap-1.5">
+                      <SeverityBadge severity={c.severity} size="sm" />
+                      <StatusBadge status={c.status} size="sm" />
+                      {isReopened && (
+                        <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300">
+                          ⚠ Reopened
+                        </span>
+                      )}
+                    </div>
+                    <span className="font-mono text-[10px] text-slate-400">
+                      {formatComplaintAge(c.created_at)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-6 text-center text-xs text-slate-400">
+              No active unresolved complaints requiring priority action.
+            </div>
+          )}
         </div>
       </div>
 
@@ -1420,7 +1482,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           <div className="h-44 mt-2">
-            {activeTimePoints.length > 0 ? (
+            {(activeTimePoints?.length ?? 0) > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={activeTimePoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>

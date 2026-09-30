@@ -17,6 +17,7 @@ import { ComplaintQueue } from '../pages/ComplaintQueue';
 import { HotspotIntelligence } from '../pages/HotspotIntelligence';
 import { Sidebar } from '../components/Sidebar';
 import { ThemeProvider } from '../context/ThemeContext';
+import { App } from '../App';
 
 // Mock Supabase Auth
 vi.mock('../services/supabaseClient', () => {
@@ -529,5 +530,85 @@ describe('NagarDrishti AI Authority Portal - Authentication & Authorization', ()
     expect(screen.queryByText(/Reset Demo/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Reset Demo Data/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Demo Dataset/i)).not.toBeInTheDocument();
+  });
+
+  // 13. Authority login flow in App: no "Access Restricted" flash
+  it('13. authority login flow in App: never displays Access Restricted screen during login', async () => {
+    window.location.hash = '';
+
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: { session: null },
+      error: null,
+    });
+
+    vi.mocked(supabase.auth.signInWithPassword).mockImplementation(async () => {
+      return {
+        data: {
+          session: {
+            access_token: 'test-authority-token',
+            token_type: 'bearer',
+            expires_in: 3600,
+            refresh_token: 'refresh-token',
+            user: {
+              id: 'officer-test-id',
+              email: 'officer@municipal.gov',
+              app_metadata: {},
+              user_metadata: { full_name: 'Officer Raj' },
+              aud: 'authenticated',
+              created_at: '2026-01-01',
+            },
+          } as any,
+          user: {
+            id: 'officer-test-id',
+            email: 'officer@municipal.gov',
+          } as any,
+        },
+        error: null,
+      };
+    });
+
+    globalThis.fetch = vi.fn().mockImplementation(async (url: any) => {
+      const urlStr = String(url);
+      if (urlStr.includes('/auth/me')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            id: 'officer-test-id',
+            email: 'officer@municipal.gov',
+            role: 'authority',
+            full_name: 'Officer Raj',
+          }),
+        };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => [],
+      };
+    });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Authority Portal')).toBeInTheDocument();
+    });
+
+    fireEvent.change(screen.getByLabelText(/Email Address/i), {
+      target: { value: 'officer@municipal.gov' },
+    });
+    fireEvent.change(screen.getByLabelText(/^Password$/i), {
+      target: { value: 'SecurePass123!' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /Sign In/i }));
+
+    // During and after login, Access Restricted must never be rendered
+    expect(screen.queryByText('Access Restricted')).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByText('Access Restricted')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Sign In/i })).not.toBeInTheDocument();
+    });
   });
 });

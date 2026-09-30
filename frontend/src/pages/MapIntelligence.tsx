@@ -66,9 +66,9 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
   onResetFilters,
 }) => {
   return (
-    <div className="p-4 sm:p-6 space-y-4 max-w-7xl mx-auto flex flex-col h-[calc(100vh-4.5rem)] transition-colors">
+    <div className="p-3 sm:p-6 space-y-3.5 sm:space-y-4 max-w-7xl mx-auto flex flex-col min-h-[calc(100vh-5rem)] md:h-[calc(100vh-4.5rem)] transition-colors">
       {/* Title & Hotspot quick selector */}
-      <div className="flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-3 shrink-0">
         <div>
           <h2 className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Geographic Map Intelligence
@@ -79,8 +79,8 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
         </div>
 
         {/* Hotspot Focus Quick Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Focus Corridor:</span>
+        <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+          <span className="text-xs text-slate-500 dark:text-slate-400 font-medium shrink-0">Focus Corridor:</span>
           <select
             value={focusedHotspot ? focusedHotspot.title : ''}
             onChange={(e) => {
@@ -88,7 +88,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
               onSelectHotspot(selected || null);
             }}
             aria-label="Focus on specific corridor hotspot"
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer shadow-2xs"
+            className="flex-1 sm:flex-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer shadow-2xs"
           >
             <option value="">Full City Overview</option>
             {hotspots.map((h, i) => (

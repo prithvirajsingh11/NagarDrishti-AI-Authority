@@ -210,3 +210,33 @@
 .dark .leaflet-popup-content p {
   color: #94a3b8;
 }
+
+/* Mobile Touch & Safe Area Support */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Smooth mobile momentum scrolling */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent accidental horizontal bounce on phone viewports */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Native-feel tap highlight removal */
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+}

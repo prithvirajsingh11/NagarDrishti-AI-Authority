@@ -106,7 +106,7 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
                   </div>
 
                   {/* Metrics 4-box */}
-                  <div className="grid grid-cols-4 gap-2 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                     <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Reports</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-100">

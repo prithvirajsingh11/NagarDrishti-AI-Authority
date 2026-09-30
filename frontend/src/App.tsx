@@ -37,10 +37,33 @@ import { Shield } from 'lucide-react';
 export type AppRoute = AuthorityRoute | '/login' | '/access-denied';
 
 function AuthorityAppContent() {
-  const { session, loading: authLoading, isAuthority, logout } = useAuth();
+  const { session, user, loading: authLoading, isAuthority, logout } = useAuth();
+
+  const parseRoute = useCallback((): AppRoute => {
+    const hashRaw = window.location.hash.replace(/^#\/?/, '');
+    const pathRaw = window.location.pathname.replace(/^\//, '');
+    const cleanPath = pathRaw === 'index.html' ? '' : pathRaw;
+    const target = hashRaw ? `/${hashRaw}` : (cleanPath ? `/${cleanPath}` : '/');
+
+    if (target === '/login' || target === '/access-denied') {
+      return target;
+    }
+    if (
+      target === '/dashboard' ||
+      target === '/reports' ||
+      target === '/map' ||
+      target === '/hotspots'
+    ) {
+      return target as AuthorityRoute;
+    }
+    if (target === '/' || target === '') {
+      return '/';
+    }
+    return '/dashboard';
+  }, []);
 
   // Routing state
-  const [currentRoute, setCurrentRoute] = useState<AppRoute>('/dashboard');
+  const [currentRoute, setCurrentRoute] = useState<AppRoute>(parseRoute);
 
   // Backend state
   const [stats, setStats] = useState<DashboardStatistics | null>(null);
@@ -85,29 +108,6 @@ function AuthorityAppContent() {
 
   // Sync routing from URL path / hash
   useEffect(() => {
-    const parseRoute = (): AppRoute => {
-      const hashRaw = window.location.hash.replace(/^#\/?/, '');
-      const pathRaw = window.location.pathname.replace(/^\//, '');
-      const cleanPath = pathRaw === 'index.html' ? '' : pathRaw;
-      const target = hashRaw ? `/${hashRaw}` : (cleanPath ? `/${cleanPath}` : '/');
-
-      if (target === '/login' || target === '/access-denied') {
-        return target;
-      }
-      if (
-        target === '/dashboard' ||
-        target === '/reports' ||
-        target === '/map' ||
-        target === '/hotspots'
-      ) {
-        return target as AuthorityRoute;
-      }
-      if (target === '/' || target === '') {
-        return '/';
-      }
-      return '/dashboard';
-    };
-
     setCurrentRoute(parseRoute());
 
     const handlePopState = () => {
@@ -120,7 +120,7 @@ function AuthorityAppContent() {
       window.removeEventListener('popstate', handlePopState);
       window.removeEventListener('hashchange', handlePopState);
     };
-  }, []);
+  }, [parseRoute]);
 
   // Route guarding based on auth session and role
   useEffect(() => {
@@ -134,9 +134,14 @@ function AuthorityAppContent() {
       return;
     }
 
-    // Authenticated user exists
+    // Role verification in progress - do not redirect until user role is established
+    if (!user) {
+      return;
+    }
+
+    // Authenticated user exists: check role
     if (!isAuthority) {
-      // User is authenticated but does NOT possess the authority role (e.g. citizen)
+      // User is authenticated citizen attempting authority portal access
       if (currentRoute !== '/access-denied') {
         navigateTo('/access-denied');
       }
@@ -147,7 +152,7 @@ function AuthorityAppContent() {
     if (currentRoute === '/login' || currentRoute === '/access-denied') {
       navigateTo('/dashboard');
     }
-  }, [authLoading, session, isAuthority, currentRoute, navigateTo]);
+  }, [authLoading, session, user, isAuthority, currentRoute, navigateTo]);
 
   // Fetch backend records (strictly with authority access token)
   const loadData = useCallback(async (showLoadingSpinner = false) => {
@@ -338,7 +343,7 @@ function AuthorityAppContent() {
     );
   }
 
-  // 1. Unauthenticated -> Login Page
+  // 1. Unauthenticated or explicitly on /login -> Login Page
   if (!session || currentRoute === '/login') {
     return (
       <LoginPage
@@ -348,9 +353,22 @@ function AuthorityAppContent() {
     );
   }
 
-  // 2. Authenticated Citizen -> Access Denied Page
-  if (!isAuthority || currentRoute === '/access-denied') {
+  // 2. Authenticated Citizen (strictly confirmed non-authority role) or explicitly on /access-denied
+  if ((user && !isAuthority) || currentRoute === '/access-denied') {
     return <AccessDeniedPage onBackToLogin={() => navigateTo('/login')} />;
+  }
+
+  // 3. User session exists but profile still resolving (transitional state)
+  if (!user || !isAuthority) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
+        <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 animate-pulse">
+          <Shield className="w-7 h-7" />
+        </div>
+        <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
+        <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
+      </div>
+    );
   }
 
   // 3. Authorized Municipal Officer -> Authority Portal Layout
@@ -394,7 +412,7 @@ function AuthorityAppContent() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/60 dark:bg-slate-900/30 overflow-y-auto pb-16 lg:pb-0">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/60 dark:bg-slate-900/30 overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 scroll-touch">
         {/* Top Navbar */}
         <Navbar
           title={getPageTitle(currentRoute)}

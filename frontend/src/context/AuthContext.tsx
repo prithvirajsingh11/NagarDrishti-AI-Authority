@@ -102,13 +102,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Error reading initial session:', error.message);
       }
 
-      setSession(initialSession);
       if (initialSession) {
         const verifiedUser = await verifyServerRole(initialSession);
         if (mounted) {
+          setSession(initialSession);
           setUser(verifiedUser);
         }
       } else {
+        setSession(null);
         setUser(null);
       }
       if (mounted) {
@@ -121,9 +122,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!mounted) return;
-      setSession(currentSession);
 
       if (event === 'SIGNED_OUT' || !currentSession) {
+        setSession(null);
         setUser(null);
         setLoading(false);
         return;
@@ -132,6 +133,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
         const verifiedUser = await verifyServerRole(currentSession);
         if (mounted) {
+          setSession(currentSession);
           setUser(verifiedUser);
           setLoading(false);
         }
@@ -174,8 +176,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: 'Authentication failed. Please try again.' };
       }
 
-      setSession(data.session);
       const verified = await verifyServerRole(data.session);
+      setSession(data.session);
       setUser(verified);
 
       const hasAuthorityRole = verified?.role === 'authority';
