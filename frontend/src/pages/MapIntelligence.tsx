@@ -88,7 +88,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
               onSelectHotspot(selected || null);
             }}
             aria-label="Focus on specific corridor hotspot"
-            className="flex-1 sm:flex-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer shadow-2xs"
+            className="flex-1 sm:flex-none bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer shadow-xs"
           >
             <option value="">Full City Overview</option>
             {hotspots.map((h, i) => (
@@ -125,7 +125,7 @@ export const MapIntelligence: React.FC<MapIntelligenceProps> = ({
       </div>
 
       {/* Large Authority Map Viewport */}
-      <div className="flex-1 min-h-[380px] rounded-2xl overflow-hidden shadow-2xs border border-slate-200/90 dark:border-slate-800/80">
+      <div className="flex-1 min-h-[380px] rounded-xl overflow-hidden shadow-xs border border-slate-200 dark:border-slate-800">
         <LeafletMap
           complaints={complaints}
           heatmapPoints={heatmapPoints}

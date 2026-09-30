@@ -124,7 +124,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
             Official triage and audit register for citizen-reported civic infrastructure defects.
           </p>
         </div>
-        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-xl shadow-2xs">
+        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-lg shadow-xs">
           {sortedComplaints.length} Records
         </span>
       </div>
@@ -154,10 +154,10 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
       />
 
       {/* Triage Register (Responsive Table & Mobile Cards) */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-2xs">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
         {sortedComplaints.length === 0 ? (
           <div className="py-20 text-center flex flex-col items-center justify-center space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-1">
+            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-1">
               <Inbox className="w-6 h-6" />
             </div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -173,7 +173,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="bg-slate-50/75 dark:bg-slate-950/60 border-b border-slate-200/90 dark:border-slate-800/80 text-slate-500 dark:text-slate-400 font-medium">
+                  <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-medium">
                     <th className="py-3 px-4">
                       <button
                         onClick={() => handleSort('report_id')}
@@ -225,7 +225,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                     <th className="py-3 px-4 text-right uppercase text-[10px] tracking-wider font-semibold">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {sortedComplaints.map((c) => (
                     <tr
                       key={c.id}
@@ -317,7 +317,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
             {/* Mobile Card List (under md) with Quick Sort Toolbar */}
             <div className="md:hidden">
               {/* Quick Sort Bar for Mobile */}
-              <div className="p-3 bg-slate-50/70 dark:bg-slate-950/60 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-1 overflow-x-auto text-[11px]">
+              <div className="p-3 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-1 overflow-x-auto text-[11px]">
                 <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 mr-1">
                   Sort:
                 </span>
@@ -335,9 +335,9 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                       type="button"
                       aria-label={s.ariaLabel}
                       onClick={() => handleSort(s.field)}
-                      className={`px-2 py-1 rounded-lg font-medium transition-all flex items-center gap-1 cursor-pointer touch-manipulation ${
+                      className={`px-2 py-1 rounded-lg font-medium transition-colors flex items-center gap-1 cursor-pointer touch-manipulation ${
                         sortField === s.field
-                          ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold shadow-2xs'
+                          ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 font-semibold'
                           : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'
                       }`}
                     >
@@ -356,12 +356,12 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                   <div
                     key={c.id}
                     onClick={() => onSelectComplaint(c)}
-                    className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-3.5 shadow-2xs hover:shadow-xs active:scale-[0.99] transition-all cursor-pointer space-y-3 touch-manipulation"
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-xs transition-colors cursor-pointer space-y-3 touch-manipulation"
                   >
                     {/* Top Row: Incident Title & Severity/Priority Badges */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-300">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-700 dark:text-slate-300">
                           <ProblemIcon type={c.problem_type} className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
@@ -394,7 +394,7 @@ export const ComplaintQueue: React.FC<ComplaintQueueProps> = ({
                     </div>
 
                     {/* Bottom Row: Status Badge & View Details Action */}
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <StatusBadge status={c.status} size="sm" />
                         {c.status === 'RESOLVED' && c.citizen_verification_status === 'PENDING' && (

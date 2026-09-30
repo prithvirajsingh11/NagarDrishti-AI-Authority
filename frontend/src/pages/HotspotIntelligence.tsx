@@ -37,15 +37,15 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
             Spatial density clustering identifying high-risk recurring civic defects across municipal wards.
           </p>
         </div>
-        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-xl shadow-2xs">
+        <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-3 py-1 rounded-lg shadow-xs">
           {hotspots.length} Active Corridors
         </span>
       </div>
 
       {/* Hotspots Grid */}
       {hotspots.length === 0 ? (
-        <div className="py-20 text-center bg-white dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl flex flex-col items-center justify-center space-y-2 shadow-2xs">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-1">
+        <div className="py-20 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center space-y-2 shadow-xs">
+          <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-1">
             <Inbox className="w-6 h-6" />
           </div>
           <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -73,7 +73,7 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
             return (
               <div
                 key={idx}
-                className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-2xs group"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-xs group"
               >
                 <div className="space-y-3.5">
                   {/* Header */}
@@ -107,25 +107,25 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
 
                   {/* Metrics 4-box */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80">
+                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-normal">Reports</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold text-slate-900 dark:text-slate-100">
                         {h.total_reports}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80">
+                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                       <span className="text-[10px] text-amber-700 dark:text-amber-400 block font-normal">Unresolved</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold text-amber-700 dark:text-amber-400">
                         {h.unresolved_count}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80">
+                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                       <span className="text-[10px] text-rose-700 dark:text-rose-400 block font-normal">Critical</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold text-rose-700 dark:text-rose-400">
                         {h.high_critical_count}
                       </span>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80">
+                    <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
                       <span className="text-[10px] text-purple-700 dark:text-purple-400 block font-normal">Reopened</span>
                       <span className="font-mono text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-400">
                         {h.reopened_count ?? 0}
@@ -146,7 +146,7 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
                   )}
 
                   {/* Deterministic Recommended Action */}
-                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/80 dark:border-slate-800/80 space-y-1">
+                  <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 space-y-1">
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">
                       Recommended Municipal Action
                     </span>
@@ -186,7 +186,7 @@ export const HotspotIntelligence: React.FC<HotspotIntelligenceProps> = ({
                       onSelectHotspot(h);
                       onNavigateToMap();
                     }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 text-xs font-semibold rounded-xl transition-all shadow-2xs cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 text-xs font-semibold rounded-lg transition-colors shadow-xs cursor-pointer"
                   >
                     <span>View On Map</span>
                     <ArrowRight className="w-3.5 h-3.5" />

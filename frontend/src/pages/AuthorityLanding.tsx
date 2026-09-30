@@ -14,8 +14,8 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
   return (
     <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-20 text-center max-w-4xl mx-auto transition-colors">
       {/* Icon Badge */}
-      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mb-6 shadow-md transition-transform hover:scale-105">
-        <Shield className="w-7 h-7 sm:w-8 sm:h-8" />
+      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mb-5 shadow-xs">
+        <Shield className="w-6 h-6 sm:w-7 sm:h-7" />
       </div>
 
       {/* Main Titles */}
@@ -25,7 +25,7 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
       <h2 className="text-lg sm:text-2xl font-semibold text-slate-600 dark:text-slate-400 mt-2">
         Authority Command Portal
       </h2>
-      <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 tracking-widest uppercase mt-2">
+      <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 tracking-wide uppercase mt-2">
         Municipal Civic Intelligence
       </p>
 
@@ -40,7 +40,7 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
       <div className="mt-8">
         <button
           onClick={onOpenDashboard}
-          className="inline-flex items-center gap-2.5 px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 font-semibold text-xs sm:text-sm rounded-xl shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-950 font-semibold text-xs sm:text-sm rounded-lg shadow-xs transition-colors cursor-pointer"
         >
           <span>Open Command Center</span>
           <ArrowRight className="w-4 h-4" />
@@ -50,19 +50,19 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
       {/* Live System Metrics Quick Snapshot */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-12 w-full text-left">
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
             <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Total City Reports</span>
             <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1 font-mono tracking-tight">{stats.total_reports}</p>
           </div>
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
             <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Critical & High</span>
             <p className="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1 font-mono tracking-tight">{stats.high_critical}</p>
           </div>
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
             <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">In Progress</span>
             <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 font-mono tracking-tight">{stats.in_progress}</p>
           </div>
-          <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 shadow-2xs">
+          <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
             <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Resolved Issues</span>
             <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 font-mono tracking-tight">{stats.resolved}</p>
           </div>

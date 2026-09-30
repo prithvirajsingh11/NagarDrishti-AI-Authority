@@ -37,33 +37,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const authUser: User = currentSession.user;
     const email = authUser.email || '';
-    let role = 'citizen';
+    
+    // Check initial role claims directly from session metadata (app_metadata takes precedence, then user_metadata)
+    const metadataRole = authUser.app_metadata?.role || authUser.user_metadata?.role;
+    let role = metadataRole || 'citizen';
     let fullName = authUser.user_metadata?.full_name || email.split('@')[0] || 'Authority Officer';
 
-    // 1. Primary check: backend /api/auth/me with Supabase JWT
+    // 1. Primary check: backend /api/auth/me with Supabase JWT (pass explicit token)
     try {
-      const serverProfile = await getAuthUserProfile();
-      if (serverProfile) {
-        role = serverProfile.role || 'citizen';
+      const serverProfile = await getAuthUserProfile(currentSession.access_token);
+      if (serverProfile && serverProfile.role) {
+        role = serverProfile.role;
         if (serverProfile.full_name) {
           fullName = serverProfile.full_name;
         }
+        return {
+          id: authUser.id,
+          email,
+          role,
+          fullName,
+        };
       }
-    } catch (err) {
+    } catch {
       // 2. Fallback check: query Supabase profiles table directly using client session
       try {
         const { data: profileData, error: profileErr } = await supabase
           .from('profiles')
           .select('role, full_name')
-          .eq('user_id', authUser.id)
-          .single();
+          .or(`user_id.eq.${authUser.id},id.eq.${authUser.id}`)
+          .maybeSingle();
 
-        if (!profileErr && profileData) {
-          role = profileData.role || 'citizen';
+        if (!profileErr && profileData && profileData.role) {
+          role = profileData.role;
           fullName = profileData.full_name || fullName;
+          return {
+            id: authUser.id,
+            email,
+            role,
+            fullName,
+          };
         }
       } catch {
-        // preserve role as citizen
+        // preserve role from metadata or citizen
       }
     }
 
@@ -134,7 +149,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const verifiedUser = await verifyServerRole(currentSession);
         if (mounted) {
           setSession(currentSession);
-          setUser(verifiedUser);
+          // Never downgrade an already verified authority user during background refresh/re-check
+          setUser((prev) => {
+            if (prev?.role === 'authority' && verifiedUser?.role !== 'authority') {
+              return prev;
+            }
+            return verifiedUser;
+          });
           setLoading(false);
         }
       }

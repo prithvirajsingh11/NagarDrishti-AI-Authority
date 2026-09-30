@@ -25,20 +25,20 @@ export const AccessDeniedPage: React.FC<AccessDeniedPageProps> = ({ onBackToLogi
           onClick={toggleTheme}
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-2xs transition-all cursor-pointer"
+          className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-xs transition-colors cursor-pointer"
         >
           {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-amber-400" />
+            <Sun className="w-4 h-4 text-amber-500" />
           ) : (
             <Moon className="w-4 h-4 text-slate-700" />
           )}
         </button>
       </div>
 
-      <div className="w-full max-w-md bg-white dark:bg-slate-900/90 border border-rose-200 dark:border-rose-500/20 rounded-2xl p-6 sm:p-8 shadow-xl dark:shadow-2xl transition-colors">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 sm:p-8 shadow-sm transition-colors">
         {/* Warning Icon */}
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 mx-auto mb-5 shadow-sm">
-          <ShieldAlert className="w-7 h-7 sm:w-8 sm:h-8" />
+        <div className="w-12 h-12 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 flex items-center justify-center text-rose-600 dark:text-rose-400 mx-auto mb-4 shadow-xs">
+          <ShieldAlert className="w-6 h-6" />
         </div>
 
         {/* Heading */}
@@ -47,12 +47,12 @@ export const AccessDeniedPage: React.FC<AccessDeniedPageProps> = ({ onBackToLogi
         </h1>
 
         {/* Message */}
-        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
           This portal is available only to authorized municipal authority users.
         </p>
 
         {user && (
-          <div className="mt-5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/90 dark:border-slate-800 text-left">
+          <div className="mt-5 p-3 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-left">
             <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">
               Signed-in Account
             </span>
@@ -70,7 +70,7 @@ export const AccessDeniedPage: React.FC<AccessDeniedPageProps> = ({ onBackToLogi
         <div className="mt-6 space-y-3">
           <button
             onClick={handleReturnToLogin}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 text-xs sm:text-sm font-semibold rounded-xl shadow-md transition-all cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-950 text-xs sm:text-sm font-semibold rounded-lg shadow-xs transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Login</span>

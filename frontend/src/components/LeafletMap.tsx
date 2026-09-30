@@ -63,14 +63,14 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
   const [isLocating, setIsLocating] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<string | null>(null);
 
-  // Helper to build Glowing DivIcon for high-severity civic complaints
+  // Helper to build DivIcon for high-severity civic complaints
   const createGlowingDivIcon = (color: string) => {
     return L.divIcon({
       className: 'custom-div-icon',
-      html: `<i class='fas fa-exclamation-circle' style='color:${color}; font-size: 24px; filter: drop-shadow(0 0 8px ${color}cc);'></i>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-      popupAnchor: [0, -12],
+      html: `<i class='fas fa-exclamation-circle' style='color:${color}; font-size: 22px; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));'></i>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+      popupAnchor: [0, -11],
     });
   };
 
@@ -492,7 +492,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       {/* Top Floating Controls Bar */}
       <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-30 flex flex-wrap md:flex-nowrap items-center justify-between gap-1.5 sm:gap-2 pointer-events-none">
         {/* Layer Switcher (Normal / Satellite / 3D) matching .map-btn & data-mode */}
-        <div className="order-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto shrink-0">
+        <div className="order-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto shrink-0">
           <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 px-1.5 sm:px-2 select-none tracking-wider">
             Layer
           </span>
@@ -529,7 +529,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         </div>
 
         {/* Center: Phase 6 Intelligence Overlay */}
-        <div className="order-3 md:order-2 w-full md:w-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto overflow-x-auto scrollbar-none touch-pan-x shrink-0">
+        <div className="order-3 md:order-2 w-full md:w-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto overflow-x-auto scrollbar-none touch-pan-x shrink-0">
           <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 px-1.5 select-none tracking-wider shrink-0">
             Overlay
           </span>
@@ -591,13 +591,13 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         </div>
 
         {/* Right side: Map visualization mode selector (Markers / Clusters / Heatmap) */}
-        <div className="order-2 md:order-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto shrink-0">
+        <div className="order-2 md:order-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 flex items-center gap-1 shadow-xs pointer-events-auto shrink-0">
           {(['markers', 'clusters', 'heatmap'] as MapMode[]).map((mode) => (
             <button
               key={mode}
               type="button"
               onClick={() => onMapModeChange(mode)}
-              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium capitalize transition-all ${
+              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-medium capitalize transition-colors ${
                 mapMode === mode
                   ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
@@ -615,7 +615,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
       {/* Bottom Floating Bar */}
       <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         {/* Severity Legend */}
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-2 sm:gap-3 shadow-xs pointer-events-auto overflow-x-auto max-w-full">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-2 sm:gap-3 shadow-xs pointer-events-auto overflow-x-auto max-w-full">
           <span className="font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[9px] sm:text-[10px] shrink-0">
             Severity
           </span>
@@ -638,7 +638,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         </div>
 
         {/* GPS Geolocation & Coordinate Tool (#btn-locate, #incident-location) */}
-        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/90 rounded-lg p-1 sm:p-1.5 flex items-center gap-1 sm:gap-1.5 shadow-xs pointer-events-auto">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-1 sm:p-1.5 flex items-center gap-1 sm:gap-1.5 shadow-xs pointer-events-auto">
           <Crosshair className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1" />
           <input
             id="incident-location"

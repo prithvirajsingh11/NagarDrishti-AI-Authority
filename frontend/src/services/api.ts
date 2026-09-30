@@ -50,7 +50,10 @@ export function triggerSessionExpired() {
   }
 }
 
-export async function getAuthHeaders(): Promise<Record<string, string>> {
+export async function getAuthHeaders(explicitToken?: string): Promise<Record<string, string>> {
+  if (explicitToken) {
+    return { Authorization: `Bearer ${explicitToken}` };
+  }
   try {
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) {
@@ -81,8 +84,8 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
   return {};
 }
 
-export async function getJsonAuthHeaders(): Promise<Record<string, string>> {
-  const auth = await getAuthHeaders();
+export async function getJsonAuthHeaders(explicitToken?: string): Promise<Record<string, string>> {
+  const auth = await getAuthHeaders(explicitToken);
   return {
     'Content-Type': 'application/json',
     ...auth,
@@ -131,8 +134,8 @@ export function resolveImageUrl(url?: string | null): string {
   return url;
 }
 
-export async function getAuthUserProfile(): Promise<AuthUserProfile> {
-  const headers = await getAuthHeaders();
+export async function getAuthUserProfile(explicitToken?: string): Promise<AuthUserProfile> {
+  const headers = await getAuthHeaders(explicitToken);
   const res = await fetch(`${API_BASE}/auth/me`, { headers });
   return handleResponse<AuthUserProfile>(res, 'Failed to verify authenticated authority profile.');
 }

@@ -62,7 +62,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
   return (
     <>
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-2.5 sm:p-3 shadow-2xs space-y-2.5 transition-colors">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3 shadow-xs space-y-2.5 transition-colors">
         {/* Mobile Filter Header (< md) */}
         <div className="md:hidden space-y-2">
           <div className="flex items-center gap-2">
@@ -74,7 +74,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 placeholder="Search reports..."
                 value={search}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-3 py-2 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
               />
               {search && (
                 <button
@@ -92,7 +92,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition-colors shrink-0 touch-manipulation cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-colors shrink-0 touch-manipulation cursor-pointer ${
                 activeCount > 0
                   ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-300'
                   : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
@@ -110,7 +110,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
           {/* Quick Date Horizon Pills + Reset for Mobile */}
           <div className="flex items-center justify-between gap-1 pt-0.5">
-            <div className="flex items-center rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
+            <div className="flex items-center rounded-lg bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
               {[
                 { val: 'all', label: 'All' },
                 { val: 'today', label: 'Today' },
@@ -121,9 +121,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                   key={item.val}
                   type="button"
                   onClick={() => onDateHorizonChange(item.val)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors cursor-pointer ${
                     dateHorizon === item.val
-                      ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs font-semibold'
+                      ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs font-semibold'
                       : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                   }`}
                 >
@@ -154,7 +154,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               placeholder="Search report ID, location, details..."
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
+              className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
             />
           </div>
 
@@ -163,7 +163,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={category}
             onChange={(e) => onCategoryChange(e.target.value)}
             aria-label="Filter by problem category"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">All Categories</option>
             <option value="pothole">Pothole</option>
@@ -178,7 +178,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={severity}
             onChange={(e) => onSeverityChange(e.target.value)}
             aria-label="Filter by severity level"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">All Severities</option>
             <option value="CRITICAL">Critical</option>
@@ -192,7 +192,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={priorityLevel}
             onChange={(e) => onPriorityLevelChange?.(e.target.value)}
             aria-label="Filter by priority level"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">All Priorities</option>
             <option value="CRITICAL">Critical Priority</option>
@@ -206,7 +206,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={status}
             onChange={(e) => onStatusChange(e.target.value)}
             aria-label="Filter by status"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">All Statuses</option>
             <option value="REPORTED">Reported</option>
@@ -221,7 +221,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={resolutionStatus}
             onChange={(e) => onResolutionStatusChange?.(e.target.value)}
             aria-label="Filter by resolution status"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors cursor-pointer"
           >
             <option value="">All Resolutions</option>
             <option value="pending_resolution">Pending Resolution</option>
@@ -236,7 +236,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             value={department}
             onChange={(e) => onDepartmentChange(e.target.value)}
             aria-label="Filter by department"
-            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 max-w-[160px] truncate transition-colors cursor-pointer"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 max-w-[160px] truncate transition-colors cursor-pointer"
           >
             <option value="">All Departments</option>
             {departments.map((d) => (
@@ -247,7 +247,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
           </select>
 
           {/* Time Horizon Segmented Control */}
-          <div className="flex items-center rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
+          <div className="flex items-center rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-0.5 text-xs">
             {[
               { val: 'all', label: 'All' },
               { val: 'today', label: 'Today' },
@@ -258,9 +258,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 key={item.val}
                 type="button"
                 onClick={() => onDateHorizonChange(item.val)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer ${
                   dateHorizon === item.val
-                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs font-semibold'
+                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs font-semibold'
                     : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                 }`}
               >
@@ -275,7 +275,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               type="button"
               onClick={onExportCsv}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors cursor-pointer ml-auto disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg transition-colors cursor-pointer ml-auto disabled:opacity-50 shadow-xs"
               title="Export filtered complaints as CSV"
             >
               <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -288,7 +288,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             <button
               type="button"
               onClick={onResetFilters}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer ${!onExportCsv ? 'ml-auto' : ''}`}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer ${!onExportCsv ? 'ml-auto' : ''}`}
               title="Clear all active filters"
             >
               <X className="w-3.5 h-3.5" />
@@ -300,12 +300,12 @@ export const FilterBar: React.FC<FilterBarProps> = ({
 
       {/* Mobile Bottom-Sheet Filters Modal */}
       {mobileFiltersOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 dark:bg-black/75 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/40 dark:bg-black/60 animate-in fade-in duration-150">
           <div className="flex-1" onClick={() => setMobileFiltersOpen(false)} />
 
-          <div className="bg-white dark:bg-slate-950 border-t border-slate-200/90 dark:border-slate-800 rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-200 select-none">
+          <div className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 rounded-t-2xl max-h-[85vh] flex flex-col shadow-xl animate-in slide-in-from-bottom duration-150 select-none">
             {/* Handle & Header */}
-            <div className="p-4 border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -320,7 +320,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 aria-label="Close filters"
               >
                 <X className="w-4 h-4" />
@@ -337,7 +337,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={category}
                   onChange={(e) => onCategoryChange(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Categories</option>
                   <option value="pothole">Pothole</option>
@@ -356,7 +356,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={severity}
                   onChange={(e) => onSeverityChange(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Severities</option>
                   <option value="CRITICAL">Critical</option>
@@ -374,7 +374,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={priorityLevel}
                   onChange={(e) => onPriorityLevelChange?.(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Priorities</option>
                   <option value="CRITICAL">Critical Priority (≥70)</option>
@@ -392,7 +392,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={status}
                   onChange={(e) => onStatusChange(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Statuses</option>
                   <option value="REPORTED">Reported</option>
@@ -411,7 +411,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={resolutionStatus}
                   onChange={(e) => onResolutionStatusChange?.(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Resolutions</option>
                   <option value="pending_resolution">Pending Resolution</option>
@@ -430,7 +430,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 <select
                   value={department}
                   onChange={(e) => onDepartmentChange(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
+                  className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-3 py-2.5 text-xs text-slate-800 dark:text-slate-200"
                 >
                   <option value="">All Departments</option>
                   {departments.map((d) => (
@@ -451,7 +451,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                       setMobileFiltersOpen(false);
                     }}
                     disabled={isExporting}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-semibold bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 disabled:opacity-50"
                   >
                     <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                     <span>{isExporting ? 'Exporting CSV...' : 'Export Filtered CSV'}</span>
@@ -461,13 +461,13 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             </div>
 
             {/* Sticky Sheet Bottom Actions */}
-            <div className="p-4 border-t border-slate-200/90 dark:border-slate-800/90 bg-slate-50 dark:bg-slate-900/60 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex items-center gap-2.5">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => {
                   onResetFilters();
                 }}
-                className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors"
+                className="flex-1 py-2.5 px-4 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 transition-colors"
               >
                 Reset All
               </button>
@@ -475,7 +475,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(false)}
-                className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-md transition-all flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 px-4 rounded-lg text-xs font-semibold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs transition-colors flex items-center justify-center gap-1.5"
               >
                 <Check className="w-4 h-4" />
                 <span>Apply Filters</span>

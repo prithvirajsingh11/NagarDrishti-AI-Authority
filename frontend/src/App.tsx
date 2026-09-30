@@ -333,9 +333,9 @@ function AuthorityAppContent() {
   // Render Loading Splash while verifying initial session
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
-        <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 animate-pulse">
-          <Shield className="w-7 h-7" />
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 select-none">
+        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-100 mb-3 shadow-xs">
+          <Shield className="w-6 h-6" />
         </div>
         <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
         <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
@@ -353,17 +353,17 @@ function AuthorityAppContent() {
     );
   }
 
-  // 2. Authenticated Citizen (strictly confirmed non-authority role) or explicitly on /access-denied
-  if ((user && !isAuthority) || currentRoute === '/access-denied') {
+  // 2. Explicitly on /access-denied route
+  if (currentRoute === '/access-denied') {
     return <AccessDeniedPage onBackToLogin={() => navigateTo('/login')} />;
   }
 
   // 3. User session exists but profile still resolving (transitional state)
   if (!user || !isAuthority) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100">
-        <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 animate-pulse">
-          <Shield className="w-7 h-7" />
+      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 select-none">
+        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-100 mb-3 shadow-xs">
+          <Shield className="w-6 h-6" />
         </div>
         <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
         <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
@@ -412,7 +412,7 @@ function AuthorityAppContent() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50/60 dark:bg-slate-900/30 overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 scroll-touch">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 scroll-touch">
         {/* Top Navbar */}
         <Navbar
           title={getPageTitle(currentRoute)}

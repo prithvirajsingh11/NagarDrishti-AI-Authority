@@ -23,7 +23,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
     IN_PROGRESS: {
       label: 'In Progress',
       cls: 'bg-indigo-50 text-indigo-700 border-indigo-200/80 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800/50',
-      dot: 'bg-indigo-500 dark:bg-indigo-400 animate-pulse',
+      dot: 'bg-indigo-500 dark:bg-indigo-400',
     },
     RESOLVED: {
       label: 'Resolved',
@@ -33,7 +33,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
     REOPENED: {
       label: 'Reopened',
       cls: 'bg-rose-50 text-rose-700 border-rose-200/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/50',
-      dot: 'bg-rose-500 dark:bg-rose-400 animate-pulse',
+      dot: 'bg-rose-500 dark:bg-rose-400',
     },
   };
 

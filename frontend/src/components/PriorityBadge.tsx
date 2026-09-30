@@ -35,7 +35,7 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({
     CRITICAL: {
       label: 'Critical Priority',
       cls: 'bg-rose-50 text-rose-800 border-rose-300 font-semibold dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/60',
-      dotCls: 'bg-rose-600 animate-pulse',
+      dotCls: 'bg-rose-600',
     },
   };
 
@@ -44,7 +44,7 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-lg border font-medium tracking-tight transition-colors shadow-2xs ${c.cls} ${padding}`}
+      className={`inline-flex items-center gap-1.5 rounded-lg border font-medium tracking-tight transition-colors ${c.cls} ${padding}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${c.dotCls}`} />
       <span>{c.label}</span>

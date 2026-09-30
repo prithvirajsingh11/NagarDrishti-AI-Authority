@@ -59,15 +59,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <aside
-      className={`bg-white dark:bg-slate-950 border-r border-slate-200/90 dark:border-slate-800/80 flex flex-col shrink-0 min-h-screen transition-all duration-200 select-none ${
+      className={`bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 min-h-screen transition-all duration-200 select-none ${
         isCollapsed ? 'w-18' : 'w-64'
       }`}
     >
       {/* Brand Header */}
-      <div className="p-4 border-b border-slate-200/90 dark:border-slate-800/80 flex items-center justify-between">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center shrink-0 shadow-xs">
-            <Shield className="w-4.5 h-4.5" />
+          <div className="w-8 h-8 rounded-lg bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center shrink-0 shadow-xs">
+            <Shield className="w-4 h-4" />
           </div>
           {!isCollapsed && (
             <div className="min-w-0 flex-1">
@@ -125,10 +125,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               key={item.route}
               onClick={() => handleNavClick(item.route)}
               title={isCollapsed ? item.label : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all text-left cursor-pointer group ${
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer group ${
                 isActive
-                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-900/70'
+                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-900'
               } ${isCollapsed ? 'justify-center px-0' : ''}`}
             >
               <Icon
@@ -145,14 +145,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Authority Profile & System Status */}
-      <div className="p-3 border-t border-slate-200/90 dark:border-slate-800/80 space-y-2.5">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
         {!isCollapsed ? (
           <>
-            <div className="bg-slate-50 dark:bg-slate-900/60 rounded-xl p-2.5 border border-slate-200/80 dark:border-slate-800/80">
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 mb-0.5">
                 <span className="font-medium">Backend Sync</span>
                 <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   Connected
                 </span>
               </div>
@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             )}
 
             {user && (
-              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-2.5 border border-slate-200/80 dark:border-slate-800/80">
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -206,7 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center"
               title="Backend Sync: Connected"
             >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
             </div>
             {user && (
               <button
@@ -236,11 +236,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-slate-900/50 dark:bg-black/70 backdrop-blur-xs transition-opacity animate-in fade-in"
+            className="fixed inset-0 bg-slate-900/40 dark:bg-black/60 transition-opacity animate-in fade-in"
             onClick={onCloseMobile}
           />
           {/* Slide-over Content */}
-          <div className="relative z-10 w-72 max-w-[85vw] flex shadow-2xl animate-in slide-in-from-left duration-200">
+          <div className="relative z-10 w-72 max-w-[85vw] flex shadow-xl animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

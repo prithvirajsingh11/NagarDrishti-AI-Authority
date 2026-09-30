@@ -362,7 +362,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* Export Notification Banner */}
       {exportNotice && (
         <div
-          className={`p-3 rounded-2xl flex items-center justify-between text-xs font-medium border animate-in fade-in ${
+          className={`p-3 rounded-xl flex items-center justify-between text-xs font-medium border ${
             exportNotice.type === 'success'
               ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200'
               : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200'
@@ -379,10 +379,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       )}
 
       {/* Phase 8: Hackathon Civic Lifecycle Pipeline Ribbon */}
-      <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3.5 shadow-2xs">
-        <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-200/60 dark:border-slate-800">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-xs">
+        <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
             <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               NagarDrishti Civic Lifecycle Pipeline
             </h4>
@@ -403,7 +403,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             { step: '8', title: 'Citizen Verification', desc: 'Close / Reopen' },
           ].map((item, idx, arr) => (
             <React.Fragment key={item.step}>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800 text-slate-800 dark:text-slate-200 shrink-0">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 shrink-0">
                 <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex items-center justify-center font-mono">
                   #{item.step}
                 </span>
@@ -429,13 +429,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             }
             onNavigateToReports();
           }}
-          className="bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800 rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-rose-400 dark:hover:border-rose-700 transition-all shadow-xs group"
+          className="bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-rose-400 dark:hover:border-rose-700 transition-colors shadow-xs group"
           role="alert"
           aria-label="Reopened complaints indicator"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-rose-600 text-white font-bold flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            <div className="p-2 rounded-lg bg-rose-600 text-white font-bold flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -469,7 +469,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* Minimalist KPI Cards including Phase 5 Metrics */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5 sm:gap-3.5">
         {/* Total Reports */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
             <span className="font-medium text-[11px] sm:text-xs">Total Reports</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
@@ -483,7 +483,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Critical & High */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-rose-200 dark:hover:border-rose-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-rose-200 dark:hover:border-rose-900/40 transition-colors">
           <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
             <span className="font-medium text-[11px] sm:text-xs">Critical & High</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
@@ -497,7 +497,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Pending Triage */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-amber-200 dark:hover:border-amber-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-amber-200 dark:hover:border-amber-900/40 transition-colors">
           <div className="flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
             <span className="font-medium text-[11px] sm:text-xs">Pending Triage</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
@@ -511,7 +511,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* In Progress */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-sky-200 dark:hover:border-sky-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-sky-200 dark:hover:border-sky-900/40 transition-colors">
           <div className="flex items-center justify-between text-xs text-sky-700 dark:text-sky-400">
             <span className="font-medium text-[11px] sm:text-xs">In Progress</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400">
@@ -525,7 +525,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Awaiting Verification */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-colors">
           <div className="flex items-center justify-between text-xs text-indigo-700 dark:text-indigo-400">
             <span className="font-medium text-[11px] sm:text-xs truncate">Awaiting Verification</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
@@ -539,7 +539,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Resolved */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-3 sm:p-4 shadow-2xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-all">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-xs hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-colors">
           <div className="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400">
             <span className="font-medium text-[11px] sm:text-xs">Resolved</span>
             <div className="p-1 sm:p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
@@ -560,11 +560,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             }
             onNavigateToReports();
           }}
-          className={`bg-white dark:bg-slate-900/80 border ${
+          className={`bg-white dark:bg-slate-900 border ${
             (stats?.reopened ?? 0) > 0
-              ? 'border-rose-300 dark:border-rose-800/80 hover:border-rose-400'
-              : 'border-slate-200/90 dark:border-slate-800/80 hover:border-slate-300'
-          } rounded-2xl p-3 sm:p-4 shadow-2xs transition-all cursor-pointer`}
+              ? 'border-rose-300 dark:border-rose-800 hover:border-rose-400'
+              : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
+          } rounded-xl p-3 sm:p-4 shadow-xs transition-colors cursor-pointer`}
         >
           <div className="flex items-center justify-between text-xs text-rose-700 dark:text-rose-400">
             <span className="font-medium text-[11px] sm:text-xs">Reopened</span>
@@ -580,10 +580,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 8: Governance Outcome Intelligence */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/60">
+            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/60">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
@@ -605,7 +605,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             <button
               onClick={handleExportCsv}
               disabled={isExportingCsv}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-lg transition-colors shadow-xs cursor-pointer disabled:opacity-50"
               title="Export complaint dataset respecting current filters"
             >
               <Download className="w-3.5 h-3.5" />
@@ -617,7 +617,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* 9 Outcomes Metrics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {/* Total Complaints */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Total Complaints</span>
             <p className="text-2xl font-bold font-mono text-slate-900 dark:text-slate-100">
               {govOutcomes?.total_complaints ?? totalReportsCount}
@@ -626,7 +626,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Active Workload */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-amber-700 dark:text-amber-400 tracking-wider">Active Workload</span>
             <p className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
               {govOutcomes?.active_complaints ?? ((stats?.pending ?? 0) + (stats?.in_progress ?? 0))}
@@ -635,7 +635,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Resolved */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">Resolved</span>
             <p className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
               {govOutcomes?.resolved_complaints ?? stats?.resolved ?? 0}
@@ -644,7 +644,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Reopened */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400 tracking-wider">Reopened</span>
             <p className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
               {govOutcomes?.reopened_complaints ?? stats?.reopened ?? 0}
@@ -653,7 +653,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Resolution Rate */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-blue-700 dark:text-blue-400 tracking-wider">Resolution Rate</span>
             <p className="text-2xl font-bold font-mono text-blue-600 dark:text-blue-400">
               {govOutcomes?.resolution_rate_pct != null
@@ -664,7 +664,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Average Response Time */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-indigo-700 dark:text-indigo-400 tracking-wider">Avg Response Time</span>
             <p className="text-2xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
               {govOutcomes?.avg_response_hours != null
@@ -675,7 +675,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Average Resolution Turnaround */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-teal-700 dark:text-teal-400 tracking-wider">Avg Resolution Time</span>
             <p className="text-2xl font-bold font-mono text-teal-600 dark:text-teal-400">
               {govOutcomes?.avg_resolution_hours != null
@@ -686,7 +686,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Pending Citizen Verification */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1">
             <span className="text-[10px] uppercase font-bold text-purple-700 dark:text-purple-400 tracking-wider">Pending Verification</span>
             <p className="text-2xl font-bold font-mono text-purple-600 dark:text-purple-400">
               {govOutcomes?.pending_citizen_verification ?? stats?.awaiting_verification ?? 0} cases
@@ -695,7 +695,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Escalated Cases */}
-          <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-1 sm:col-span-2 lg:col-span-2">
+          <div className="p-3.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1 sm:col-span-2 lg:col-span-2">
             <span className="text-[10px] uppercase font-bold text-rose-700 dark:text-rose-400 tracking-wider">Escalated Cases</span>
             <p className="text-2xl font-bold font-mono text-rose-600 dark:text-rose-400">
               {govOutcomes?.escalated_cases ?? displayedEscalations.length}
@@ -705,7 +705,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Data Quality & Trust Indicator Footnote */}
-        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/80 dark:border-slate-800/80 text-[11px] text-slate-600 dark:text-slate-400">
+        <div className="flex items-center gap-2 p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-600 dark:text-slate-400">
           <Info className="w-3.5 h-3.5 text-blue-500 shrink-0" />
           <span>
             <strong>Data Integrity Standard:</strong> All municipal governance metrics are computed strictly from real timestamped complaints.
@@ -769,10 +769,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 6 Priority Actions: What should we act on first? */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 font-bold">
+            <div className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 font-bold">
               <Zap className="w-4 h-4" />
             </div>
             <div>
@@ -818,7 +818,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <th className="pb-2.5 font-semibold text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {priorityActions.length > 0 ? (
                 priorityActions.map((c) => {
                   const isReopened = c.status === 'REOPENED' || c.citizen_reopened === true;
@@ -902,11 +902,11 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <div
                   key={`mobile-priority-${c.id}`}
                   onClick={() => onSelectComplaint(c)}
-                  className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 space-y-2.5 active:bg-slate-100 dark:active:bg-slate-800/80 transition-colors cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 space-y-2.5 shadow-xs transition-colors cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
                         <ProblemIcon type={c.problem_type} className="w-4 h-4" />
                       </div>
                       <div>
@@ -930,7 +930,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                     <span className="truncate">{c.location_name}</span>
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-slate-800/60 text-[11px]">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
                     <div className="flex items-center gap-1.5">
                       <SeverityBadge severity={c.severity} size="sm" />
                       <StatusBadge status={c.status} size="sm" />
@@ -956,10 +956,10 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 7 Escalation Center: Operational Intervention with Explicit Reasons */}
-      <div className="bg-white dark:bg-slate-900/80 border border-rose-200/90 dark:border-rose-900/60 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3.5">
+      <div className="bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 rounded-xl p-4 sm:p-5 shadow-xs space-y-3.5">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-100/80 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 font-bold">
+            <div className="p-2 rounded-lg bg-rose-100/80 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 font-bold">
               <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
@@ -984,7 +984,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
               <div
                 key={esc.complaint.id}
                 onClick={() => onSelectComplaint(esc.complaint)}
-                className="p-3.5 rounded-xl border border-rose-200/70 dark:border-rose-900/40 bg-rose-50/20 dark:bg-rose-950/10 hover:border-rose-300 dark:hover:border-rose-800/80 transition-all cursor-pointer space-y-2.5 flex flex-col justify-between"
+                className="p-3.5 rounded-lg border border-rose-200 dark:border-rose-900/40 bg-rose-50/30 dark:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-800 transition-colors cursor-pointer space-y-2.5 flex flex-col justify-between"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -1025,7 +1025,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-[11px]">
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
                   <span className="text-slate-500 dark:text-slate-400 truncate max-w-[150px]">
                     {esc.department || 'Unassigned Dept'}
                   </span>
@@ -1052,7 +1052,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 6 Complaint Aging Intelligence */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -1072,7 +1072,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             return (
               <div
                 key={idx}
-                className={`p-3.5 rounded-xl border ${
+                className={`p-3.5 rounded-lg border ${
                   isCriticalAge
                     ? 'border-rose-300 bg-rose-50/50 dark:border-rose-900/60 dark:bg-rose-950/20'
                     : isHighAge
@@ -1125,7 +1125,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 6 Department Performance & Workload */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <Building2 className="w-4 h-4 text-sky-600 dark:text-sky-400" />
@@ -1154,7 +1154,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <th className="pb-2.5 font-semibold">Resolution Rate</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {deptPerformance.length > 0 ? (
                 deptPerformance.map((dp, idx) => (
                   <tr
@@ -1214,7 +1214,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       </div>
 
       {/* Phase 6 Category Trend Intelligence */}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -1235,7 +1235,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             return (
               <div
                 key={idx}
-                className="p-3 rounded-xl border border-slate-200/80 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 space-y-1.5"
+                className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold capitalize text-slate-800 dark:text-slate-200">
@@ -1277,7 +1277,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* Split Section: Top Hotspots vs Recent Complaints */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Top Hotspots */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col shadow-2xs">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Flame className="w-4 h-4 text-amber-500 dark:text-amber-400" />
@@ -1294,13 +1294,13 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </button>
           </div>
 
-          <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800/80 flex-1">
+          <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800 flex-1">
             {stats?.hotspots && stats.hotspots.length > 0 ? (
               stats.hotspots.slice(0, 4).map((h, i) => (
                 <div
                   key={i}
                   onClick={() => onSelectHotspot(h)}
-                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-xl cursor-pointer transition-colors"
+                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-lg cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2.5">
                     <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono text-[11px] font-semibold flex items-center justify-center shrink-0">
@@ -1328,7 +1328,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Recent Complaints */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 flex flex-col shadow-2xs">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <h3 className="text-xs font-semibold tracking-tight text-slate-900 dark:text-slate-100">
               Recent Complaints Queue
@@ -1342,16 +1342,16 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
             </button>
           </div>
 
-          <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800/80 flex-1">
+          <div className="mt-2 divide-y divide-slate-100 dark:divide-slate-800 flex-1">
             {complaints.length > 0 ? (
               complaints.slice(0, 4).map((c) => (
                 <div
                   key={c.id}
                   onClick={() => onSelectComplaint(c)}
-                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-xl cursor-pointer transition-colors"
+                  className="py-2.5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 px-2 rounded-lg cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 text-slate-600 dark:text-slate-300">
                       <ProblemIcon type={c.problem_type} className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
@@ -1384,7 +1384,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {/* Analytics Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Problem Distribution */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -1409,12 +1409,12 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                       backgroundColor: chartTheme.tooltipBg,
                       borderColor: chartTheme.tooltipBorder,
                       color: chartTheme.tooltipColor,
-                      borderRadius: '0.75rem',
+                      borderRadius: '0.5rem',
                       fontSize: '0.75rem',
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06)',
                     }}
                   />
-                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {categoryChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={categoryColors[entry.key] || '#3b82f6'} />
                     ))}
@@ -1430,7 +1430,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
 
         {/* Phase 8 Time-Based Analytics */}
-        <div className="bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col justify-between">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-5 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
@@ -1439,7 +1439,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                   Time-Based Operational Analytics
                 </h3>
               </div>
-              <div className="flex items-center rounded-xl bg-slate-100 dark:bg-slate-800 p-0.5 text-xs">
+              <div className="flex items-center rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5 text-xs">
                 {[
                   { key: 'received', label: 'Received' },
                   { key: 'resolved', label: 'Resolved' },
@@ -1448,9 +1448,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                   <button
                     key={t.key}
                     onClick={() => setTimeMetricView(t.key as any)}
-                    className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-md text-[10px] font-semibold transition-colors cursor-pointer ${
                       timeMetricView === t.key
-                        ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 shadow-2xs font-bold'
+                        ? 'bg-white dark:bg-slate-900 text-blue-700 dark:text-blue-300 font-bold shadow-xs'
                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                     }`}
                   >
@@ -1462,7 +1462,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
 
             {/* Turnaround Quick Indicators */}
             <div className="grid grid-cols-2 gap-2 mt-3 mb-2">
-              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80 text-[11px]">
+              <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px]">
                 <span className="text-slate-500 text-[10px] uppercase font-bold block">Avg Response Time</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {timeAnalytics?.avg_response_hours != null
@@ -1470,7 +1470,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                     : <span className="text-slate-400 font-normal">Awaiting response records</span>}
                 </span>
               </div>
-              <div className="p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200/70 dark:border-slate-800/80 text-[11px]">
+              <div className="p-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px]">
                 <span className="text-slate-500 text-[10px] uppercase font-bold block">Avg Resolution Turnaround</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-slate-100">
                   {timeAnalytics?.avg_resolution_hours != null
@@ -1487,7 +1487,7 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                 <AreaChart data={activeTimePoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="timeCurveGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={activeCurveColor} stopOpacity={0.35} />
+                      <stop offset="5%" stopColor={activeCurveColor} stopOpacity={0.12} />
                       <stop offset="95%" stopColor={activeCurveColor} stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -1499,9 +1499,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
                       backgroundColor: chartTheme.tooltipBg,
                       borderColor: chartTheme.tooltipBorder,
                       color: chartTheme.tooltipColor,
-                      borderRadius: '0.75rem',
+                      borderRadius: '0.5rem',
                       fontSize: '0.75rem',
-                      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+                      boxShadow: '0 4px 6px -1px rgba(0,0,0,0.06)',
                     }}
                     labelFormatter={(val, items) => {
                       const item = items[0]?.payload;

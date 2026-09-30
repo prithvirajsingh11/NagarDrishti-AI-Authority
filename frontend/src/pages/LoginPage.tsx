@@ -51,40 +51,37 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
           onClick={toggleTheme}
           aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-2xs transition-all cursor-pointer"
+          className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white shadow-xs transition-colors cursor-pointer"
         >
           {theme === 'dark' ? (
-            <Sun className="w-4 h-4 text-amber-400" />
+            <Sun className="w-4 h-4 text-amber-500" />
           ) : (
             <Moon className="w-4 h-4 text-slate-700" />
           )}
         </button>
       </div>
 
-      {/* Subtle ambient light gradient */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 sm:w-96 h-80 sm:h-96 bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mx-auto mb-4 shadow-md transition-transform hover:scale-105">
-            <Shield className="w-6 h-6 sm:w-7 sm:h-7" />
+          <div className="w-12 h-12 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mx-auto mb-3 shadow-xs">
+            <Shield className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             NagarDrishti AI
           </h1>
-          <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 mt-1">
+          <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-1">
             Authority Portal
           </p>
-          <p className="text-[10px] sm:text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Municipal Civic Intelligence
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-xl dark:shadow-2xl transition-colors">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 sm:p-8 shadow-sm transition-colors">
           {errorMessage && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs leading-relaxed">
+            <div className="mb-5 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 flex items-start gap-3 text-rose-700 dark:text-rose-300 text-xs leading-relaxed">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
@@ -109,7 +106,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="officer@municipal.gov"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
                 />
               </div>
             </div>
@@ -132,7 +129,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
                 />
                 <button
                   type="button"
@@ -148,7 +145,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 flex items-center justify-center gap-2 py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 text-xs sm:text-sm font-semibold rounded-xl shadow-md transition-all disabled:opacity-50 cursor-pointer"
+              className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-950 text-xs sm:text-sm font-semibold rounded-lg shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
             >
               <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -156,7 +153,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
           </form>
 
           {/* Access notice */}
-          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 text-center">
+          <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
             <p className="text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed">
               Authorized municipal government personnel only.
               <br />

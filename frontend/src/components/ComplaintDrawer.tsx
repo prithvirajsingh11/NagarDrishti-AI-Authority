@@ -392,16 +392,16 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 dark:bg-black/70 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+      <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/50 dark:bg-black/70 transition-opacity animate-in fade-in duration-200">
         {/* Click outside backdrop */}
         <div className="flex-1" onClick={onClose} />
 
         {/* Drawer Surface */}
-        <div className="w-full sm:max-w-lg md:max-w-xl bg-white dark:bg-slate-950 border-l border-slate-200/90 dark:border-slate-800 shadow-2xl flex flex-col h-full overflow-hidden transition-colors duration-150 animate-in slide-in-from-right duration-200">
+        <div className="w-full sm:max-w-lg md:max-w-xl bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 shadow-xl flex flex-col h-full overflow-hidden transition-colors duration-150 animate-in slide-in-from-right duration-200">
           {/* Drawer Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-200/90 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/40">
+          <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900/40">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-2xs">
+              <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-xs">
                 <ProblemIcon type={complaint.problem_type} className="w-4 h-4" />
               </div>
               <div>
@@ -420,7 +420,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center cursor-pointer"
+              className="w-9 h-9 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center justify-center cursor-pointer"
               aria-label="Close details"
             >
               <X className="w-4 h-4" />
@@ -1289,8 +1289,8 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
       {/* Confirmation Dialog Modal: Mark as Resolved */}
       {isResolveModalOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-start justify-between">
               <div>
@@ -1317,7 +1317,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
             {/* Error Message */}
             {resolutionError && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
+              <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs">
                 {resolutionError}
               </div>
             )}
@@ -1338,7 +1338,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
               />
 
               {resolutionPreviewUrl ? (
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 aspect-video bg-slate-100 dark:bg-slate-900">
+                <div className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 aspect-video bg-slate-100 dark:bg-slate-900">
                   <img
                     src={resolutionPreviewUrl}
                     alt="Resolution preview"
@@ -1351,7 +1351,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                       setResolutionPreviewUrl('');
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
-                    className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/70 hover:bg-black text-white text-xs flex items-center gap-1 transition-all cursor-pointer"
+                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/70 hover:bg-black text-white text-xs flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <X className="w-3.5 h-3.5" />
                     <span>Change</span>
@@ -1360,9 +1360,9 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-400 p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-slate-50/50 dark:bg-slate-900/30"
+                  className="rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-400 p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-slate-50/50 dark:bg-slate-900/30"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2">
                     <Upload className="w-5 h-5" />
                   </div>
                   <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
@@ -1385,7 +1385,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                 onChange={(e) => setResolutionNote(e.target.value)}
                 placeholder="e.g., Road surface repaired and pothole filled."
                 rows={3}
-                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"
               />
             </div>
 
@@ -1401,7 +1401,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                   }
                 }}
                 disabled={isSubmittingResolution}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -1410,7 +1410,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                 type="button"
                 onClick={handleConfirmResolution}
                 disabled={isSubmittingResolution || (!resolutionFile && !resolutionPreviewUrl)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 {isSubmittingResolution ? (
                   <span>Saving Resolution...</span>

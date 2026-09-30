@@ -85,8 +85,8 @@
 .leaflet-popup-content-wrapper {
   background: #ffffff;
   color: #0f172a;
-  border-radius: 0.75rem;
-  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   padding: 0;
   border: 1px solid #e2e8f0;
 }
@@ -95,7 +95,7 @@
   background: #0f172a;
   color: #f1f5f9;
   border: 1px solid #1e293b;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .leaflet-popup-tip {
@@ -106,7 +106,7 @@
   background: #0f172a;
 }
 
-/* Custom Glowing DivIcon (Leaflet Live Incidents) */
+/* Custom Marker DivIcon (Leaflet Live Incidents) */
 .custom-div-icon {
   display: flex !important;
   align-items: center;
@@ -114,11 +114,11 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.15s ease-out;
 }
 
 .custom-div-icon:hover {
-  transform: scale(1.25);
+  transform: scale(1.08);
   z-index: 1000 !important;
 }
 
@@ -126,18 +126,7 @@
 .custom-div-icon svg {
   display: inline-block;
   line-height: 1;
-  animation: marker-glow-pulse 2.2s infinite ease-in-out;
-}
-
-@keyframes marker-glow-pulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.7));
-    transform: scale(1);
-  }
-  50% {
-    filter: drop-shadow(0 0 14px rgba(239, 68, 68, 1));
-    transform: scale(1.06);
-  }
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
 }
 
 /* Map Layer Switcher Buttons (.map-btn) */
