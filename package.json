@@ -9,6 +9,7 @@
     "dev:backend": "python3 backend/run.py",
     "build": "npm --prefix frontend run build",
     "preview": "npm --prefix frontend run preview",
+    "postinstall": "npm --prefix frontend install",
     "install:frontend": "npm --prefix frontend install"
   }
 }
