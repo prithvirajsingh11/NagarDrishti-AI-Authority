@@ -1048,16 +1048,10 @@ class CivicDataStore:
                     except Exception as parse_err:
                         logger.warning(f"Error parsing complaint record from Supabase: {parse_err}")
 
-                # Ensure base seed complaints exist for authority testing and verification
-                for s in self._get_seed_records():
-                    if s.id not in existing_report_ids and s.report_id not in existing_report_ids:
-                        local_s = local_by_rep.get(s.report_id) or local_by_id.get(s.id)
-                        parsed.append(local_s if local_s else s)
-
                 self.complaints = parsed
                 self._report_seq = max_seq + 1
                 self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
-                logger.info(f"Loaded {len(parsed)} complaints (Supabase + seeds)")
+                logger.info(f"Loaded {len(parsed)} complaints from Supabase")
                 self._save_to_storage()
 
                 # Sync active departments
@@ -1135,421 +1129,18 @@ class CivicDataStore:
                     logger.warning(f"Failed to load from {target}: {e}")
 
         if not loaded:
-            # If storage doesn't exist yet, seed with authentic Delhi complaints from NagarDrishti-AI
-            self._seed_initial_records()
+            self.complaints = []
+            self._report_seq = 1
             self._save_to_storage()
 
     def _get_seed_records(self) -> List[Complaint]:
-        """Returns the 18 authentic Delhi/Bhopal civic complaints matching NagarDrishti-AI."""
-        now_utc = datetime.now(timezone.utc)
-
-        def dt_off(d: int, h: int = 0) -> str:
-            return (now_utc - timedelta(days=d, hours=h)).isoformat()
-
-        seed_data = [
-            Complaint(
-                id="c001",
-                report_id="NGD-2026-00101",
-                problem_type="pothole",
-                confidence=0.94,
-                severity="HIGH",
-                evidence=["Large cavity visible in active road lane", "Cracked asphalt with water pooling"],
-                latitude=28.6315,
-                longitude=77.2167,
-                location_name="Connaught Place Outer Circle near Radial 2",
-                department="Municipal Roads (PWD)",
-                description="Hazardous pothole causing two-wheeler skids near metro gate.",
-                image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="ASSIGNED",
-                assigned_to="Officer Sharma (Road Unit)",
-                assigned_at=dt_off(3, 2),
-                assignment_history=[
-                    AssignmentRecord(
-                        id="asg-seed-001",
-                        complaint_id="NGD-2026-00101",
-                        previous_department=None,
-                        new_department="Municipal Roads (PWD)",
-                        previous_assignee=None,
-                        new_assignee="Officer Sharma (Road Unit)",
-                        changed_by="Chief Zonal Engineer",
-                        timestamp=dt_off(3, 2),
-                        note="Assigned to central night repair unit for asphalt milling",
-                    )
-                ],
-                internal_notes=[
-                    InternalNote(
-                        id="note-seed-001",
-                        complaint_id="NGD-2026-00101",
-                        author="Officer Sharma",
-                        author_role="authority",
-                        note="Field inspection completed. Hot-mix asphalt truck requisitioned for night shift.",
-                        timestamp=dt_off(2, 6),
-                    )
-                ],
-                duplicate_of=None,
-                created_at=dt_off(3, 4),
-                updated_at=dt_off(3, 2),
-            ),
-            Complaint(
-                id="c005",
-                report_id="NGD-2026-00105",
-                problem_type="pothole",
-                confidence=0.82,
-                severity="MEDIUM",
-                evidence=["Asphalt wear and shallow road rutting"],
-                latitude=28.6322,
-                longitude=77.2175,
-                location_name="Near Shivaji Stadium Terminal",
-                department="Municipal Roads (PWD)",
-                description="Road surface cracking and minor pothole developing.",
-                image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="RESOLVED",
-                resolution_image_url="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
-                resolution_image_path="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
-                resolution_note="Cold asphalt mix compacted and steam rolled across 4 sq meters to level road surface.",
-                resolved_at=dt_off(1, 2),
-                resolved_by="Municipal Roads (PWD Officer)",
-                citizen_verification_status="PENDING",
-                citizen_resolution_confirmed=None,
-                citizen_reopened=False,
-                duplicate_of=None,
-                created_at=dt_off(5, 6),
-                updated_at=dt_off(1, 2),
-            ),
-            Complaint(
-                id="c008",
-                report_id="NGD-2026-00108",
-                problem_type="pothole",
-                confidence=0.91,
-                severity="CRITICAL",
-                evidence=["Deep road collapse cave-in exposing base gravel", "Severe vehicular obstruction"],
-                latitude=28.6310,
-                longitude=77.2160,
-                location_name="Radial Road 3, Connaught Place",
-                department="Municipal Roads (PWD)",
-                description="Cave-in on inner lane, traffic backed up.",
-                image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="IN_PROGRESS",
-                duplicate_of=None,
-                created_at=dt_off(1, 8),
-                updated_at=dt_off(0, 4),
-            ),
-            Complaint(
-                id="c009",
-                report_id="NGD-2026-00109",
-                problem_type="pothole",
-                confidence=0.93,
-                severity="HIGH",
-                evidence=["Cavity in road lane matching recent report"],
-                latitude=28.6316,
-                longitude=77.2168,
-                location_name="Connaught Place Outer Circle, Metro Gate 4",
-                department="Municipal Roads (PWD)",
-                description="Duplicate report submitted by nearby pedestrian.",
-                image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of="NGD-2026-00101",
-                created_at=dt_off(0, 3),
-                updated_at=dt_off(0, 3),
-            ),
-            Complaint(
-                id="c002",
-                report_id="NGD-2026-00102",
-                problem_type="garbage",
-                confidence=0.91,
-                severity="CRITICAL",
-                evidence=["Solid waste accumulation blocking entire pedestrian pavement", "Overflowing open municipal bin"],
-                latitude=28.6520,
-                longitude=77.1905,
-                location_name="Ajmal Khan Road Market, Karol Bagh",
-                department="MCD Sanitation & Solid Waste",
-                description="Severe stench and pedestrian pathway completely obstructed.",
-                image_url="https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-                status="ASSIGNED",
-                duplicate_of=None,
-                created_at=dt_off(4, 2),
-                updated_at=dt_off(2, 1),
-            ),
-            Complaint(
-                id="c010",
-                report_id="NGD-2026-00110",
-                problem_type="garbage",
-                confidence=0.89,
-                severity="HIGH",
-                evidence=["Debris pile spilling onto main commercial road", "Scattered organic waste"],
-                latitude=28.6532,
-                longitude=77.1912,
-                location_name="Arya Samaj Road crossing, Karol Bagh",
-                department="MCD Sanitation & Solid Waste",
-                description="Commercial waste dumped overnight near vegetable market.",
-                image_url="https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of=None,
-                created_at=dt_off(2, 5),
-                updated_at=dt_off(2, 5),
-            ),
-            Complaint(
-                id="c011",
-                report_id="NGD-2026-00111",
-                problem_type="garbage",
-                confidence=0.85,
-                severity="MEDIUM",
-                evidence=["Accumulated packaging waste outside electronics shops"],
-                latitude=28.6515,
-                longitude=77.1895,
-                location_name="Gaffar Market Entry Gate, Karol Bagh",
-                department="MCD Sanitation & Solid Waste",
-                description="Cardboard and plastic bags piling up.",
-                image_url="https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-                status="IN_PROGRESS",
-                duplicate_of=None,
-                created_at=dt_off(3, 7),
-                updated_at=dt_off(0, 5),
-            ),
-            Complaint(
-                id="c003",
-                report_id="NGD-2026-00103",
-                problem_type="streetlight",
-                confidence=0.88,
-                severity="MEDIUM",
-                evidence=["Damaged light fixture head hanging unlit", "Pole bent slightly at base"],
-                latitude=28.6280,
-                longitude=77.2060,
-                location_name="Gole Market Road, Sector 4",
-                department="BSES / Municipal Street Lighting Cell",
-                description="Dark spot on road during night, posing safety hazard for pedestrians.",
-                image_url="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-                status="IN_PROGRESS",
-                duplicate_of=None,
-                created_at=dt_off(4, 9),
-                updated_at=dt_off(1, 4),
-            ),
-            Complaint(
-                id="c012",
-                report_id="NGD-2026-00112",
-                problem_type="streetlight",
-                confidence=0.92,
-                severity="HIGH",
-                evidence=["Streetlight lamp shattered with loose dangling wires"],
-                latitude=28.6292,
-                longitude=77.2050,
-                location_name="Bhai Veer Singh Marg, Gole Market",
-                department="BSES / Municipal Street Lighting Cell",
-                description="Three consecutive light poles dark at school crossing.",
-                image_url="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of=None,
-                created_at=dt_off(1, 3),
-                updated_at=dt_off(1, 3),
-            ),
-            Complaint(
-                id="c013",
-                report_id="NGD-2026-00113",
-                problem_type="streetlight",
-                confidence=0.95,
-                severity="CRITICAL",
-                evidence=["Pole bent at 45 degree angle across sidewalk", "Live electrical wiring visible"],
-                latitude=28.6275,
-                longitude=77.2070,
-                location_name="Peshwa Road Junction, Gole Market",
-                department="BSES / Municipal Street Lighting Cell",
-                description="Accident vehicle struck pole, sparks reported during rainfall.",
-                image_url="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
-                status="ASSIGNED",
-                duplicate_of=None,
-                created_at=dt_off(0, 6),
-                updated_at=dt_off(0, 2),
-            ),
-            Complaint(
-                id="c004",
-                report_id="NGD-2026-00104",
-                problem_type="drain",
-                confidence=0.95,
-                severity="HIGH",
-                evidence=["Open stormwater gutter overflowing onto road surface", "Debris clogging inlet grate"],
-                latitude=28.6185,
-                longitude=77.2210,
-                location_name="Janpath Lane near Central Cottage",
-                department="Delhi Jal Board (DJB)",
-                description="Foul drain water spilling over the asphalt.",
-                image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of=None,
-                created_at=dt_off(2, 8),
-                updated_at=dt_off(2, 8),
-            ),
-            Complaint(
-                id="c014",
-                report_id="NGD-2026-00114",
-                problem_type="drain",
-                confidence=0.93,
-                severity="CRITICAL",
-                evidence=["Complete drain canal overflow flooding bus stop", "Black sewage water backup"],
-                latitude=28.6195,
-                longitude=77.2225,
-                location_name="Tolstoy Marg Bus Shelter, Janpath",
-                department="Delhi Jal Board (DJB)",
-                description="Pedestrians unable to access bus stop due to sewage flood.",
-                image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-                status="IN_PROGRESS",
-                assigned_to="Engineer Verma (DJB Drainage Cell)",
-                assigned_at=dt_off(1, 8),
-                assignment_history=[
-                    AssignmentRecord(
-                        id="asg-seed-002",
-                        complaint_id="NGD-2026-00114",
-                        previous_department=None,
-                        new_department="Delhi Jal Board (DJB)",
-                        previous_assignee=None,
-                        new_assignee="Engineer Verma (DJB Drainage Cell)",
-                        changed_by="Zonal Sanitation Commissioner",
-                        timestamp=dt_off(1, 8),
-                        note="Heavy machinery and suction jetting team mobilized",
-                    )
-                ],
-                internal_notes=[
-                    InternalNote(
-                        id="note-seed-002",
-                        complaint_id="NGD-2026-00114",
-                        author="Engineer Verma",
-                        author_role="authority",
-                        note="High volume suction truck arriving at 23:00 to clear trunk stormwater line.",
-                        timestamp=dt_off(0, 7),
-                    )
-                ],
-                status_update_requests=[
-                    StatusUpdateRequestItem(
-                        id="sur-seed-002",
-                        complaint_id="NGD-2026-00114",
-                        issue_type="drain",
-                        location_name="Tolstoy Marg Bus Shelter, Janpath",
-                        current_status="IN_PROGRESS",
-                        request_date=dt_off(0, 2),
-                        citizen_message="Can we get an estimated time for suction pump deployment?",
-                        state="OPEN",
-                        citizen_notified=False,
-                    )
-                ],
-                duplicate_of=None,
-                created_at=dt_off(1, 10),
-                updated_at=dt_off(0, 6),
-            ),
-            Complaint(
-                id="c015",
-                report_id="NGD-2026-00115",
-                problem_type="drain",
-                confidence=0.81,
-                severity="LOW",
-                evidence=["Minor curb runoff pooling near storm grate"],
-                latitude=28.6178,
-                longitude=77.2198,
-                location_name="Windsor Place Roundabout, Janpath",
-                department="Delhi Jal Board (DJB)",
-                description="Drain grate cleaned and water receding.",
-                image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-                status="RESOLVED",
-                resolution_image_url="https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
-                resolution_image_path="https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
-                resolution_note="Stormwater grating desilted, solid trash cleared and drain flushing completed.",
-                resolved_at=dt_off(2, 2),
-                resolved_by="Delhi Jal Board Zonal Super",
-                citizen_verification_status="CONFIRMED",
-                citizen_resolution_confirmed=True,
-                citizen_resolution_confirmed_at=dt_off(1, 12),
-                citizen_verified_at=dt_off(1, 12),
-                citizen_reopened=False,
-                duplicate_of=None,
-                created_at=dt_off(6, 4),
-                updated_at=dt_off(1, 12),
-            ),
-            Complaint(
-                id="c016",
-                report_id="NGD-2026-00116",
-                problem_type="other",
-                confidence=0.76,
-                severity="LOW",
-                evidence=["Damaged metal divider barricade on sidewalk boundary"],
-                latitude=28.6250,
-                longitude=77.2120,
-                location_name="Sansad Marg near Patel Chowk",
-                department="Delhi Traffic Police & Civic Oversight",
-                description="Barricade leaning into footpath.",
-                image_url="https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of=None,
-                created_at=dt_off(0, 1),
-                updated_at=dt_off(0, 1),
-            ),
-            Complaint(
-                id="c017",
-                report_id="NGD-2026-00117",
-                problem_type="pothole",
-                confidence=0.85,
-                severity="LOW",
-                evidence=["Minor road surface crack repaved"],
-                latitude=28.6310,
-                longitude=77.2162,
-                location_name="Connaught Place Inner Circle Radial 1",
-                department="Municipal Roads (PWD)",
-                description="Crack in road sealed by maintenance team.",
-                image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                status="REOPENED",
-                resolution_image_url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                resolution_image_path="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
-                resolution_note="Crack in road sealed by municipal maintenance squad.",
-                resolved_at=dt_off(2, 1),
-                resolved_by="Municipal Roads (PWD Squad 4)",
-                citizen_verification_status="REOPENED",
-                citizen_resolution_confirmed=False,
-                citizen_reopened=True,
-                citizen_reopened_at=dt_off(0, 5),
-                reopened_at=dt_off(0, 5),
-                reopen_reason="The pothole is still present beside the repaired section.",
-                status_update_requests=[
-                    StatusUpdateRequestItem(
-                        id="sur-seed-001",
-                        complaint_id="NGD-2026-00117",
-                        issue_type="pothole",
-                        location_name="Connaught Place Inner Circle Radial 1",
-                        current_status="REOPENED",
-                        request_date=dt_off(0, 3),
-                        citizen_message="The pothole was marked repaired but gravel came loose again. Please expedite.",
-                        state="OPEN",
-                        citizen_notified=False,
-                    )
-                ],
-                duplicate_of=None,
-                created_at=dt_off(5, 2),
-                updated_at=dt_off(0, 5),
-            ),
-            Complaint(
-                id="c018",
-                report_id="NGD-2026-00118",
-                problem_type="garbage",
-                confidence=0.92,
-                severity="HIGH",
-                evidence=["Commercial waste pile spilling across alley"],
-                latitude=28.6472,
-                longitude=77.1915,
-                location_name="Ajmal Khan Market Back Alley, Karol Bagh",
-                department="MCD Sanitation & Solid Waste",
-                description="Urgent clearing needed for morning market access.",
-                image_url="https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-                status="REPORTED",
-                duplicate_of=None,
-                created_at=dt_off(0, 4),
-                updated_at=dt_off(0, 4),
-            ),
-        ]
-        for c in seed_data:
-            if not c.status_history:
-                c.status_history = build_default_history(c.model_dump())
-        return seed_data
+        """Returns empty list: dummy seed data removed."""
+        return []
 
     def _seed_initial_records(self):
-        """Seeds the authentic civic complaints matching NagarDrishti-AI."""
-        self.complaints = self._get_seed_records()
-        self._report_seq = 119
+        """Initializes empty complaints list for clean database state."""
+        self.complaints = []
+        self._report_seq = 1
 
     def _save_to_storage(self):
         """Saves current state to all configured storage targets."""
@@ -1597,7 +1188,7 @@ class CivicDataStore:
             logger.debug(f"User site API notify skipped or unavailable ({USER_SITE_API_URL}): {e}")
 
     def reset_demo(self) -> Dict[str, Any]:
-        """Resets seed dataset while strictly preserving any real citizen user reports."""
+        """Clears dummy dataset while strictly preserving any real citizen user reports."""
         self._check_auto_reload()
         demo_ids = {f"c{i:03d}" for i in range(1, 19)}
         demo_reps = {f"NGD-2026-{i:05d}" for i in range(101, 119)}
@@ -1607,14 +1198,13 @@ class CivicDataStore:
             if c.id not in demo_ids and c.report_id not in demo_reps
         ]
 
-        self._seed_initial_records()
-        self.complaints.extend(user_reports)
+        self.complaints = user_reports
         self._save_to_storage()
 
         return {
             "status": "success",
-            "message": "Actual demo complaints reset; citizen user-submitted reports preserved.",
-            "demo_count": 16,
+            "message": "Dummy complaints removed; citizen user-submitted reports preserved.",
+            "demo_count": 0,
             "user_preserved_count": len(user_reports),
         }
 

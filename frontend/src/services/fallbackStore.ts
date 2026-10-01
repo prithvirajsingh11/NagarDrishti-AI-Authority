@@ -27,7 +27,7 @@ export const INITIAL_DEPARTMENTS: Department[] = [
   { id: 'dept-5', name: 'Delhi Traffic Police & Civic Oversight', category: 'Traffic & Hazards', is_active: true },
 ];
 
-const STORAGE_KEY = 'nagardrishti_local_complaints_v1';
+const STORAGE_KEY = 'nagardrishti_local_complaints_v2';
 
 function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371000.0;
@@ -51,10 +51,11 @@ class ClientCivicStore {
 
   private initStore() {
     try {
+      localStorage.removeItem('nagardrishti_local_complaints_v1');
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           this.complaints = parsed;
           return;
         }
@@ -62,7 +63,7 @@ class ClientCivicStore {
     } catch {
       // ignore
     }
-    // Fallback to authentic seed complaints
+    // Fallback to authentic seed complaints (or empty)
     this.complaints = (seedDataRaw as any[]).map((item) => ({
       ...item,
       evidence: Array.isArray(item.evidence) ? item.evidence : [],
@@ -81,15 +82,8 @@ class ClientCivicStore {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && Array.isArray(data) && data.length > 0) {
-        const existingIds = new Set(data.map((d: any) => d.id || d.report_id));
-        const merged = [...data];
-        for (const s of this.complaints) {
-          if (!existingIds.has(s.id) && !existingIds.has(s.report_id)) {
-            merged.push(s);
-          }
-        }
-        this.complaints = merged;
+      if (!error && Array.isArray(data)) {
+        this.complaints = data;
         this.save();
         this.syncedWithSupabase = true;
       }
