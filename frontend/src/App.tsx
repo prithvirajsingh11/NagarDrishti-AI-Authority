@@ -19,6 +19,7 @@ import {
   acknowledgeStatusUpdateRequest,
   getComplaintById,
 } from './services/api';
+import { supabase } from './services/supabaseClient';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
 import { MobileBottomNav } from './components/MobileBottomNav';
@@ -185,6 +186,32 @@ function AuthorityAppContent() {
       loadData(true);
     }
   }, [authLoading, session, isAuthority, loadData]);
+
+  // Real-time Supabase postgres_changes subscription + periodic polling safeguard
+  useEffect(() => {
+    if (!session || !isAuthority) return;
+
+    const channel = supabase
+      .channel('authority-realtime-complaints')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'complaints' },
+        (payload) => {
+          console.log('[Realtime] Live complaint update detected:', payload.eventType);
+          loadData(false);
+        }
+      )
+      .subscribe();
+
+    const pollTimer = setInterval(() => {
+      loadData(false);
+    }, 10000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(pollTimer);
+    };
+  }, [session, isAuthority, loadData]);
 
   // Reset master filters
   const handleResetFilters = () => {

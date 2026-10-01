@@ -175,7 +175,7 @@ export async function getComplaints(filters?: {
     return await handleResponse<Complaint[]>(res, 'Failed to retrieve complaints.');
   } catch (err) {
     console.warn('Backend /complaints unavailable, falling back to civic store:', err);
-    await clientCivicStore.syncWithSupabase();
+    await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getComplaints(filters);
   }
 }
@@ -313,7 +313,7 @@ export async function getDashboardStatistics(): Promise<DashboardStatistics> {
     return await handleResponse<DashboardStatistics>(res, 'Failed to load dashboard statistics.');
   } catch (err) {
     console.warn('Backend /dashboard/statistics unavailable, falling back to civic store:', err);
-    await clientCivicStore.syncWithSupabase();
+    await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getStatistics();
   }
 }
@@ -324,6 +324,7 @@ export async function getDashboardHeatmap(): Promise<HeatmapPoint[]> {
     const res = await fetch(`${API_BASE}/dashboard/heatmap`, { headers });
     return await handleResponse<HeatmapPoint[]>(res, 'Failed to load heatmap data.');
   } catch {
+    await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getHeatmap();
   }
 }
@@ -334,6 +335,7 @@ export async function getDashboardHotspots(): Promise<HotspotInfo[]> {
     const res = await fetch(`${API_BASE}/dashboard/hotspots`, { headers });
     return await handleResponse<HotspotInfo[]>(res, 'Failed to load hotspot data.');
   } catch {
+    await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getHotspots();
   }
 }

@@ -1,1 +1,67 @@
-[]
+[
+  {
+    "id": "09a40a33-4050-454e-97e1-265dab1e61ff",
+    "report_id": "NGD-2026-00175",
+    "problem_type": "garbage",
+    "confidence": 0.98,
+    "severity": "HIGH",
+    "evidence": [
+      "Large accumulation of solid waste and litter piled along the roadside",
+      "Person on a scooter actively throwing a plastic bag of garbage onto the street"
+    ],
+    "latitude": 23.2599,
+    "longitude": 77.4126,
+    "location_name": "Bhopal, Madhya Pradesh",
+    "department": "Sanitation",
+    "description": "",
+    "image_url": "/api/complaints/image/48ded66468a74b6abfaa66a460991445.jpg",
+    "status": "REPORTED",
+    "duplicate_of": null,
+    "created_at": "2026-10-01T05:33:13.195064+00:00",
+    "updated_at": "2026-10-01T05:33:13.195064+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": null,
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-10-01T05:33:13.195064+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-10-01T05:33:13.195064+00:00",
+        "note": "Garbage detected (98% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-10-01T05:33:13.195064+00:00",
+        "note": "Assigned to Sanitation",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  }
+]

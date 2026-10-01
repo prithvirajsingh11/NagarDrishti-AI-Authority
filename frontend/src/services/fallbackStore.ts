@@ -74,8 +74,8 @@ class ClientCivicStore {
     }));
   }
 
-  public async syncWithSupabase() {
-    if (this.syncedWithSupabase) return;
+  public async syncWithSupabase(force = true): Promise<Complaint[]> {
+    if (this.syncedWithSupabase && !force) return this.complaints;
     try {
       const { data, error } = await supabase
         .from('complaints')
@@ -90,6 +90,7 @@ class ClientCivicStore {
     } catch {
       // ignore
     }
+    return this.complaints;
   }
 
   private save() {
