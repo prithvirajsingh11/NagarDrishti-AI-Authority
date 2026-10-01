@@ -129,11 +129,56 @@ async function handleResponse<T>(res: Response, defaultErrorMsg: string): Promis
   return res.json();
 }
 
-export function resolveImageUrl(url?: string | null): string {
+function getStoredSupabaseToken(): string | null {
+  if (typeof window === 'undefined' || !window.localStorage) return null;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        const item = localStorage.getItem(key);
+        if (item) {
+          const parsed = JSON.parse(item);
+          if (parsed && typeof parsed.access_token === 'string') return parsed.access_token;
+          if (parsed && parsed.currentSession && typeof parsed.currentSession.access_token === 'string') {
+            return parsed.currentSession.access_token;
+          }
+        }
+      }
+    }
+  } catch {}
+  return null;
+}
+
+let cachedAuthorityToken: string | null = null;
+if (typeof window !== 'undefined') {
+  cachedAuthorityToken = getStoredSupabaseToken();
+  try {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      cachedAuthorityToken = session?.access_token || null;
+    });
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.access_token) {
+        cachedAuthorityToken = session.access_token;
+      }
+    });
+  } catch {}
+}
+
+export function resolveImageUrl(url?: string | null, token?: string | null): string {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
-    return url;
+  let resolved = url;
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('blob:') && !url.startsWith('data:')) {
+    if (SERVER_ORIGIN) {
+      resolved = ${SERVER_ORIGIN};
+    }
   }
+  const activeToken = token || cachedAuthorityToken || getStoredSupabaseToken();
+  if (resolved.includes('/api/complaints/image/') && activeToken && !resolved.includes('token=')) {
+    const separator = resolved.includes('?') ? '&' : '?';
+    return ${resolved}token=;
+  }
+  return resolved;
+}
   if (SERVER_ORIGIN) {
     return `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
   }
