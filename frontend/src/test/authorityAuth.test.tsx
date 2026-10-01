@@ -37,6 +37,11 @@ vi.mock('../services/supabaseClient', () => {
         eq: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({ data: { role: 'authority', full_name: 'Municipal Officer' }, error: null }),
       })),
+      channel: vi.fn(() => ({
+        on: vi.fn().mockReturnThis(),
+        subscribe: vi.fn(),
+      })),
+      removeChannel: vi.fn(),
     },
   };
 });

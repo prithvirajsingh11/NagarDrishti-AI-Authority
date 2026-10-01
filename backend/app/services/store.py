@@ -1048,10 +1048,40 @@ class CivicDataStore:
                     except Exception as parse_err:
                         logger.warning(f"Error parsing complaint record from Supabase: {parse_err}")
 
+                # Preserve local complaints not in Supabase (e.g. seeded baseline, test records)
+                for local_c in self.complaints:
+                    if local_c.id not in existing_report_ids and local_c.report_id not in existing_report_ids:
+                        parsed.append(local_c)
+                        existing_report_ids.add(local_c.id)
+                        existing_report_ids.add(local_c.report_id)
+
+                # Also merge baseline complaints from complaints_backup.json if missing
+                backup_file = Path(LOCAL_BACKUP_DB_PATH).parent / "complaints_backup.json"
+                if backup_file.exists():
+                    try:
+                        with open(backup_file, "r", encoding="utf-8") as bf:
+                            b_data = json.load(bf)
+                        b_items = []
+                        if isinstance(b_data, list):
+                            b_items = b_data
+                        elif isinstance(b_data, dict):
+                            b_items = b_data.get("local", []) + b_data.get("supabase", [])
+                        for b_item in b_items:
+                            try:
+                                bc = parse_complaint_dict(b_item)
+                                if bc.id not in existing_report_ids and bc.report_id not in existing_report_ids:
+                                    parsed.append(bc)
+                                    existing_report_ids.add(bc.id)
+                                    existing_report_ids.add(bc.report_id)
+                            except Exception:
+                                pass
+                    except Exception as be:
+                        logger.warning(f"Could not merge backup complaints: {be}")
+
                 self.complaints = parsed
                 self._report_seq = max_seq + 1
                 self._last_supabase_sync = datetime.now(timezone.utc).timestamp()
-                logger.info(f"Loaded {len(parsed)} complaints from Supabase")
+                logger.info(f"Loaded {len(parsed)} complaints from Supabase and baseline store")
                 self._save_to_storage()
 
                 # Sync active departments
@@ -1088,50 +1118,55 @@ class CivicDataStore:
         return targets
 
     def _load_from_storage(self):
-        """Loads complaints from Supabase or shared database file."""
-        if self._sync_with_supabase():
-            self._save_to_storage()
-            return
-
+        """Loads complaints from local storage targets (merging unique records) and synchronizes with Supabase."""
         targets = self._get_storage_targets()
-        loaded = False
+        known_ids = set()
+        all_raw_items = []
+        max_mtime = 0.0
 
         for target in targets:
             if target.exists() and target.stat().st_size > 5:
                 try:
+                    max_mtime = max(max_mtime, target.stat().st_mtime)
                     with open(target, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                    if isinstance(data, list) and len(data) > 0:
-                        parsed = []
-                        max_seq = 118
-                        for item in data:
-                            try:
-                                c = parse_complaint_dict(item)
-                                parsed.append(c)
-                                rep = str(c.report_id)
-                                if rep.startswith("NGD-2026-"):
-                                    try:
-                                        s = int(rep.split("-")[-1])
-                                        if s > max_seq:
-                                            max_seq = s
-                                    except ValueError:
-                                        pass
-                            except Exception as parse_err:
-                                logger.warning(f"Error parsing complaint record: {parse_err}")
-                        if parsed:
-                            self.complaints = parsed
-                            self._report_seq = max_seq + 1
-                            self._last_mtime = target.stat().st_mtime
-                            logger.info(f"Loaded {len(parsed)} complaints from {target}")
-                            loaded = True
-                            break
+                    items = []
+                    if isinstance(data, list):
+                        items = data
+                    elif isinstance(data, dict):
+                        items = data.get("local", []) + data.get("supabase", [])
+                    for it in items:
+                        iid = it.get("id") or it.get("report_id")
+                        if iid and iid not in known_ids:
+                            known_ids.add(iid)
+                            all_raw_items.append(it)
                 except Exception as e:
                     logger.warning(f"Failed to load from {target}: {e}")
 
-        if not loaded:
-            self.complaints = []
-            self._report_seq = 1
-            self._save_to_storage()
+        parsed = []
+        max_seq = 118
+        for item in all_raw_items:
+            try:
+                c = parse_complaint_dict(item)
+                parsed.append(c)
+                rep = str(c.report_id)
+                if rep.startswith("NGD-2026-"):
+                    try:
+                        s = int(rep.split("-")[-1])
+                        if s > max_seq:
+                            max_seq = s
+                    except ValueError:
+                        pass
+            except Exception as parse_err:
+                logger.warning(f"Error parsing complaint record: {parse_err}")
+
+        self.complaints = parsed
+        self._report_seq = max_seq + 1
+        self._last_mtime = max_mtime
+
+        # Synchronize live updates from Supabase while preserving local baseline
+        self._sync_with_supabase()
+        self._save_to_storage()
 
     def _get_seed_records(self) -> List[Complaint]:
         """Returns empty list: dummy seed data removed."""

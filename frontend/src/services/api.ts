@@ -93,6 +93,21 @@ export async function getJsonAuthHeaders(explicitToken?: string): Promise<Record
   };
 }
 
+export function isAuthError(err: any): boolean {
+  if (!err) return false;
+  const msg = typeof err === 'string' ? err : (err.message || String(err));
+  return (
+    err.status === 401 ||
+    err.status === 403 ||
+    msg.includes('session has expired') ||
+    msg.includes('Authority role') ||
+    msg.includes('Access denied') ||
+    msg.includes('privileges required') ||
+    msg.includes('401') ||
+    msg.includes('403')
+  );
+}
+
 async function handleResponse<T>(res: Response, defaultErrorMsg: string): Promise<T> {
   if (res.status === 401) {
     triggerSessionExpired();
@@ -100,18 +115,21 @@ async function handleResponse<T>(res: Response, defaultErrorMsg: string): Promis
   }
 
   if (res.status === 403) {
-    let detail = 'Access denied. Authority privileges required.';
+    let detail = 'Authority role required. Citizens are not permitted to access this resource.';
     try {
       const err = await res.json();
-      if (err.detail) detail = err.detail;
+      if (err.detail) detail = typeof err.detail === 'string' ? err.detail : JSON.stringify(err.detail);
     } catch {
       // ignore
     }
     throw new Error(detail);
   }
 
-  const contentType = res.headers.get('content-type') || '';
-  if (!res.ok || !contentType.includes('application/json')) {
+  const contentType = (res.headers && typeof res.headers.get === 'function')
+    ? (res.headers.get('content-type') || '')
+    : 'application/json';
+
+  if (!res.ok || (contentType && !contentType.includes('application/json'))) {
     let detail = defaultErrorMsg;
     if (contentType.includes('application/json')) {
       try {
@@ -121,7 +139,7 @@ async function handleResponse<T>(res: Response, defaultErrorMsg: string): Promis
         // ignore
       }
     } else {
-      detail = `API returned non-JSON response (${res.status} ${contentType || 'unknown'})`;
+      detail = `${defaultErrorMsg} (HTTP ${res.status})`;
     }
     throw new Error(detail);
   }
@@ -235,6 +253,7 @@ export async function getComplaints(filters?: {
     const res = await fetch(url, { headers });
     return await handleResponse<Complaint[]>(res, 'Failed to retrieve complaints.');
   } catch (err) {
+    if (isAuthError(err)) throw err;
     console.warn('Backend /complaints unavailable, falling back to civic store:', err);
     await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getComplaints(filters);
@@ -246,7 +265,8 @@ export async function getComplaintById(id: string): Promise<Complaint> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/complaints/${id}`, { headers });
     return await handleResponse<Complaint>(res, 'Complaint not found.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     const c = clientCivicStore.getComplaintById(id);
     if (c) return c;
     throw new Error('Complaint not found.');
@@ -270,7 +290,8 @@ export async function updateComplaintStatus(
       }),
     });
     return await handleResponse<Complaint>(res, 'Failed to update complaint status.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.updateStatus(id, status, resolution);
   }
 }
@@ -317,7 +338,8 @@ export async function resolveComplaint(
       }),
     });
     return await handleResponse<Complaint>(res, 'Failed to mark complaint as resolved.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.updateStatus(id, 'RESOLVED', {
       resolution_image_url,
       resolution_note,
@@ -333,7 +355,8 @@ export async function confirmComplaintResolution(id: string): Promise<Complaint>
       headers,
     });
     return await handleResponse<Complaint>(res, 'Failed to confirm complaint resolution.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     const c = clientCivicStore.getComplaintById(id);
     if (!c) throw new Error('Complaint not found.');
     c.citizen_verification_status = 'CONFIRMED';
@@ -351,7 +374,8 @@ export async function reopenComplaint(id: string, reason?: string): Promise<Comp
       body: JSON.stringify({ reason: reason || '' }),
     });
     return await handleResponse<Complaint>(res, 'Failed to submit reopen request.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.updateStatus(id, 'REOPENED', { resolution_note: reason });
   }
 }
@@ -361,7 +385,8 @@ export async function getComplaintHistory(id: string): Promise<any[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/complaints/${id}/history`, { headers });
     return await handleResponse<any[]>(res, 'Failed to retrieve complaint history.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     const c = clientCivicStore.getComplaintById(id);
     return c?.status_history || [];
   }
@@ -372,7 +397,8 @@ export async function getDashboardStatistics(): Promise<DashboardStatistics> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/statistics`, { headers });
     return await handleResponse<DashboardStatistics>(res, 'Failed to load dashboard statistics.');
-  } catch (err) {
+  } catch (err: any) {
+    if (isAuthError(err)) throw err;
     console.warn('Backend /dashboard/statistics unavailable, falling back to civic store:', err);
     await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getStatistics();
@@ -384,7 +410,8 @@ export async function getDashboardHeatmap(): Promise<HeatmapPoint[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/heatmap`, { headers });
     return await handleResponse<HeatmapPoint[]>(res, 'Failed to load heatmap data.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getHeatmap();
   }
@@ -395,7 +422,8 @@ export async function getDashboardHotspots(): Promise<HotspotInfo[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/hotspots`, { headers });
     return await handleResponse<HotspotInfo[]>(res, 'Failed to load hotspot data.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     await clientCivicStore.syncWithSupabase(true);
     return clientCivicStore.getHotspots();
   }
@@ -439,7 +467,8 @@ export async function getPriorityActions(): Promise<Complaint[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/priority-actions`, { headers });
     return await handleResponse<Complaint[]>(res, 'Failed to fetch priority actions.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getStatistics().priority_actions || [];
   }
 }
@@ -449,7 +478,8 @@ export async function getAgingAnalysis(): Promise<AgingAnalysis> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/aging`, { headers });
     return await handleResponse<AgingAnalysis>(res, 'Failed to fetch aging analysis.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getAgingAnalysis();
   }
 }
@@ -459,7 +489,8 @@ export async function getDepartmentPerformance(): Promise<DepartmentPerformance[
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/departments`, { headers });
     return await handleResponse<DepartmentPerformance[]>(res, 'Failed to fetch department performance.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getDepartmentPerformance();
   }
 }
@@ -469,7 +500,8 @@ export async function getCategoryTrends(): Promise<CategoryTrend[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/trends`, { headers });
     return await handleResponse<CategoryTrend[]>(res, 'Failed to fetch category trends.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getCategoryTrends();
   }
 }
@@ -486,7 +518,8 @@ export async function assignComplaint(
       body: JSON.stringify(payload),
     });
     return await handleResponse<Complaint>(res, 'Failed to assign complaint.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.assign(id, payload);
   }
 }
@@ -503,7 +536,8 @@ export async function addInternalNote(
       body: JSON.stringify({ note }),
     });
     return await handleResponse<InternalNote>(res, 'Failed to add internal note.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.addNote(id, note);
   }
 }
@@ -513,7 +547,8 @@ export async function getInternalNotes(id: string): Promise<InternalNote[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/complaints/${id}/internal-notes`, { headers });
     return await handleResponse<InternalNote[]>(res, 'Failed to load internal notes.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     const c = clientCivicStore.getComplaintById(id);
     return c?.internal_notes || [];
   }
@@ -545,7 +580,8 @@ export async function acknowledgeStatusUpdateRequest(
       body: JSON.stringify({ response_note: responseNote }),
     });
     return await handleResponse<StatusUpdateRequestItem>(res, 'Failed to acknowledge status update request.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.acknowledgeStatusUpdateRequest(requestId, responseNote);
   }
 }
@@ -555,7 +591,8 @@ export async function getEscalations(): Promise<EscalationItem[]> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/escalations`, { headers });
     return await handleResponse<EscalationItem[]>(res, 'Failed to load escalations.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getEscalations();
   }
 }
@@ -566,7 +603,8 @@ export async function getStatusUpdateRequests(state?: string): Promise<StatusUpd
     const params = state ? `?state=${encodeURIComponent(state)}` : '';
     const res = await fetch(`${API_BASE}/dashboard/status-requests${params}`, { headers });
     return await handleResponse<StatusUpdateRequestItem[]>(res, 'Failed to load status update requests.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     const list: StatusUpdateRequestItem[] = [];
     clientCivicStore.getComplaints().forEach((c) => {
       (c.status_update_requests || []).forEach((r) => {
@@ -582,7 +620,8 @@ export async function getGovernanceOutcomes(): Promise<GovernanceOutcomes> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/governance-outcomes`, { headers });
     return await handleResponse<GovernanceOutcomes>(res, 'Failed to load governance outcomes.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getGovernanceOutcomes();
   }
 }
@@ -592,7 +631,8 @@ export async function getTimeAnalytics(): Promise<TimeBasedAnalytics> {
     const headers = await getAuthHeaders();
     const res = await fetch(`${API_BASE}/dashboard/time-analytics`, { headers });
     return await handleResponse<TimeBasedAnalytics>(res, 'Failed to load time-based analytics.');
-  } catch {
+  } catch (err) {
+    if (isAuthError(err)) throw err;
     return clientCivicStore.getTimeAnalytics();
   }
 }

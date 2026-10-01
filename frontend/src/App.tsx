@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import type {
   Complaint,
   ComplaintStatus,
@@ -192,24 +192,27 @@ function AuthorityAppContent() {
   useEffect(() => {
     if (!session || !isAuthority) return;
 
-    const channel = supabase
-      .channel('authority-realtime-complaints')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'complaints' },
-        (payload) => {
-          console.log('[Realtime] Live complaint update detected:', payload.eventType);
-          loadData(false);
-        }
-      )
-      .subscribe();
+    const channel = typeof supabase.channel === 'function'
+      ? supabase
+          .channel('authority-realtime-complaints')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'complaints' },
+            () => {
+              loadData(false);
+            }
+          )
+          .subscribe()
+      : null;
 
     const pollTimer = setInterval(() => {
       loadData(false);
     }, 10000);
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel && typeof supabase.removeChannel === 'function') {
+        supabase.removeChannel(channel);
+      }
       clearInterval(pollTimer);
     };
   }, [session, isAuthority, loadData]);
