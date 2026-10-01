@@ -399,7 +399,7 @@ function AuthorityAppContent() {
       : '/dashboard';
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-150">
+    <div className="flex min-h-screen lg:h-screen lg:overflow-hidden bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-150">
       {/* Sidebar Navigation */}
       <Sidebar
         currentRoute={authorityRoute}
@@ -412,7 +412,7 @@ function AuthorityAppContent() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 scroll-touch">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-50 dark:bg-slate-950 overflow-y-auto pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 scroll-touch h-full">
         {/* Top Navbar */}
         <Navbar
           title={getPageTitle(currentRoute)}

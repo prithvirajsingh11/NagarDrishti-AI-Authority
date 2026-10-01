@@ -59,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const sidebarContent = (
     <aside
-      className={`bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 min-h-screen transition-all duration-200 select-none ${
+      className={`bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 h-screen max-h-screen transition-all duration-200 select-none ${
         isCollapsed ? 'w-18' : 'w-64'
       }`}
     >
@@ -116,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Navigation Links */}
-      <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
+      <nav className="p-3 space-y-1 flex-1 overflow-y-auto min-h-0">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentRoute === item.route;
@@ -145,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Authority Profile & System Status */}
-      <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2.5 shrink-0 mt-auto bg-white dark:bg-slate-950">
         {!isCollapsed ? (
           <>
             <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2.5 border border-slate-200 dark:border-slate-800">
@@ -227,7 +227,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Persistent Sidebar */}
-      <div className="hidden lg:flex shrink-0">
+      <div className="hidden lg:flex shrink-0 sticky top-0 h-screen z-30">
         {sidebarContent}
       </div>
 
@@ -240,7 +240,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onCloseMobile}
           />
           {/* Slide-over Content */}
-          <div className="relative z-10 w-72 max-w-[85vw] flex shadow-xl animate-in slide-in-from-left duration-200">
+          <div className="relative z-10 w-72 max-w-[85vw] h-full flex flex-col shadow-xl animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>
