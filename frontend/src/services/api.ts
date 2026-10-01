@@ -164,25 +164,20 @@ if (typeof window !== 'undefined') {
   } catch {}
 }
 
-export function resolveImageUrl(url?: string | null, token?: string | null): string {
+export function resolveImageUrl(url?: string | null, explicitToken?: string | null): string {
   if (!url) return '';
   let resolved = url;
   if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('blob:') && !url.startsWith('data:')) {
     if (SERVER_ORIGIN) {
-      resolved = ${SERVER_ORIGIN};
+      resolved = `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
     }
   }
-  const activeToken = token || cachedAuthorityToken || getStoredSupabaseToken();
-  if (resolved.includes('/api/complaints/image/') && activeToken && !resolved.includes('token=')) {
+  const token = explicitToken || cachedAuthorityToken || getStoredSupabaseToken();
+  if (resolved.includes('/api/complaints/image/') && token && !resolved.includes('token=')) {
     const separator = resolved.includes('?') ? '&' : '?';
-    return ${resolved}token=;
+    return `${resolved}${separator}token=${encodeURIComponent(token)}`;
   }
   return resolved;
-}
-  if (SERVER_ORIGIN) {
-    return `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
-  }
-  return url;
 }
 
 export async function getAuthUserProfile(explicitToken?: string): Promise<AuthUserProfile> {

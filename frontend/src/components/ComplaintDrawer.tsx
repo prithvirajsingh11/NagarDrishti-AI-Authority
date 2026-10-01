@@ -641,8 +641,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                         alt="Citizen report photographic evidence"
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60';
+                          console.warn('Citizen evidence image failed to load:', (e.target as HTMLImageElement).src);
                         }}
                       />
                     </div>
@@ -673,8 +672,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                         alt="Municipal authority resolution evidence"
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60';
+                          console.warn('Resolution evidence image failed to load:', (e.target as HTMLImageElement).src);
                         }}
                       />
                     </div>
@@ -709,8 +707,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                     alt={complaint.description || 'Civic defect evidence'}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60';
+                      console.warn('Image failed to load:', (e.target as HTMLImageElement).src);
                     }}
                   />
                   <a
