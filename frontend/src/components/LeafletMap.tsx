@@ -3,7 +3,6 @@ import L from 'leaflet';
 import {
   Layers,
   Globe,
-  Building2,
   Navigation,
   Crosshair,
 } from 'lucide-react';
@@ -11,7 +10,7 @@ import type { Complaint, HeatmapPoint, HotspotInfo } from '../types/complaint';
 import { useTheme } from '../context/ThemeContext';
 
 export type MapMode = 'markers' | 'clusters' | 'heatmap';
-export type TileLayerMode = 'normal' | 'satellite' | '3d';
+export type TileLayerMode = 'normal' | 'satellite';
 
 export const DEFAULT_MAP_CENTER: [number, number] = [23.2599, 77.4126];
 export const DEFAULT_MAP_ZOOM = 12;
@@ -74,7 +73,7 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
     });
   };
 
-  // Tile Layer factory for the three supported modes
+  // Tile Layer factory for supported modes
   const getTileLayer = (mode: TileLayerMode): L.TileLayer => {
     if (mode === 'satellite') {
       return L.tileLayer(
@@ -82,16 +81,6 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
         {
           attribution: 'Tiles &copy; Esri',
           maxZoom: 18,
-        }
-      );
-    }
-    if (mode === '3d') {
-      return L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-        {
-          attribution: '&copy; CARTO',
-          subdomains: 'abcd',
-          maxZoom: 19,
         }
       );
     }
@@ -515,16 +504,6 @@ export const LeafletMap: React.FC<LeafletMapProps> = ({
           >
             <Globe className="w-3.5 h-3.5" />
             <span>Satellite</span>
-          </button>
-          <button
-            type="button"
-            data-mode="3d"
-            onClick={() => handleSwitchTileLayer('3d')}
-            className={`map-btn ${tileMode === '3d' ? 'active' : ''}`}
-            title="Carto Dark 3D Layer"
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>3D Dark</span>
           </button>
         </div>
 
