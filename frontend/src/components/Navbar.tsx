@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import {
   RefreshCw,
   ExternalLink,
@@ -7,12 +7,12 @@ import {
   Sun,
   Moon,
   Menu,
-  Shield,
   ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { CITIZEN_PORTAL_URL } from '../services/api';
+import { NagarDrishtiLogo } from './NagarDrishtiLogo';
 
 interface NavbarProps {
   title: string;
@@ -66,9 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="lg:hidden w-8 h-8 rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 text-white dark:from-slate-100 dark:to-slate-200 dark:text-slate-950 flex items-center justify-center shrink-0 shadow-xs">
-            <Shield className="w-4 h-4" />
-          </div>
+          <NagarDrishtiLogo size={32} className="lg:hidden" />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100 truncate">

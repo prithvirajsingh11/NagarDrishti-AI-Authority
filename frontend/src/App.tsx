@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
+﻿import { useEffect, useMemo, useState, useCallback } from 'react';
 import type {
   Complaint,
   ComplaintStatus,
@@ -22,6 +22,7 @@ import {
 import { supabase } from './services/supabaseClient';
 import { Sidebar, type AuthorityRoute } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
+import { NagarDrishtiLogo } from './components/NagarDrishtiLogo';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { ComplaintDrawer } from './components/ComplaintDrawer';
 import { AuthorityLanding } from './pages/AuthorityLanding';
@@ -33,7 +34,7 @@ import { LoginPage } from './pages/LoginPage';
 import { AccessDeniedPage } from './pages/AccessDeniedPage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import type { MapMode } from './components/LeafletMap';
-import { Shield } from 'lucide-react';
+
 
 export type AppRoute = AuthorityRoute | '/login' | '/access-denied';
 
@@ -361,9 +362,7 @@ function AuthorityAppContent() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 select-none">
-        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-100 mb-3 shadow-xs">
-          <Shield className="w-6 h-6" />
-        </div>
+        <NagarDrishtiLogo size={48} className="mb-3" />
         <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
         <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
       </div>
@@ -389,9 +388,7 @@ function AuthorityAppContent() {
   if (!user || !isAuthority) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-100 select-none">
-        <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-100 mb-3 shadow-xs">
-          <Shield className="w-6 h-6" />
-        </div>
+        <NagarDrishtiLogo size={48} className="mb-3" />
         <p className="text-sm font-semibold tracking-wide">NagarDrishti AI Authority</p>
         <p className="text-xs text-slate-500 mt-1">Verifying municipal session security...</p>
       </div>

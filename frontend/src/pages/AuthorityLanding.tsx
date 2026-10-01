@@ -1,5 +1,6 @@
-import React from 'react';
-import { Shield, ArrowRight } from 'lucide-react';
+﻿import React from 'react';
+import { ArrowRight } from 'lucide-react';
+import { NagarDrishtiLogo } from '../components/NagarDrishtiLogo';
 import type { DashboardStatistics } from '../types/complaint';
 
 interface AuthorityLandingProps {
@@ -14,9 +15,7 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
   return (
     <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 py-12 sm:py-20 text-center max-w-4xl mx-auto transition-colors">
       {/* Icon Badge */}
-      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mb-5 shadow-xs">
-        <Shield className="w-6 h-6 sm:w-7 sm:h-7" />
-      </div>
+      <NagarDrishtiLogo size={52} className="mb-5" />
 
       {/* Main Titles */}
       <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
@@ -72,9 +71,9 @@ export const AuthorityLanding: React.FC<AuthorityLandingProps> = ({
       {/* Footer System Architecture Info */}
       <div className="mt-14 pt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs text-slate-400 dark:text-slate-500 flex flex-wrap justify-center gap-4 sm:gap-6">
         <span>Shared FastAPI Backend</span>
-        <span>•</span>
+        <span>â€¢</span>
         <span>Supabase Spatial PostgreSQL</span>
-        <span>•</span>
+        <span>â€¢</span>
         <span>Multimodal Gemini Vision</span>
       </div>
     </div>

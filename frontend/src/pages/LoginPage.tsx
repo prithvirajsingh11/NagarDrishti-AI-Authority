@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Shield, Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff, Sun, Moon } from 'lucide-react';
+﻿import React, { useState } from 'react';
+import { Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { CITIZEN_PORTAL_URL } from '../services/api';
+import { NagarDrishtiLogo } from '../components/NagarDrishtiLogo';
 
 interface LoginPageProps {
   onLoginSuccess: () => void;
@@ -64,9 +65,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="w-12 h-12 rounded-xl bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-950 flex items-center justify-center mx-auto mb-3 shadow-xs">
-            <Shield className="w-6 h-6" />
-          </div>
+          <NagarDrishtiLogo size={48} className="mx-auto mb-3" />
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
             NagarDrishti AI
           </h1>
@@ -128,7 +127,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   className="w-full pl-10 pr-10 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-slate-400 dark:focus:border-slate-600 transition-colors"
                 />
                 <button
@@ -170,7 +169,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onAccessDe
             rel="noreferrer"
             className="text-xs text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
           >
-            Looking for public reporting? <span className="font-semibold underline">Go to Citizen Portal →</span>
+            Looking for public reporting? <span className="font-semibold underline">Go to Citizen Portal â†’</span>
           </a>
         </div>
       </div>
