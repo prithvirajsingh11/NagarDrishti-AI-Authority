@@ -147,6 +147,6 @@ npm run build
 ---
 
 ## 📚 Documentation Links
-- [System Architecture](file:///docs/ARCHITECTURE.md)
-- [Hackathon Demo Script (2.5–3 min)](file:///docs/AUTHORITY_DEMO_SCRIPT.md)
-- [Comprehensive Features Guide](file:///docs/FEATURES.md)
+- [System Architecture](docs/ARCHITECTURE.md)
+- [Hackathon Demo Script (2.5–3 min)](docs/AUTHORITY_DEMO_SCRIPT.md)
+- [Comprehensive Features Guide](docs/FEATURES.md)
