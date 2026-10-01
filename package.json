@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npm --prefix frontend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "python3 backend/run.py",
+    "dev:backend": "python backend/run.py",
     "build": "npm --prefix frontend run build",
     "preview": "npm --prefix frontend run preview",
     "postinstall": "npm --prefix frontend install",

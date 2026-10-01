@@ -1,5 +1,515 @@
 [
   {
+    "id": "1b7cac19-da1e-4b0f-82a7-4b72730df243",
+    "report_id": "NGD-2026-00124",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": "NGD-2026-00123",
+    "created_at": "2026-09-29T19:59:16.623855+00:00",
+    "updated_at": "2026-09-29T19:59:22.715209+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:59:16.623855+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:59:16.623855+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:59:16.623855+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:59:22.715209+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:59:22.715209+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:59:22.715209+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
+    "id": "8ed94a85-3e79-4663-a688-1b48a9ade63b",
+    "report_id": "NGD-2026-00123",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": "NGD-2026-00122",
+    "created_at": "2026-09-29T19:16:59.488566+00:00",
+    "updated_at": "2026-09-29T19:59:21.507114+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:16:59.488566+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:16:59.488566+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:16:59.488566+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:59:21.507114+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:59:21.507114+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:59:21.507114+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
+    "id": "98836a2a-4093-4c59-ae1e-b41993b09c03",
+    "report_id": "NGD-2026-00122",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": "NGD-2026-00121",
+    "created_at": "2026-09-29T19:07:53.653676+00:00",
+    "updated_at": "2026-09-29T19:17:04.108278+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:07:53.653676+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:07:53.653676+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:07:53.653676+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:17:04.108278+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:17:04.108278+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:17:04.108278+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
+    "id": "3030cf6d-c3fd-4b95-b2c4-c3798f514f81",
+    "report_id": "NGD-2026-00121",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": "NGD-2026-00120",
+    "created_at": "2026-09-29T19:03:11.739595+00:00",
+    "updated_at": "2026-09-29T19:07:57.64345+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:03:11.739595+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:03:11.739595+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:03:11.739595+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:07:57.64345+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:07:57.64345+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:07:57.64345+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
+    "id": "f47a8f87-f33c-4d48-abaf-ad07ee5aa3e4",
+    "report_id": "NGD-2026-00120",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": "NGD-2026-00119",
+    "created_at": "2026-09-29T19:02:34.591237+00:00",
+    "updated_at": "2026-09-29T19:03:15.763637+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:02:34.591237+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:02:34.591237+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:02:34.591237+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:03:15.763637+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:03:15.763637+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:03:15.763637+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
+    "id": "a4c1550e-06cf-46f8-8a87-e6c82da4fbf9",
+    "report_id": "NGD-2026-00119",
+    "problem_type": "pothole",
+    "confidence": 0.95,
+    "severity": "HIGH",
+    "evidence": [
+      "deep asphalt crater"
+    ],
+    "latitude": 23.2355,
+    "longitude": 77.432,
+    "location_name": "Hamidia Road, Bhopal",
+    "department": "Municipal Roads (PWD)",
+    "description": "Hazardous road crater causing traffic disruption",
+    "image_url": "https://example.com/pothole.jpg",
+    "status": "RESOLVED",
+    "duplicate_of": null,
+    "created_at": "2026-09-29T19:01:47.91086+00:00",
+    "updated_at": "2026-09-29T19:02:38.534966+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": "PENDING",
+    "citizen_resolution_confirmed": null,
+    "citizen_resolution_confirmed_at": null,
+    "citizen_verified_at": null,
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
+    "status_history": [
+      {
+        "status": "REPORTED",
+        "timestamp": "2026-09-29T19:01:47.91086+00:00",
+        "note": "Citizen submitted civic report",
+        "actor": "Citizen User",
+        "actor_role": "citizen"
+      },
+      {
+        "status": "AI_VERIFIED",
+        "timestamp": "2026-09-29T19:01:47.91086+00:00",
+        "note": "Pothole detected (95% vision confidence)",
+        "actor": "NagarDrishti Vision AI",
+        "actor_role": "ai"
+      },
+      {
+        "status": "ASSIGNED",
+        "timestamp": "2026-09-29T19:01:47.91086+00:00",
+        "note": "Assigned to Municipal Roads (PWD)",
+        "actor": "Municipal Dispatch",
+        "actor_role": "authority"
+      },
+      {
+        "status": "IN_PROGRESS",
+        "timestamp": "2026-09-29T19:02:38.534966+00:00",
+        "note": "Repair squad dispatched and work started on-site",
+        "actor": "Field Maintenance Squad",
+        "actor_role": "authority"
+      },
+      {
+        "status": "RESOLVED",
+        "timestamp": "2026-09-29T19:02:38.534966+00:00",
+        "note": "Defect rectified and resolution evidence uploaded",
+        "actor": "Municipal Authority Officer",
+        "actor_role": "authority"
+      },
+      {
+        "status": "CITIZEN_VERIFICATION_PENDING",
+        "timestamp": "2026-09-29T19:02:38.534966+00:00",
+        "note": "Pending citizen verification",
+        "actor": "Citizen Verification Cell",
+        "actor_role": "system"
+      }
+    ],
+    "priority_score": null,
+    "priority_level": null,
+    "priority_explanation": null,
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
+    "internal_notes": [],
+    "status_update_requests": []
+  },
+  {
     "id": "426a460e-6295-45b7-a8eb-22ef35d8cba8",
     "report_id": "NGD-2026-00114",
     "problem_type": "pothole",
@@ -19,7 +529,7 @@
     "status": "RESOLVED",
     "duplicate_of": "NGD-2026-00113",
     "created_at": "2026-09-29T17:49:01.181243+00:00",
-    "updated_at": "2026-09-29T18:09:46.249824+00:00",
+    "updated_at": "2026-09-29T18:48:45.988217+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -57,21 +567,21 @@
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-29T18:09:46.249824+00:00",
+        "timestamp": "2026-09-29T18:48:45.988217+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Field Maintenance Squad",
         "actor_role": "authority"
       },
       {
         "status": "RESOLVED",
-        "timestamp": "2026-09-29T18:09:46.249824+00:00",
+        "timestamp": "2026-09-29T18:48:45.988217+00:00",
         "note": "Defect rectified and resolution evidence uploaded",
         "actor": "Municipal Authority Officer",
         "actor_role": "authority"
       },
       {
         "status": "CITIZEN_VERIFICATION_PENDING",
-        "timestamp": "2026-09-29T18:09:46.249824+00:00",
+        "timestamp": "2026-09-29T18:48:45.988217+00:00",
         "note": "Pending citizen verification",
         "actor": "Citizen Verification Cell",
         "actor_role": "system"
@@ -277,8 +787,8 @@
     "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "status": "ASSIGNED",
     "duplicate_of": null,
-    "created_at": "2026-09-26T14:09:42.514213+00:00",
-    "updated_at": "2026-09-26T16:09:42.514213+00:00",
+    "created_at": "2026-09-27T23:59:47.253180+00:00",
+    "updated_at": "2026-09-28T01:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -295,21 +805,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-26T14:09:42.514213+00:00",
+        "timestamp": "2026-09-27T23:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-26T14:09:42.514213+00:00",
+        "timestamp": "2026-09-27T23:59:47.253180+00:00",
         "note": "Pothole detected (94% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-26T14:09:42.514213+00:00",
+        "timestamp": "2026-09-27T23:59:47.253180+00:00",
         "note": "Assigned to Municipal Roads (PWD)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
@@ -319,7 +829,7 @@
     "priority_level": "HIGH",
     "priority_explanation": "High priority because: High severity (+25) + Active field deployment (+5) + Unresolved for 3.2 days (+12) + 7 nearby unresolved reports (+15) + Road safety risk (+5)",
     "assigned_to": "Officer Sharma (Road Unit)",
-    "assigned_at": "2026-09-26T16:09:42.514213+00:00",
+    "assigned_at": "2026-09-28T01:59:47.253180+00:00",
     "assignment_history": [
       {
         "id": "asg-seed-001",
@@ -328,7 +838,7 @@
         "previous_assignee": null,
         "new_assignee": "Officer Sharma (Road Unit)",
         "changed_by": "Chief Zonal Engineer",
-        "timestamp": "2026-09-26T16:09:42.514213+00:00",
+        "timestamp": "2026-09-28T01:59:47.253180+00:00",
         "note": "Assigned to central night repair unit for asphalt milling"
       }
     ],
@@ -339,7 +849,7 @@
         "note": "Field inspection completed. Hot-mix asphalt truck requisitioned for night shift.",
         "author": "Officer Sharma",
         "author_role": "authority",
-        "timestamp": "2026-09-27T12:09:42.514213+00:00"
+        "timestamp": "2026-09-28T21:59:47.253180+00:00"
       }
     ],
     "status_update_requests": []
@@ -361,12 +871,12 @@
     "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "status": "RESOLVED",
     "duplicate_of": null,
-    "created_at": "2026-09-24T12:09:42.514213+00:00",
-    "updated_at": "2026-09-29T18:09:48.098902+00:00",
+    "created_at": "2026-09-25T21:59:47.253180+00:00",
+    "updated_at": "2026-09-30T01:59:47.253180+00:00",
     "resolution_image_url": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
     "resolution_image_path": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=60",
     "resolution_note": "Cold asphalt mix compacted and steam rolled across 4 sq meters to level road surface.",
-    "resolved_at": "2026-09-28T16:09:42.514213+00:00",
+    "resolved_at": "2026-09-30T01:59:47.253180+00:00",
     "resolved_by": "Municipal Roads (PWD Officer)",
     "citizen_verification_status": "PENDING",
     "citizen_resolution_confirmed": null,
@@ -379,59 +889,45 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-24T12:09:42.514213+00:00",
+        "timestamp": "2026-09-25T21:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-24T12:09:42.514213+00:00",
+        "timestamp": "2026-09-25T21:59:47.253180+00:00",
         "note": "Pothole detected (82% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-24T12:09:42.514213+00:00",
+        "timestamp": "2026-09-25T21:59:47.253180+00:00",
         "note": "Assigned to Municipal Roads (PWD)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-28T16:09:42.514213+00:00",
+        "timestamp": "2026-09-30T01:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Municipal Roads (PWD Officer)",
         "actor_role": "authority"
       },
       {
         "status": "RESOLVED",
-        "timestamp": "2026-09-28T16:09:42.514213+00:00",
+        "timestamp": "2026-09-30T01:59:47.253180+00:00",
         "note": "Cold asphalt mix compacted and steam rolled across 4 sq meters to level road surface.",
         "actor": "Municipal Roads (PWD Officer)",
         "actor_role": "authority"
       },
       {
         "status": "CITIZEN_VERIFICATION_PENDING",
-        "timestamp": "2026-09-28T16:09:42.514213+00:00",
+        "timestamp": "2026-09-30T01:59:47.253180+00:00",
         "note": "Pending citizen verification",
         "actor": "Citizen Verification Cell",
         "actor_role": "system"
-      },
-      {
-        "status": "INTERNAL_NOTE",
-        "timestamp": "2026-09-29T18:09:48.079485+00:00",
-        "note": "Internal note: Material procurement pending for bitumen grade 60/70.",
-        "actor": "Executive Engineer Phase 7",
-        "actor_role": "authority"
-      },
-      {
-        "status": "INTERNAL_NOTE",
-        "timestamp": "2026-09-29T18:09:48.098902+00:00",
-        "note": "Internal note: Contractor contacted; equipment rolling at 22:30.",
-        "actor": "Executive Engineer Phase 7",
-        "actor_role": "authority"
       }
     ],
     "priority_score": 0.0,
@@ -440,24 +936,7 @@
     "assigned_to": null,
     "assigned_at": null,
     "assignment_history": [],
-    "internal_notes": [
-      {
-        "id": "8c8e8354-fd66-4a88-910e-671dda88db57",
-        "complaint_id": "NGD-2026-00105",
-        "note": "Material procurement pending for bitumen grade 60/70.",
-        "author": "Executive Engineer Phase 7",
-        "author_role": "authority",
-        "timestamp": "2026-09-29T18:09:48.079485+00:00"
-      },
-      {
-        "id": "467c64f6-04e8-4b3c-904a-0e7b340ee8e0",
-        "complaint_id": "NGD-2026-00105",
-        "note": "Contractor contacted; equipment rolling at 22:30.",
-        "author": "Executive Engineer Phase 7",
-        "author_role": "authority",
-        "timestamp": "2026-09-29T18:09:48.098902+00:00"
-      }
-    ],
+    "internal_notes": [],
     "status_update_requests": []
   },
   {
@@ -478,8 +957,8 @@
     "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "status": "IN_PROGRESS",
     "duplicate_of": null,
-    "created_at": "2026-09-28T10:09:42.514213+00:00",
-    "updated_at": "2026-09-29T14:09:42.514213+00:00",
+    "created_at": "2026-09-29T19:59:47.253180+00:00",
+    "updated_at": "2026-09-30T23:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -496,28 +975,28 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-28T10:09:42.514213+00:00",
+        "timestamp": "2026-09-29T19:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-28T10:09:42.514213+00:00",
+        "timestamp": "2026-09-29T19:59:47.253180+00:00",
         "note": "Pothole detected (91% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-28T10:09:42.514213+00:00",
+        "timestamp": "2026-09-29T19:59:47.253180+00:00",
         "note": "Assigned to Municipal Roads (PWD)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-29T14:09:42.514213+00:00",
+        "timestamp": "2026-09-30T23:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Field Maintenance Squad",
         "actor_role": "authority"
@@ -549,8 +1028,8 @@
     "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "status": "REPORTED",
     "duplicate_of": "NGD-2026-00101",
-    "created_at": "2026-09-29T15:09:42.514213+00:00",
-    "updated_at": "2026-09-29T15:09:42.514213+00:00",
+    "created_at": "2026-10-01T00:59:47.253180+00:00",
+    "updated_at": "2026-10-01T00:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -567,21 +1046,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-29T15:09:42.514213+00:00",
+        "timestamp": "2026-10-01T00:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-29T15:09:42.514213+00:00",
+        "timestamp": "2026-10-01T00:59:47.253180+00:00",
         "note": "Pothole detected (93% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-29T15:09:42.514213+00:00",
+        "timestamp": "2026-10-01T00:59:47.253180+00:00",
         "note": "Assigned to Municipal Roads (PWD)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
@@ -614,8 +1093,8 @@
     "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
     "status": "ASSIGNED",
     "duplicate_of": null,
-    "created_at": "2026-09-25T16:09:42.514213+00:00",
-    "updated_at": "2026-09-27T17:09:42.514213+00:00",
+    "created_at": "2026-09-27T01:59:47.253180+00:00",
+    "updated_at": "2026-09-29T02:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -632,21 +1111,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-25T16:09:42.514213+00:00",
+        "timestamp": "2026-09-27T01:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-25T16:09:42.514213+00:00",
+        "timestamp": "2026-09-27T01:59:47.253180+00:00",
         "note": "Garbage detected (91% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-25T16:09:42.514213+00:00",
+        "timestamp": "2026-09-27T01:59:47.253180+00:00",
         "note": "Assigned to MCD Sanitation & Solid Waste",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
@@ -674,13 +1153,13 @@
     "latitude": 28.6532,
     "longitude": 77.1912,
     "location_name": "Arya Samaj Road crossing, Karol Bagh",
-    "department": "Municipal Roads (PWD)",
+    "department": "MCD Sanitation & Solid Waste",
     "description": "Commercial waste dumped overnight near vegetable market.",
     "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
-    "status": "ASSIGNED",
+    "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T13:09:42.514213+00:00",
-    "updated_at": "2026-09-29T18:09:47.485438+00:00",
+    "created_at": "2026-09-28T22:59:47.253180+00:00",
+    "updated_at": "2026-09-28T22:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -697,67 +1176,32 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-27T13:09:42.514213+00:00",
+        "timestamp": "2026-09-28T22:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-27T13:09:42.514213+00:00",
+        "timestamp": "2026-09-28T22:59:47.253180+00:00",
         "note": "Garbage detected (89% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-27T13:09:42.514213+00:00",
+        "timestamp": "2026-09-28T22:59:47.253180+00:00",
         "note": "Assigned to MCD Sanitation & Solid Waste",
         "actor": "Municipal Dispatch",
-        "actor_role": "authority"
-      },
-      {
-        "status": "ASSIGNED",
-        "timestamp": "2026-09-29T18:09:47.285108+00:00",
-        "note": "Assigned to Municipal Roads (PWD) — Team/Officer: Officer A (Bhopal Rapid Patch Squad) (Immediate night milling and hot asphalt filling required.)",
-        "actor": "Executive Engineer Phase 7",
-        "actor_role": "authority"
-      },
-      {
-        "status": "ASSIGNED",
-        "timestamp": "2026-09-29T18:09:47.485438+00:00",
-        "note": "Assigned to Municipal Roads (PWD) — Team/Officer: Officer B (Zonal Heavy Equipment Unit) (Reassigned due to larger paver equipment requirement.)",
-        "actor": "Executive Engineer Phase 7",
         "actor_role": "authority"
       }
     ],
     "priority_score": 49.0,
     "priority_level": "MEDIUM",
     "priority_explanation": "Medium priority because: High severity (+25) + Untriaged intake (+8) + Unresolved for 2.2 days (+6) + 3 nearby unresolved reports (+8) + Sanitation accumulation (+2)",
-    "assigned_to": "Officer B (Zonal Heavy Equipment Unit)",
-    "assigned_at": "2026-09-29T18:09:47.485438+00:00",
-    "assignment_history": [
-      {
-        "id": "7ad52a27-8ab9-4ff8-b005-d3372fdca23d",
-        "previous_department": "MCD Sanitation & Solid Waste",
-        "new_department": "Municipal Roads (PWD)",
-        "previous_assignee": null,
-        "new_assignee": "Officer A (Bhopal Rapid Patch Squad)",
-        "changed_by": "Executive Engineer Phase 7",
-        "timestamp": "2026-09-29T18:09:47.285108+00:00",
-        "note": "Immediate night milling and hot asphalt filling required."
-      },
-      {
-        "id": "c0bc355c-d9b2-47aa-a331-fee22d1f01fe",
-        "previous_department": "Municipal Roads (PWD)",
-        "new_department": "Municipal Roads (PWD)",
-        "previous_assignee": "Officer A (Bhopal Rapid Patch Squad)",
-        "new_assignee": "Officer B (Zonal Heavy Equipment Unit)",
-        "changed_by": "Executive Engineer Phase 7",
-        "timestamp": "2026-09-29T18:09:47.485438+00:00",
-        "note": "Reassigned due to larger paver equipment requirement."
-      }
-    ],
+    "assigned_to": null,
+    "assigned_at": null,
+    "assignment_history": [],
     "internal_notes": [],
     "status_update_requests": []
   },
@@ -778,8 +1222,8 @@
     "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
     "status": "IN_PROGRESS",
     "duplicate_of": null,
-    "created_at": "2026-09-26T11:09:42.514213+00:00",
-    "updated_at": "2026-09-29T13:09:42.514213+00:00",
+    "created_at": "2026-09-27T20:59:47.253180+00:00",
+    "updated_at": "2026-09-30T22:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -796,28 +1240,28 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-26T11:09:42.514213+00:00",
+        "timestamp": "2026-09-27T20:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-26T11:09:42.514213+00:00",
+        "timestamp": "2026-09-27T20:59:47.253180+00:00",
         "note": "Garbage detected (85% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-26T11:09:42.514213+00:00",
+        "timestamp": "2026-09-27T20:59:47.253180+00:00",
         "note": "Assigned to MCD Sanitation & Solid Waste",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-29T13:09:42.514213+00:00",
+        "timestamp": "2026-09-30T22:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Field Maintenance Squad",
         "actor_role": "authority"
@@ -850,8 +1294,8 @@
     "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
     "status": "IN_PROGRESS",
     "duplicate_of": null,
-    "created_at": "2026-09-25T09:09:42.514213+00:00",
-    "updated_at": "2026-09-28T14:09:42.514213+00:00",
+    "created_at": "2026-09-26T18:59:47.253180+00:00",
+    "updated_at": "2026-09-29T23:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -868,28 +1312,28 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-25T09:09:42.514213+00:00",
+        "timestamp": "2026-09-26T18:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-25T09:09:42.514213+00:00",
+        "timestamp": "2026-09-26T18:59:47.253180+00:00",
         "note": "Streetlight detected (88% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-25T09:09:42.514213+00:00",
+        "timestamp": "2026-09-26T18:59:47.253180+00:00",
         "note": "Assigned to BSES / Municipal Street Lighting Cell",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-28T14:09:42.514213+00:00",
+        "timestamp": "2026-09-29T23:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Field Maintenance Squad",
         "actor_role": "authority"
@@ -921,8 +1365,8 @@
     "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-28T15:09:42.514213+00:00",
-    "updated_at": "2026-09-28T15:09:42.514213+00:00",
+    "created_at": "2026-09-30T00:59:47.253180+00:00",
+    "updated_at": "2026-09-30T00:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -939,21 +1383,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-28T15:09:42.514213+00:00",
+        "timestamp": "2026-09-30T00:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-28T15:09:42.514213+00:00",
+        "timestamp": "2026-09-30T00:59:47.253180+00:00",
         "note": "Streetlight detected (92% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-28T15:09:42.514213+00:00",
+        "timestamp": "2026-09-30T00:59:47.253180+00:00",
         "note": "Assigned to BSES / Municipal Street Lighting Cell",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
@@ -986,8 +1430,8 @@
     "image_url": "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?w=800&auto=format&fit=crop&q=60",
     "status": "ASSIGNED",
     "duplicate_of": null,
-    "created_at": "2026-09-29T12:09:42.514213+00:00",
-    "updated_at": "2026-09-29T16:09:42.514213+00:00",
+    "created_at": "2026-09-30T21:59:47.253180+00:00",
+    "updated_at": "2026-10-01T01:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -1004,21 +1448,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-29T12:09:42.514213+00:00",
+        "timestamp": "2026-09-30T21:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-29T12:09:42.514213+00:00",
+        "timestamp": "2026-09-30T21:59:47.253180+00:00",
         "note": "Streetlight detected (95% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-29T12:09:42.514213+00:00",
+        "timestamp": "2026-09-30T21:59:47.253180+00:00",
         "note": "Assigned to BSES / Municipal Street Lighting Cell",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
@@ -1051,8 +1495,8 @@
     "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-27T10:09:42.514213+00:00",
-    "updated_at": "2026-09-29T18:09:48.170312+00:00",
+    "created_at": "2026-09-28T19:59:47.253180+00:00",
+    "updated_at": "2026-09-28T19:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -1069,37 +1513,23 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-27T10:09:42.514213+00:00",
+        "timestamp": "2026-09-28T19:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-27T10:09:42.514213+00:00",
+        "timestamp": "2026-09-28T19:59:47.253180+00:00",
         "note": "Drain detected (95% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-27T10:09:42.514213+00:00",
+        "timestamp": "2026-09-28T19:59:47.253180+00:00",
         "note": "Assigned to Delhi Jal Board (DJB)",
         "actor": "Municipal Dispatch",
-        "actor_role": "authority"
-      },
-      {
-        "status": "STATUS_UPDATE_REQUESTED",
-        "timestamp": "2026-09-29T18:09:48.133649+00:00",
-        "note": "Citizen requested status update: \"Water logging increasing near storefront. Need update please.\"",
-        "actor": "Citizen User",
-        "actor_role": "citizen"
-      },
-      {
-        "status": "STATUS_REQUEST_ACKNOWLEDGED",
-        "timestamp": "2026-09-29T18:09:48.170312+00:00",
-        "note": "Status update request acknowledged by Executive Engineer Phase 7: \"Drainage jetting unit deployed; estimated clearance 45 mins.\"",
-        "actor": "Executive Engineer Phase 7",
         "actor_role": "authority"
       }
     ],
@@ -1110,26 +1540,7 @@
     "assigned_at": null,
     "assignment_history": [],
     "internal_notes": [],
-    "status_update_requests": [
-      {
-        "id": "e737973e-5a2a-4112-b628-91e9fef95ce1",
-        "complaint_id": "NGD-2026-00104",
-        "report_id": "NGD-2026-00104",
-        "problem_type": "drain",
-        "issue_type": "drain",
-        "location_name": "Janpath Lane near Central Cottage",
-        "current_status": "REPORTED",
-        "requested_at": "2026-09-29T18:09:48.133649+00:00",
-        "request_date": "2026-09-29T18:09:48.133649+00:00",
-        "citizen_message": "Water logging increasing near storefront. Need update please.",
-        "status": "OPEN",
-        "state": "ACKNOWLEDGED",
-        "acknowledged_at": "2026-09-29T18:09:48.170312+00:00",
-        "acknowledged_by": "Executive Engineer Phase 7",
-        "citizen_notified": true,
-        "response_note": "Drainage jetting unit deployed; estimated clearance 45 mins."
-      }
-    ]
+    "status_update_requests": []
   },
   {
     "id": "c015",
@@ -1148,17 +1559,17 @@
     "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
     "status": "RESOLVED",
     "duplicate_of": null,
-    "created_at": "2026-09-23T14:09:42.514213+00:00",
-    "updated_at": "2026-09-28T06:09:42.514213+00:00",
+    "created_at": "2026-09-24T23:59:47.253180+00:00",
+    "updated_at": "2026-09-29T15:59:47.253180+00:00",
     "resolution_image_url": "https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
     "resolution_image_path": "https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&auto=format&fit=crop&q=60",
     "resolution_note": "Stormwater grating desilted, solid trash cleared and drain flushing completed.",
-    "resolved_at": "2026-09-27T16:09:42.514213+00:00",
+    "resolved_at": "2026-09-29T01:59:47.253180+00:00",
     "resolved_by": "Delhi Jal Board Zonal Super",
     "citizen_verification_status": "CONFIRMED",
     "citizen_resolution_confirmed": true,
-    "citizen_resolution_confirmed_at": "2026-09-28T06:09:42.514213+00:00",
-    "citizen_verified_at": "2026-09-28T06:09:42.514213+00:00",
+    "citizen_resolution_confirmed_at": "2026-09-29T15:59:47.253180+00:00",
+    "citizen_verified_at": "2026-09-29T15:59:47.253180+00:00",
     "citizen_reopened": false,
     "citizen_reopened_at": null,
     "reopened_at": null,
@@ -1166,42 +1577,42 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-23T14:09:42.514213+00:00",
+        "timestamp": "2026-09-24T23:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-23T14:09:42.514213+00:00",
+        "timestamp": "2026-09-24T23:59:47.253180+00:00",
         "note": "Drain detected (81% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-23T14:09:42.514213+00:00",
+        "timestamp": "2026-09-24T23:59:47.253180+00:00",
         "note": "Assigned to Delhi Jal Board (DJB)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-28T06:09:42.514213+00:00",
+        "timestamp": "2026-09-29T15:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Delhi Jal Board Zonal Super",
         "actor_role": "authority"
       },
       {
         "status": "RESOLVED",
-        "timestamp": "2026-09-27T16:09:42.514213+00:00",
+        "timestamp": "2026-09-29T01:59:47.253180+00:00",
         "note": "Stormwater grating desilted, solid trash cleared and drain flushing completed.",
         "actor": "Delhi Jal Board Zonal Super",
         "actor_role": "authority"
       },
       {
         "status": "CITIZEN_CONFIRMED",
-        "timestamp": "2026-09-28T06:09:42.514213+00:00",
+        "timestamp": "2026-09-29T15:59:47.253180+00:00",
         "note": "Citizen confirmed resolution",
         "actor": "Citizen User",
         "actor_role": "citizen"
@@ -1231,63 +1642,49 @@
     "department": "Delhi Traffic Police & Civic Oversight",
     "description": "Barricade leaning into footpath.",
     "image_url": "https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=60",
-    "status": "REOPENED",
+    "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-29T17:09:42.514213+00:00",
-    "updated_at": "2026-09-29T18:09:46.801790+00:00",
-    "resolution_image_url": "/api/complaints/image/res_work2.jpg",
-    "resolution_image_path": "/api/complaints/image/res_work2.jpg",
-    "resolution_note": "Drain unclogged",
-    "resolved_at": "2026-09-29T18:09:46.396713+00:00",
-    "resolved_by": "Superintending Engineer",
-    "citizen_verification_status": "REOPENED",
-    "citizen_resolution_confirmed": false,
+    "created_at": "2026-10-01T02:59:47.253180+00:00",
+    "updated_at": "2026-10-01T02:59:47.253180+00:00",
+    "resolution_image_url": null,
+    "resolution_image_path": null,
+    "resolution_note": null,
+    "resolved_at": null,
+    "resolved_by": null,
+    "citizen_verification_status": null,
+    "citizen_resolution_confirmed": null,
     "citizen_resolution_confirmed_at": null,
     "citizen_verified_at": null,
-    "citizen_reopened": true,
-    "citizen_reopened_at": "2026-09-29T18:09:46.801790+00:00",
-    "reopened_at": "2026-09-29T18:09:46.801790+00:00",
-    "reopen_reason": "Water is still overflowing across the walkway.",
+    "citizen_reopened": null,
+    "citizen_reopened_at": null,
+    "reopened_at": null,
+    "reopen_reason": null,
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-29T17:09:42.514213+00:00",
+        "timestamp": "2026-10-01T02:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-29T17:09:42.514213+00:00",
+        "timestamp": "2026-10-01T02:59:47.253180+00:00",
         "note": "Other detected (76% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-29T17:09:42.514213+00:00",
+        "timestamp": "2026-10-01T02:59:47.253180+00:00",
         "note": "Assigned to Delhi Traffic Police & Civic Oversight",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
-      },
-      {
-        "status": "RESOLVED",
-        "timestamp": "2026-09-29T18:09:46.396713+00:00",
-        "note": "Drain unclogged",
-        "actor": "Superintending Engineer",
-        "actor_role": "authority"
-      },
-      {
-        "status": "REOPENED",
-        "timestamp": "2026-09-29T18:09:46.801790+00:00",
-        "note": "Water is still overflowing across the walkway.",
-        "actor": "Citizen User",
-        "actor_role": "citizen"
       }
     ],
-    "priority_score": 53.0,
-    "priority_level": "HIGH",
-    "priority_explanation": "High priority because: Low severity (+5) + Reopened by citizen (+20) + Reopened status (+10) + Fresh intake < 24h (+2) + 8 nearby unresolved reports (+15) + General infrastructure (+1)",
+    "priority_score": 31.0,
+    "priority_level": "MEDIUM",
+    "priority_explanation": "Medium priority because: Low severity (+5) + Untriaged intake (+8) + Fresh intake < 24h (+2) + 8 nearby unresolved reports (+15) + General infrastructure (+1)",
     "assigned_to": null,
     "assigned_at": null,
     "assignment_history": [],
@@ -1311,60 +1708,60 @@
     "image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "status": "REOPENED",
     "duplicate_of": null,
-    "created_at": "2026-09-24T16:09:42.514213+00:00",
-    "updated_at": "2026-09-29T13:09:42.514213+00:00",
+    "created_at": "2026-09-26T01:59:47.253180+00:00",
+    "updated_at": "2026-09-30T22:59:47.253180+00:00",
     "resolution_image_url": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "resolution_image_path": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=60",
     "resolution_note": "Crack in road sealed by municipal maintenance squad.",
-    "resolved_at": "2026-09-27T17:09:42.514213+00:00",
+    "resolved_at": "2026-09-29T02:59:47.253180+00:00",
     "resolved_by": "Municipal Roads (PWD Squad 4)",
     "citizen_verification_status": "REOPENED",
     "citizen_resolution_confirmed": false,
     "citizen_resolution_confirmed_at": null,
     "citizen_verified_at": null,
     "citizen_reopened": true,
-    "citizen_reopened_at": "2026-09-29T13:09:42.514213+00:00",
-    "reopened_at": "2026-09-29T13:09:42.514213+00:00",
+    "citizen_reopened_at": "2026-09-30T22:59:47.253180+00:00",
+    "reopened_at": "2026-09-30T22:59:47.253180+00:00",
     "reopen_reason": "The pothole is still present beside the repaired section.",
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-24T16:09:42.514213+00:00",
+        "timestamp": "2026-09-26T01:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-24T16:09:42.514213+00:00",
+        "timestamp": "2026-09-26T01:59:47.253180+00:00",
         "note": "Pothole detected (85% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-24T16:09:42.514213+00:00",
+        "timestamp": "2026-09-26T01:59:47.253180+00:00",
         "note": "Assigned to Municipal Roads (PWD)",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"
       },
       {
         "status": "IN_PROGRESS",
-        "timestamp": "2026-09-29T13:09:42.514213+00:00",
+        "timestamp": "2026-09-30T22:59:47.253180+00:00",
         "note": "Repair squad dispatched and work started on-site",
         "actor": "Municipal Roads (PWD Squad 4)",
         "actor_role": "authority"
       },
       {
         "status": "RESOLVED",
-        "timestamp": "2026-09-27T17:09:42.514213+00:00",
+        "timestamp": "2026-09-29T02:59:47.253180+00:00",
         "note": "Crack in road sealed by municipal maintenance squad.",
         "actor": "Municipal Roads (PWD Squad 4)",
         "actor_role": "authority"
       },
       {
         "status": "REOPENED",
-        "timestamp": "2026-09-29T13:09:42.514213+00:00",
+        "timestamp": "2026-09-30T22:59:47.253180+00:00",
         "note": "The pothole is still present beside the repaired section.",
         "actor": "Citizen User",
         "actor_role": "citizen"
@@ -1386,8 +1783,8 @@
         "issue_type": "pothole",
         "location_name": "Connaught Place Inner Circle Radial 1",
         "current_status": "REOPENED",
-        "requested_at": "2026-09-29T15:09:42.514213+00:00",
-        "request_date": "2026-09-29T15:09:42.514213+00:00",
+        "requested_at": "2026-10-01T00:59:47.253180+00:00",
+        "request_date": "2026-10-01T00:59:47.253180+00:00",
         "citizen_message": "The pothole was marked repaired but gravel came loose again. Please expedite.",
         "status": "OPEN",
         "state": "OPEN",
@@ -1415,8 +1812,8 @@
     "image_url": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=60",
     "status": "REPORTED",
     "duplicate_of": null,
-    "created_at": "2026-09-29T14:09:42.514213+00:00",
-    "updated_at": "2026-09-29T14:09:42.514213+00:00",
+    "created_at": "2026-09-30T23:59:47.253180+00:00",
+    "updated_at": "2026-09-30T23:59:47.253180+00:00",
     "resolution_image_url": null,
     "resolution_image_path": null,
     "resolution_note": null,
@@ -1433,21 +1830,21 @@
     "status_history": [
       {
         "status": "REPORTED",
-        "timestamp": "2026-09-29T14:09:42.514213+00:00",
+        "timestamp": "2026-09-30T23:59:47.253180+00:00",
         "note": "Citizen submitted civic report",
         "actor": "Citizen User",
         "actor_role": "citizen"
       },
       {
         "status": "AI_VERIFIED",
-        "timestamp": "2026-09-29T14:09:42.514213+00:00",
+        "timestamp": "2026-09-30T23:59:47.253180+00:00",
         "note": "Garbage detected (92% vision confidence)",
         "actor": "NagarDrishti Vision AI",
         "actor_role": "ai"
       },
       {
         "status": "ASSIGNED",
-        "timestamp": "2026-09-29T14:09:42.514213+00:00",
+        "timestamp": "2026-09-30T23:59:47.253180+00:00",
         "note": "Assigned to MCD Sanitation & Solid Waste",
         "actor": "Municipal Dispatch",
         "actor_role": "authority"

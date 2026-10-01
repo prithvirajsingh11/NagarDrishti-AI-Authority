@@ -210,43 +210,6 @@ describe('Phase 8: Governance Reporting + Outcome Intelligence + Hackathon Readi
     },
   };
 
-  it('renders the Hackathon Civic Lifecycle Pipeline Ribbon at top of Command Center', () => {
-    render(
-      <CommandCenter
-        stats={mockStats}
-        complaints={mockComplaints}
-        heatmapPoints={[]}
-        departments={mockDepartments}
-        loading={false}
-        onSelectComplaint={vi.fn()}
-        onSelectHotspot={vi.fn()}
-        focusedHotspot={null}
-        mapMode="markers"
-        onMapModeChange={vi.fn()}
-        categoryFilter=""
-        onCategoryFilterChange={vi.fn()}
-        severityFilter=""
-        onSeverityFilterChange={vi.fn()}
-        statusFilter=""
-        onStatusFilterChange={vi.fn()}
-        departmentFilter=""
-        onDepartmentFilterChange={vi.fn()}
-        dateHorizon="all"
-        onDateHorizonChange={vi.fn()}
-        searchQuery=""
-        onSearchQueryChange={vi.fn()}
-        onResetFilters={vi.fn()}
-        onNavigateToReports={vi.fn()}
-        onNavigateToHotspots={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText(/NagarDrishti Civic Lifecycle Pipeline/i)).toBeInTheDocument();
-    expect(screen.getByText(/Citizen Reports/i)).toBeInTheDocument();
-    expect(screen.getByText(/AI Classification/i)).toBeInTheDocument();
-    expect(screen.getByText(/Geographic Intelligence/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Citizen Verification/i).length).toBeGreaterThan(0);
-  });
 
   it('renders Governance Outcomes Summary with evidence-based metrics and trust indicator', () => {
     render(

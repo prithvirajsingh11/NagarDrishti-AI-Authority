@@ -378,47 +378,6 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         </div>
       )}
 
-      {/* Phase 8: Hackathon Civic Lifecycle Pipeline Ribbon */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 shadow-xs">
-        <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
-              NagarDrishti Civic Lifecycle Pipeline
-            </h4>
-          </div>
-          <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">
-            Intake → AI Vision → GIS → Priority → Dispatch → Evidence → Citizen Sign-off
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none touch-pan-x text-[11px] font-semibold py-1">
-          {[
-            { step: '1', title: 'Citizen Reports', desc: 'Direct Intake' },
-            { step: '2', title: 'AI Classification', desc: 'Gemini Vision' },
-            { step: '3', title: 'Geographic Intelligence', desc: 'GIS Clustering' },
-            { step: '4', title: 'Priority', desc: 'Deterministic Index' },
-            { step: '5', title: 'Assignment', desc: 'Department Dispatch' },
-            { step: '6', title: 'Action', desc: 'Field Execution' },
-            { step: '7', title: 'Resolution', desc: 'Evidence Upload' },
-            { step: '8', title: 'Citizen Verification', desc: 'Close / Reopen' },
-          ].map((item, idx, arr) => (
-            <React.Fragment key={item.step}>
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 shrink-0">
-                <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 text-[10px] font-bold flex items-center justify-center font-mono">
-                  #{item.step}
-                </span>
-                <div>
-                  <div className="leading-tight">{item.title}</div>
-                  <div className="text-[9px] text-slate-400 font-normal leading-none">{item.desc}</div>
-                </div>
-              </div>
-              {idx < arr.length - 1 && (
-                <ArrowRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700 shrink-0" />
-              )}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
 
       {/* High-Visibility Reopened Alert Indicator */}
       {(stats?.reopened ?? 0) > 0 && (
