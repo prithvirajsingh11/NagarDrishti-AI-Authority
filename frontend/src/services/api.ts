@@ -164,13 +164,34 @@ if (typeof window !== 'undefined') {
   } catch {}
 }
 
+const SUPABASE_STORAGE_BASE = `${(import.meta.env.VITE_SUPABASE_URL || 'https://otjbonkovzciglttxfzz.supabase.co').replace(/\/+$/, '')}/storage/v1/object/public/complaint-images`;
+
 export function resolveImageUrl(url?: string | null, explicitToken?: string | null): string {
   if (!url) return '';
-  let resolved = url;
-  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('blob:') && !url.startsWith('data:')) {
-    if (SERVER_ORIGIN) {
-      resolved = `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
+  if (url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+
+  // Fast-path: map complaint images directly to Supabase Storage public CDN
+  if (url.includes('/api/complaints/image/')) {
+    const filename = url.split('/api/complaints/image/')[1]?.split('?')[0];
+    if (filename) {
+      return `${SUPABASE_STORAGE_BASE}/${filename}`;
     }
+  }
+
+  // Bare filenames like 48ded66468a74b6abfaa66a460991445.jpg or uuid.png
+  if (/^[a-f0-9-]+\.(jpg|jpeg|png|webp|gif)$/i.test(url)) {
+    return `${SUPABASE_STORAGE_BASE}/${url}`;
+  }
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  let resolved = url;
+  if (SERVER_ORIGIN) {
+    resolved = `${SERVER_ORIGIN}${url.startsWith('/') ? '' : '/'}${url}`;
   }
   const token = explicitToken || cachedAuthorityToken || getStoredSupabaseToken();
   if (resolved.includes('/api/complaints/image/') && token && !resolved.includes('token=')) {

@@ -21,6 +21,7 @@ import {
   Send,
   History,
   User,
+  ImageOff,
 } from 'lucide-react';
 import type { Complaint, ComplaintStatus, Department } from '../types/complaint';
 import { ProblemIcon, getProblemLabel } from './ProblemIcon';
@@ -78,6 +79,15 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
   const [resolutionError, setResolutionError] = useState<string | null>(null);
   const [isSubmittingResolution, setIsSubmittingResolution] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Evidence image load error states
+  const [evidenceImgError, setEvidenceImgError] = useState(false);
+  const [resolutionImgError, setResolutionImgError] = useState(false);
+
+  useEffect(() => {
+    setEvidenceImgError(false);
+    setResolutionImgError(false);
+  }, [complaint?.id, complaint?.image_url]);
 
   // Phase 7: Case Assignment State
   const [assignDept, setAssignDept] = useState(complaint?.department || '');
@@ -636,14 +646,29 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                       </a>
                     </div>
                     <div className="rounded-xl overflow-hidden aspect-video bg-slate-200 dark:bg-slate-950 relative group">
-                      <img
-                        src={resolveImageUrl(complaint.image_url)}
-                        alt="Citizen report photographic evidence"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.warn('Citizen evidence image failed to load:', (e.target as HTMLImageElement).src);
-                        }}
-                      />
+                      {evidenceImgError ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-900/60">
+                          <ImageOff className="w-5 h-5 mb-1 opacity-50" />
+                          <span className="text-[10px]">Photo unavailable</span>
+                        </div>
+                      ) : (
+                        <img
+                          src={resolveImageUrl(complaint.image_url)}
+                          alt="Citizen report photographic evidence"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            if (complaint.image_url && !img.src.includes('supabase.co')) {
+                              const filename = complaint.image_url.split('/api/complaints/image/')[1]?.split('?')[0];
+                              if (filename) {
+                                img.src = `https://otjbonkovzciglttxfzz.supabase.co/storage/v1/object/public/complaint-images/${filename}`;
+                                return;
+                              }
+                            }
+                            setEvidenceImgError(true);
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -667,14 +692,29 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                       </a>
                     </div>
                     <div className="rounded-xl overflow-hidden aspect-video bg-slate-200 dark:bg-slate-950 relative group">
-                      <img
-                        src={resolveImageUrl(resolutionImage)}
-                        alt="Municipal authority resolution evidence"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          console.warn('Resolution evidence image failed to load:', (e.target as HTMLImageElement).src);
-                        }}
-                      />
+                      {resolutionImgError ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-3 text-center text-emerald-600/70 dark:text-emerald-400/60 bg-emerald-50/50 dark:bg-emerald-950/30">
+                          <ImageOff className="w-5 h-5 mb-1 opacity-50" />
+                          <span className="text-[10px]">Resolution photo unavailable</span>
+                        </div>
+                      ) : (
+                        <img
+                          src={resolveImageUrl(resolutionImage)}
+                          alt="Municipal authority resolution evidence"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            if (resolutionImage && !img.src.includes('supabase.co')) {
+                              const filename = resolutionImage.split('/api/complaints/image/')[1]?.split('?')[0];
+                              if (filename) {
+                                img.src = `https://otjbonkovzciglttxfzz.supabase.co/storage/v1/object/public/complaint-images/${filename}`;
+                                return;
+                              }
+                            }
+                            setResolutionImgError(true);
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -702,23 +742,43 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
                   Citizen Photographic Evidence
                 </h4>
                 <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 aspect-video relative group shadow-2xs">
-                  <img
-                    src={resolveImageUrl(complaint.image_url)}
-                    alt={complaint.description || 'Civic defect evidence'}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      console.warn('Image failed to load:', (e.target as HTMLImageElement).src);
-                    }}
-                  />
-                  <a
-                    href={resolveImageUrl(complaint.image_url)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="absolute bottom-2.5 right-2.5 px-3 py-1.5 rounded-xl bg-white/95 dark:bg-slate-950/90 hover:bg-white text-[11px] font-semibold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 transition-all shadow-md"
-                  >
-                    <span>Full Image</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                  {evidenceImgError || !complaint.image_url ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/40">
+                      <ImageOff className="w-8 h-8 mb-2 opacity-50 text-slate-400" />
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Photographic Evidence Unavailable</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 max-w-xs">
+                        No image proof recorded or file is not accessible from CDN storage
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src={resolveImageUrl(complaint.image_url)}
+                        alt={complaint.description || 'Civic defect evidence'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          if (complaint.image_url && !img.src.includes('supabase.co')) {
+                            const filename = complaint.image_url.split('/api/complaints/image/')[1]?.split('?')[0];
+                            if (filename) {
+                              img.src = `https://otjbonkovzciglttxfzz.supabase.co/storage/v1/object/public/complaint-images/${filename}`;
+                              return;
+                            }
+                          }
+                          setEvidenceImgError(true);
+                        }}
+                      />
+                      <a
+                        href={resolveImageUrl(complaint.image_url)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="absolute bottom-2.5 right-2.5 px-3 py-1.5 rounded-xl bg-white/95 dark:bg-slate-950/90 hover:bg-white text-[11px] font-semibold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-800 flex items-center gap-1.5 transition-all shadow-md"
+                      >
+                        <span>Full Image</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </>
+                  )}
                 </div>
                 {complaint.description && (
                   <p className="text-xs text-slate-600 dark:text-slate-300 mt-2.5 bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800/80 leading-relaxed italic">
