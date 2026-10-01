@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const displayName = user?.fullName || (user?.email ? user.email.split('@')[0] : 'Officer');
 
   return (
-    <header className="h-16 pt-[env(safe-area-inset-top,0px)] bg-white/85 dark:bg-slate-950/85 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 select-none">
+    <header className="h-[70px] min-h-[70px] shrink-0 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-all duration-200 select-none">
       {/* Left Title & Mobile Menu Trigger */}
       <div className="flex items-center gap-3 min-w-0">
         {onOpenMobileMenu && (
