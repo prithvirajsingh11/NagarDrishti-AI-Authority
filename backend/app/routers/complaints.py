@@ -303,7 +303,7 @@ def reopen_complaint(
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found.")
 
-    if complaint.status != "RESOLVED":
+    if complaint.status not in ("RESOLVED", "REOPENED") and not complaint.resolved_at:
         raise HTTPException(
             status_code=400,
             detail="Only resolved complaints can be reopened.",

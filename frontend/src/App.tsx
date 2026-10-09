@@ -246,9 +246,6 @@ function AuthorityAppContent() {
       if (severityFilter && c.severity.toUpperCase() !== severityFilter.toUpperCase()) {
         return false;
       }
-      if (statusFilter && c.status.toUpperCase() !== statusFilter.toUpperCase()) {
-        return false;
-      }
       if (departmentFilter && c.department !== departmentFilter) {
         return false;
       }
@@ -266,20 +263,27 @@ function AuthorityAppContent() {
         } else if (resFilter === 'citizen_confirmed') {
           if (c.citizen_verification_status !== 'CONFIRMED') return false;
         } else if (resFilter === 'reopened') {
-          if (c.status !== 'REOPENED' && c.citizen_verification_status !== 'REOPENED') return false;
+          if (c.status !== 'REOPENED' && !c.citizen_reopened && c.citizen_verification_status !== 'REOPENED') return false;
+        }
+      }
+      if (statusFilter && c.status.toUpperCase() !== statusFilter.toUpperCase()) {
+        if (statusFilter.toUpperCase() === 'REOPENED') {
+          if (c.status !== 'REOPENED' && !c.citizen_reopened && c.citizen_verification_status !== 'REOPENED') return false;
+        } else if (!resolutionStatusFilter || resolutionStatusFilter.toLowerCase() !== 'reopened') {
+          return false;
         }
       }
       if (dateHorizon !== 'all') {
-        const itemDate = new Date(c.created_at).getTime();
+        const checkTime = c.reopened_at ? new Date(c.reopened_at).getTime() : new Date(c.created_at).getTime();
         const now = Date.now();
         const oneDay = 24 * 60 * 60 * 1000;
-        if (dateHorizon === 'today' && now - itemDate > oneDay) {
+        if (dateHorizon === 'today' && now - checkTime > oneDay) {
           return false;
         }
-        if (dateHorizon === '7d' && now - itemDate > 7 * oneDay) {
+        if (dateHorizon === '7d' && now - checkTime > 7 * oneDay) {
           return false;
         }
-        if (dateHorizon === '30d' && now - itemDate > 30 * oneDay) {
+        if (dateHorizon === '30d' && now - checkTime > 30 * oneDay) {
           return false;
         }
       }

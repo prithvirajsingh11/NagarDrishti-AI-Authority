@@ -207,6 +207,7 @@ class ClientCivicStore {
         .select('*')
         .order('created_at', { ascending: false });
 
+<<<<<<< Updated upstream
       if (!error && Array.isArray(data) && data.length > 0) {
         const localByRep = new Map<string, Complaint>();
         const localById = new Map<string, Complaint>();
@@ -259,6 +260,22 @@ class ClientCivicStore {
         }
 
         this.complaints = merged;
+=======
+      if (!error && Array.isArray(data)) {
+        this.complaints = data.map((item: any) => {
+          const isReopened = Boolean(
+            item.citizen_reopened === true ||
+            String(item.status || '').toUpperCase() === 'REOPENED' ||
+            String(item.citizen_verification_status || '').toUpperCase() === 'REOPENED'
+          );
+          return {
+            ...item,
+            status: isReopened ? 'REOPENED' : item.status,
+            citizen_reopened: isReopened ? true : item.citizen_reopened,
+            citizen_verification_status: isReopened ? 'REOPENED' : item.citizen_verification_status,
+          };
+        });
+>>>>>>> Stashed changes
         this.save();
         this.syncedWithSupabase = true;
       }

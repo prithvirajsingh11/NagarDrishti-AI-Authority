@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List, Optional, Literal, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 ProblemType = Literal["pothole", "garbage", "streetlight", "drain", "other"]
 SeverityLevel = Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
@@ -180,11 +180,38 @@ class Complaint(BaseModel):
     internal_notes: List[InternalNote] = Field(default_factory=list)
     status_update_requests: List[StatusUpdateRequestItem] = Field(default_factory=list)
 
+    @field_validator("status", mode="before")
+    @classmethod
+    def normalize_status(cls, v: Any) -> str:
+        if isinstance(v, str):
+            v_clean = v.strip().upper()
+            if v_clean in ("REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REOPENED"):
+                return v_clean
+        return v
+
+    @field_validator("citizen_verification_status", mode="before")
+    @classmethod
+    def normalize_citizen_verification_status(cls, v: Any) -> Optional[str]:
+        if isinstance(v, str):
+            v_clean = v.strip().upper()
+            if v_clean in ("PENDING", "CONFIRMED", "REOPENED"):
+                return v_clean
+        return v
+
 
 class StatusUpdate(BaseModel):
     status: ComplaintStatus
     resolution_image_url: Optional[str] = None
     resolution_note: Optional[str] = None
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def normalize_status(cls, v: Any) -> str:
+        if isinstance(v, str):
+            v_clean = v.strip().upper()
+            if v_clean in ("REPORTED", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REOPENED"):
+                return v_clean
+        return v
 
 
 class ResolveComplaintRequest(BaseModel):

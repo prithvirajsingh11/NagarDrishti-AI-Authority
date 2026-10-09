@@ -383,6 +383,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
       {(stats?.reopened ?? 0) > 0 && (
         <div
           onClick={() => {
+            if (onStatusFilterChange) {
+              onStatusFilterChange('');
+            }
             if (onResolutionStatusFilterChange) {
               onResolutionStatusFilterChange('reopened');
             }
@@ -514,6 +517,9 @@ export const CommandCenter: React.FC<CommandCenterProps> = ({
         {/* Reopened */}
         <div
           onClick={() => {
+            if (onStatusFilterChange) {
+              onStatusFilterChange('');
+            }
             if (onResolutionStatusFilterChange) {
               onResolutionStatusFilterChange('reopened');
             }

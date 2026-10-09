@@ -146,11 +146,21 @@ def parse_complaint_dict(item: Dict[str, Any]) -> Complaint:
         data["resolution_image_url"] = res_img
         data["resolution_image_path"] = res_img
 
-    if data.get("citizen_resolution_confirmed") is True:
-        data["citizen_verification_status"] = "CONFIRMED"
-    elif data.get("citizen_reopened") is True or data.get("status") == "REOPENED":
+    raw_status = str(data.get("status") or "").strip().upper()
+    raw_cv_status = str(data.get("citizen_verification_status") or "").strip().upper()
+    is_reopened = (
+        data.get("citizen_reopened") is True
+        or raw_status == "REOPENED"
+        or raw_cv_status == "REOPENED"
+    )
+
+    if is_reopened:
+        data["status"] = "REOPENED"
+        data["citizen_reopened"] = True
         data["citizen_verification_status"] = "REOPENED"
-    elif data.get("status") == "RESOLVED" and not data.get("citizen_verification_status"):
+    elif data.get("citizen_resolution_confirmed") is True or raw_cv_status == "CONFIRMED":
+        data["citizen_verification_status"] = "CONFIRMED"
+    elif raw_status == "RESOLVED" and not data.get("citizen_verification_status"):
         data["citizen_verification_status"] = "PENDING"
 
     if "citizen_resolution_confirmed_at" in data and not data.get("citizen_verified_at"):
@@ -1017,7 +1027,16 @@ class CivicDataStore:
                         # If local store has recent updates, preserve them
                         local_c = local_by_rep.get(c.report_id) or local_by_id.get(c.id)
                         if local_c:
-                            if local_c.updated_at >= c.updated_at:
+                            is_remote_reopened = bool(c.status == "REOPENED" or c.citizen_reopened or c.citizen_verification_status == "REOPENED")
+                            is_local_reopened = bool(local_c.status == "REOPENED" or local_c.citizen_reopened or local_c.citizen_verification_status == "REOPENED")
+
+                            if is_remote_reopened or is_local_reopened:
+                                c.status = "REOPENED"
+                                c.citizen_reopened = True
+                                c.citizen_verification_status = "REOPENED"
+                                c.reopened_at = c.reopened_at or local_c.reopened_at
+                                c.reopen_reason = c.reopen_reason or local_c.reopen_reason
+                            elif local_c.updated_at > c.updated_at:
                                 c.status = local_c.status
                                 c.priority_score = local_c.priority_score
                                 c.priority_level = local_c.priority_level
@@ -1029,18 +1048,17 @@ class CivicDataStore:
                                 c.citizen_verification_status = local_c.citizen_verification_status or c.citizen_verification_status
                                 c.citizen_resolution_confirmed = local_c.citizen_resolution_confirmed if local_c.citizen_resolution_confirmed is not None else c.citizen_resolution_confirmed
                                 c.citizen_verified_at = local_c.citizen_verified_at or c.citizen_verified_at
-                                c.reopened_at = local_c.reopened_at or c.reopened_at
-                                c.reopen_reason = local_c.reopen_reason or c.reopen_reason
                                 c.assigned_to = local_c.assigned_to or c.assigned_to
                                 c.assigned_at = local_c.assigned_at or c.assigned_at
-                                if len(local_c.assignment_history) > len(c.assignment_history):
-                                    c.assignment_history = local_c.assignment_history
-                                if len(local_c.internal_notes) > len(c.internal_notes):
-                                    c.internal_notes = local_c.internal_notes
-                                if len(local_c.status_update_requests) > len(c.status_update_requests):
-                                    c.status_update_requests = local_c.status_update_requests
-                                if len(local_c.status_history) > len(c.status_history):
-                                    c.status_history = local_c.status_history
+
+                            if len(local_c.assignment_history) > len(c.assignment_history):
+                                c.assignment_history = local_c.assignment_history
+                            if len(local_c.internal_notes) > len(c.internal_notes):
+                                c.internal_notes = local_c.internal_notes
+                            if len(local_c.status_update_requests) > len(c.status_update_requests):
+                                c.status_update_requests = local_c.status_update_requests
+                            if len(local_c.status_history) > len(c.status_history):
+                                c.status_history = local_c.status_history
 
                         parsed.append(c)
                         existing_report_ids.add(c.report_id)
@@ -1305,7 +1323,14 @@ class CivicDataStore:
         if severity:
             results = [c for c in results if c.severity.upper() == severity.upper()]
         if status:
-            results = [c for c in results if c.status.upper() == status.upper()]
+            st_filter = status.upper().strip()
+            if st_filter == "REOPENED":
+                results = [
+                    c for c in results
+                    if c.status == "REOPENED" or c.citizen_reopened is True or c.citizen_verification_status == "REOPENED"
+                ]
+            else:
+                results = [c for c in results if c.status.upper() == st_filter]
         if department:
             results = [c for c in results if department.lower() in c.department.lower()]
         if priority_level:
@@ -1637,7 +1662,7 @@ class CivicDataStore:
         now_utc = datetime.now(timezone.utc)
         for c in self.complaints:
             if c.id == complaint_id or c.report_id == complaint_id:
-                if c.status != "RESOLVED":
+                if c.status not in ("RESOLVED", "REOPENED") and not c.resolved_at:
                     return None
                 c.status = "REOPENED"
                 c.citizen_reopened = True
