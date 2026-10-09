@@ -171,6 +171,13 @@ function AuthorityAppContent() {
       ]);
       setStats(statsData);
       setComplaints(complaintsData);
+      setSelectedComplaint((prev) => {
+        if (!prev) return null;
+        const fresh = complaintsData.find(
+          (c) => c.id === prev.id || c.report_id === prev.report_id
+        );
+        return fresh || prev;
+      });
       setHeatmapPoints(heatmapData);
       setDepartments(deptsData);
       setLastUpdated(new Date());
@@ -302,8 +309,20 @@ function AuthorityAppContent() {
     } else {
       updated = await updateComplaintStatus(id, newStatus);
     }
-    setComplaints((prev) => prev.map((item) => (item.id === id ? updated : item)));
-    if (selectedComplaint && selectedComplaint.id === id) {
+    setComplaints((prev) =>
+      prev.map((item) =>
+        item.id === id || item.report_id === id || (updated && (item.id === updated.id || item.report_id === updated.report_id))
+          ? updated
+          : item
+      )
+    );
+    if (
+      selectedComplaint &&
+      (selectedComplaint.id === id ||
+        selectedComplaint.report_id === id ||
+        selectedComplaint.id === updated.id ||
+        selectedComplaint.report_id === updated.report_id)
+    ) {
       setSelectedComplaint(updated);
     }
     getDashboardStatistics().then((s) => setStats(s)).catch(() => {});
@@ -315,8 +334,20 @@ function AuthorityAppContent() {
     payload: { department: string; assigned_to: string; note?: string }
   ) => {
     const updated = await assignComplaint(id, payload);
-    setComplaints((prev) => prev.map((item) => (item.id === id ? updated : item)));
-    if (selectedComplaint && selectedComplaint.id === id) {
+    setComplaints((prev) =>
+      prev.map((item) =>
+        item.id === id || item.report_id === id || (updated && (item.id === updated.id || item.report_id === updated.report_id))
+          ? updated
+          : item
+      )
+    );
+    if (
+      selectedComplaint &&
+      (selectedComplaint.id === id ||
+        selectedComplaint.report_id === id ||
+        selectedComplaint.id === updated.id ||
+        selectedComplaint.report_id === updated.report_id)
+    ) {
       setSelectedComplaint(updated);
     }
     getDashboardStatistics().then((s) => setStats(s)).catch(() => {});
@@ -326,8 +357,20 @@ function AuthorityAppContent() {
   const handleAddInternalNote = async (id: string, note: string) => {
     await addInternalNote(id, note);
     const refreshed = await getComplaintById(id);
-    setComplaints((prev) => prev.map((item) => (item.id === id ? refreshed : item)));
-    if (selectedComplaint && selectedComplaint.id === id) {
+    setComplaints((prev) =>
+      prev.map((item) =>
+        item.id === id || item.report_id === id || item.id === refreshed.id || item.report_id === refreshed.report_id
+          ? refreshed
+          : item
+      )
+    );
+    if (
+      selectedComplaint &&
+      (selectedComplaint.id === id ||
+        selectedComplaint.report_id === id ||
+        selectedComplaint.id === refreshed.id ||
+        selectedComplaint.report_id === refreshed.report_id)
+    ) {
       setSelectedComplaint(refreshed);
     }
   };
@@ -340,8 +383,20 @@ function AuthorityAppContent() {
   ) => {
     await acknowledgeStatusUpdateRequest(complaintId, requestId, responseNote);
     const refreshed = await getComplaintById(complaintId);
-    setComplaints((prev) => prev.map((item) => (item.id === complaintId ? refreshed : item)));
-    if (selectedComplaint && selectedComplaint.id === complaintId) {
+    setComplaints((prev) =>
+      prev.map((item) =>
+        item.id === complaintId || item.report_id === complaintId || item.id === refreshed.id || item.report_id === refreshed.report_id
+          ? refreshed
+          : item
+      )
+    );
+    if (
+      selectedComplaint &&
+      (selectedComplaint.id === complaintId ||
+        selectedComplaint.report_id === complaintId ||
+        selectedComplaint.id === refreshed.id ||
+        selectedComplaint.report_id === refreshed.report_id)
+    ) {
       setSelectedComplaint(refreshed);
     }
   };

@@ -118,17 +118,18 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
   const handleAssignSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!complaint || !assignDept.trim() || !assignTo.trim()) return;
+    const targetId = complaint.id || complaint.report_id;
     setIsAssigning(true);
     setAssignSuccessMsg(null);
     try {
       if (onAssignComplaint) {
-        await onAssignComplaint(complaint.id, {
+        await onAssignComplaint(targetId, {
           department: assignDept.trim(),
           assigned_to: assignTo.trim(),
           note: assignNote.trim() || undefined,
         });
       } else {
-        await apiAssignComplaint(complaint.id, {
+        await apiAssignComplaint(targetId, {
           department: assignDept.trim(),
           assigned_to: assignTo.trim(),
           note: assignNote.trim() || undefined,
@@ -146,13 +147,14 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
   const handleInternalNoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!complaint || !internalNoteInput.trim()) return;
+    const targetId = complaint.id || complaint.report_id;
     setIsSubmittingNote(true);
     setNoteSuccessMsg(null);
     try {
       if (onAddInternalNote) {
-        await onAddInternalNote(complaint.id, internalNoteInput.trim());
+        await onAddInternalNote(targetId, internalNoteInput.trim());
       } else {
-        await apiAddInternalNote(complaint.id, internalNoteInput.trim());
+        await apiAddInternalNote(targetId, internalNoteInput.trim());
       }
       setInternalNoteInput('');
       setNoteSuccessMsg('Internal note appended to confidential file.');
@@ -165,13 +167,14 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
 
   const handleAcknowledgeRequest = async (requestId: string) => {
     if (!complaint) return;
+    const targetId = complaint.id || complaint.report_id;
     setAcknowledgingIds((prev) => ({ ...prev, [requestId]: true }));
     try {
       const responseNote = ackResponseNotes[requestId]?.trim() || undefined;
       if (onAcknowledgeStatusRequest) {
-        await onAcknowledgeStatusRequest(complaint.id, requestId, responseNote);
+        await onAcknowledgeStatusRequest(targetId, requestId, responseNote);
       } else {
-        await apiAcknowledgeStatus(complaint.id, requestId, responseNote);
+        await apiAcknowledgeStatus(targetId, requestId, responseNote);
       }
       setAckResponseNotes((prev) => {
         const next = { ...prev };
@@ -195,10 +198,11 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
       return;
     }
 
+    const targetId = complaint.id || complaint.report_id;
     setIsUpdating(true);
     setErrorMsg(null);
     try {
-      await onUpdateStatus(complaint.id, targetStatus);
+      await onUpdateStatus(targetId, targetStatus);
     } catch (err: any) {
       setErrorMsg(err.message || 'Status transition failed.');
     } finally {
@@ -229,10 +233,20 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
     setResolutionError(null);
     setResolutionFile(file);
     try {
-      const objectUrl = URL.createObjectURL(file);
-      setResolutionPreviewUrl(objectUrl);
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          setResolutionPreviewUrl(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
     } catch {
-      setResolutionPreviewUrl('blob:mock-url');
+      try {
+        const objectUrl = URL.createObjectURL(file);
+        setResolutionPreviewUrl(objectUrl);
+      } catch {
+        setResolutionPreviewUrl('data:image/png;base64,mock');
+      }
     }
   };
 
@@ -254,7 +268,7 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
           const uploadRes = await uploadResolutionEvidence(resolutionFile);
           finalImageUrl = uploadRes.image_url;
         } catch (uploadErr: any) {
-          // If mock/testing or backend offline, fallback to object preview url
+          // If mock/testing or backend offline, fallback to object/data preview url
           console.warn('Upload API fallback:', uploadErr);
           if (!finalImageUrl) {
             throw uploadErr;
@@ -262,7 +276,8 @@ export const ComplaintDrawer: React.FC<ComplaintDrawerProps> = ({
         }
       }
 
-      await onUpdateStatus(complaint.id, 'RESOLVED', {
+      const targetId = complaint.id || complaint.report_id;
+      await onUpdateStatus(targetId, 'RESOLVED', {
         resolution_image_url: finalImageUrl,
         resolution_note: resolutionNote.trim(),
       });

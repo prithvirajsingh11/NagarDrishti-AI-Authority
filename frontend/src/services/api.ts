@@ -273,6 +273,15 @@ export async function getComplaintById(id: string): Promise<Complaint> {
   }
 }
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 export async function updateComplaintStatus(
   id: string,
   status: ComplaintStatus,
@@ -289,16 +298,50 @@ export async function updateComplaintStatus(
         resolution_note: resolution?.resolution_note,
       }),
     });
+    if (res.ok) {
+      const updated = await res.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
     return await handleResponse<Complaint>(res, 'Failed to update complaint status.');
   } catch (err) {
     if (isAuthError(err)) throw err;
-    return clientCivicStore.updateStatus(id, status, resolution);
+    console.warn('Backend update status failed, utilizing synced local state:', err);
+    try {
+      const localUpdated = clientCivicStore.updateStatus(id, status, resolution);
+      clientCivicStore.syncItem(localUpdated);
+      return localUpdated;
+    } catch {
+      throw err;
+    }
   }
 }
 
 export async function uploadResolutionEvidence(
   file: File
 ): Promise<{ image_url: string; filename: string }> {
+  // 1. Attempt direct upload to Supabase Storage bucket 'complaint-images'
+  try {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const filename = `resolution_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${ext}`;
+    const { data, error } = await supabase.storage.from('complaint-images').upload(filename, file, {
+      cacheControl: '3600',
+      upsert: true,
+    });
+    if (!error && data?.path) {
+      const { data: publicUrlData } = supabase.storage.from('complaint-images').getPublicUrl(data.path);
+      if (publicUrlData?.publicUrl) {
+        return {
+          image_url: publicUrlData.publicUrl,
+          filename: data.path,
+        };
+      }
+    }
+  } catch (e) {
+    console.warn('Direct Supabase storage upload skipped or failed:', e);
+  }
+
+  // 2. Attempt backend endpoint
   try {
     const headers = await getAuthHeaders();
     const formData = new FormData();
@@ -309,10 +352,20 @@ export async function uploadResolutionEvidence(
       headers,
       body: formData,
     });
-    return await handleResponse<{ image_url: string; filename: string }>(
-      res,
-      'Failed to upload resolution evidence.'
-    );
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (backendErr) {
+    console.warn('Backend upload-resolution-evidence unavailable:', backendErr);
+  }
+
+  // 3. Fallback to base64 Data URL so image survives page reload & works cross-client
+  try {
+    const dataUrl = await fileToDataUrl(file);
+    return {
+      image_url: dataUrl,
+      filename: file.name,
+    };
   } catch {
     const previewUrl = URL.createObjectURL(file);
     return {
@@ -329,6 +382,7 @@ export async function resolveComplaint(
 ): Promise<Complaint> {
   try {
     const headers = await getJsonAuthHeaders();
+    // 1. Try dedicated POST /resolve
     const res = await fetch(`${API_BASE}/complaints/${id}/resolve`, {
       method: 'POST',
       headers,
@@ -337,13 +391,41 @@ export async function resolveComplaint(
         resolution_note: resolution_note || '',
       }),
     });
+    if (res.ok) {
+      const updated = await res.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
+
+    // 2. Fallback to PATCH /status if /resolve endpoint is unsupported
+    const patchRes = await fetch(`${API_BASE}/complaints/${id}/status`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        status: 'RESOLVED',
+        resolution_image_url,
+        resolution_note: resolution_note || '',
+      }),
+    });
+    if (patchRes.ok) {
+      const updated = await patchRes.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
     return await handleResponse<Complaint>(res, 'Failed to mark complaint as resolved.');
   } catch (err) {
     if (isAuthError(err)) throw err;
-    return clientCivicStore.updateStatus(id, 'RESOLVED', {
-      resolution_image_url,
-      resolution_note,
-    });
+    console.warn('Backend resolve failed, returning synced local store update:', err);
+    try {
+      const localUpdated = clientCivicStore.updateStatus(id, 'RESOLVED', {
+        resolution_image_url,
+        resolution_note,
+      });
+      clientCivicStore.syncItem(localUpdated);
+      return localUpdated;
+    } catch {
+      throw err;
+    }
   }
 }
 
@@ -354,14 +436,22 @@ export async function confirmComplaintResolution(id: string): Promise<Complaint>
       method: 'POST',
       headers,
     });
+    if (res.ok) {
+      const updated = await res.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
     return await handleResponse<Complaint>(res, 'Failed to confirm complaint resolution.');
   } catch (err) {
     if (isAuthError(err)) throw err;
-    const c = clientCivicStore.getComplaintById(id);
-    if (!c) throw new Error('Complaint not found.');
-    c.citizen_verification_status = 'CONFIRMED';
-    c.citizen_resolution_confirmed = true;
-    return c;
+    console.warn('Backend confirm resolution failed, returning local state:', err);
+    try {
+      const localUpdated = clientCivicStore.confirmResolution(id);
+      clientCivicStore.syncItem(localUpdated);
+      return localUpdated;
+    } catch {
+      throw err;
+    }
   }
 }
 
@@ -373,10 +463,37 @@ export async function reopenComplaint(id: string, reason?: string): Promise<Comp
       headers,
       body: JSON.stringify({ reason: reason || '' }),
     });
+    if (res.ok) {
+      const updated = await res.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
+
+    // Fallback to PATCH status
+    const patchRes = await fetch(`${API_BASE}/complaints/${id}/status`, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({
+        status: 'REOPENED',
+        resolution_note: reason || '',
+      }),
+    });
+    if (patchRes.ok) {
+      const updated = await patchRes.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
     return await handleResponse<Complaint>(res, 'Failed to submit reopen request.');
   } catch (err) {
     if (isAuthError(err)) throw err;
-    return clientCivicStore.updateStatus(id, 'REOPENED', { resolution_note: reason });
+    console.warn('Backend reopen failed, returning local state:', err);
+    try {
+      const localUpdated = clientCivicStore.reopenComplaint(id, reason);
+      clientCivicStore.syncItem(localUpdated);
+      return localUpdated;
+    } catch {
+      throw err;
+    }
   }
 }
 
@@ -510,6 +627,9 @@ export async function assignComplaint(
   id: string,
   payload: { department: string; assigned_to: string; note?: string }
 ): Promise<Complaint> {
+  const localUpdated = clientCivicStore.assign(id, payload);
+  clientCivicStore.syncItem(localUpdated);
+
   try {
     const headers = await getJsonAuthHeaders();
     const res = await fetch(`${API_BASE}/complaints/${id}/assign`, {
@@ -517,10 +637,16 @@ export async function assignComplaint(
       headers,
       body: JSON.stringify(payload),
     });
+    if (res.ok) {
+      const updated = await res.json();
+      clientCivicStore.syncItem(updated);
+      return updated;
+    }
     return await handleResponse<Complaint>(res, 'Failed to assign complaint.');
   } catch (err) {
     if (isAuthError(err)) throw err;
-    return clientCivicStore.assign(id, payload);
+    console.warn('Backend assign failed, returning local state:', err);
+    return localUpdated;
   }
 }
 

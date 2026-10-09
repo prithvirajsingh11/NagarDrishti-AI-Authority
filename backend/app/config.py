@@ -34,7 +34,11 @@ CORS_ORIGINS = [
 
 # Supabase configuration
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://otjbonkovzciglttxfzz.supabase.co")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "") or os.getenv("SUPABASE_KEY", "")
+SUPABASE_ANON_KEY = os.getenv(
+    "SUPABASE_ANON_KEY",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90amJvbmtvdnpjaWdsdHR4Znp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNTAzMDAsImV4cCI6MjA4NjkyNjMwMH0.s61eZgq-Fw1sPzPkW5YQ-92K9a4v3u2HkU5Ww4mZlQ0"
+)
 STORAGE_BUCKET = os.getenv("STORAGE_BUCKET", "complaint-images")
 
 # Connection to user site (NagarDrishti-AI)
@@ -43,6 +47,14 @@ SHARED_DB_PATH = os.getenv(
     "SHARED_DB_PATH",
     os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "complaints_db.json")
 )
+
+# Candidate paths for shared civic databases (citizen app + authority app)
+SHARED_DB_CANDIDATE_PATHS = [
+    SHARED_DB_PATH,
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "complaints_db.json"),
+    "/Users/tejasvnigam/Desktop/nagardrishti ai/NagarDrishti-AI/backend/data/complaints_db.json",
+    "/Users/tejasvnigam/nagardrishti_Auth1/backend/data/complaints_db.json",
+]
 
 # Local fallback paths
 LOCAL_BACKUP_DB_PATH = os.path.join(

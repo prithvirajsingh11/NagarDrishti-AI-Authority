@@ -15,6 +15,8 @@ from ..config import (
     USER_SITE_API_URL,
     SUPABASE_URL,
     SUPABASE_SERVICE_ROLE_KEY,
+    SUPABASE_ANON_KEY,
+    SHARED_DB_CANDIDATE_PATHS,
 )
 from ..models.schemas import (
     Complaint,
@@ -985,13 +987,15 @@ class CivicDataStore:
         self._load_from_storage()
 
     def _get_supabase_client(self):
-        if self._supabase_client is None and SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY:
-            try:
-                from supabase import create_client
-                self._supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-                logger.info("Connected to Supabase PostgreSQL database.")
-            except Exception as e:
-                logger.warning(f"Could not initialize Supabase client: {e}")
+        if self._supabase_client is None and SUPABASE_URL:
+            key = SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY
+            if key:
+                try:
+                    from supabase import create_client
+                    self._supabase_client = create_client(SUPABASE_URL, key)
+                    logger.info("Connected to Supabase PostgreSQL database.")
+                except Exception as e:
+                    logger.warning(f"Could not initialize Supabase client: {e}")
         return self._supabase_client
 
     def _sync_with_supabase(self) -> bool:
@@ -1015,11 +1019,15 @@ class CivicDataStore:
                         if local_c:
                             if local_c.updated_at >= c.updated_at:
                                 c.status = local_c.status
+                                c.priority_score = local_c.priority_score
+                                c.priority_level = local_c.priority_level
+                                c.priority_explanation = local_c.priority_explanation
                                 c.resolved_at = local_c.resolved_at or c.resolved_at
                                 c.resolved_by = local_c.resolved_by or c.resolved_by
                                 c.resolution_image_url = local_c.resolution_image_url or c.resolution_image_url
                                 c.resolution_note = local_c.resolution_note or c.resolution_note
                                 c.citizen_verification_status = local_c.citizen_verification_status or c.citizen_verification_status
+                                c.citizen_resolution_confirmed = local_c.citizen_resolution_confirmed if local_c.citizen_resolution_confirmed is not None else c.citizen_resolution_confirmed
                                 c.citizen_verified_at = local_c.citizen_verified_at or c.citizen_verified_at
                                 c.reopened_at = local_c.reopened_at or c.reopened_at
                                 c.reopen_reason = local_c.reopen_reason or c.reopen_reason
@@ -1107,8 +1115,11 @@ class CivicDataStore:
 
     def _get_storage_targets(self) -> List[Path]:
         targets = []
-        for p_str in [SHARED_DB_PATH, LOCAL_BACKUP_DB_PATH]:
-            if p_str:
+        paths_to_check = [SHARED_DB_PATH, LOCAL_BACKUP_DB_PATH] + SHARED_DB_CANDIDATE_PATHS
+        seen = set()
+        for p_str in paths_to_check:
+            if p_str and p_str not in seen:
+                seen.add(p_str)
                 p = Path(p_str)
                 try:
                     p.parent.mkdir(parents=True, exist_ok=True)
@@ -1142,6 +1153,25 @@ class CivicDataStore:
                             all_raw_items.append(it)
                 except Exception as e:
                     logger.warning(f"Failed to load from {target}: {e}")
+
+        # Also merge baseline complaints from complaints_backup.json if present
+        backup_file = Path(LOCAL_BACKUP_DB_PATH).parent / "complaints_backup.json"
+        if backup_file.exists() and backup_file.stat().st_size > 5:
+            try:
+                with open(backup_file, "r", encoding="utf-8") as bf:
+                    b_data = json.load(bf)
+                b_items = []
+                if isinstance(b_data, list):
+                    b_items = b_data
+                elif isinstance(b_data, dict):
+                    b_items = b_data.get("local", []) + b_data.get("supabase", [])
+                for it in b_items:
+                    iid = it.get("id") or it.get("report_id")
+                    if iid and iid not in known_ids:
+                        known_ids.add(iid)
+                        all_raw_items.append(it)
+            except Exception as be:
+                logger.warning(f"Could not load baseline backup file {backup_file}: {be}")
 
         parsed = []
         max_seq = 118
@@ -1367,6 +1397,7 @@ class CivicDataStore:
         self._check_auto_reload()
         updated_c = None
         now_iso = datetime.now(timezone.utc).isoformat()
+        now_utc = datetime.now(timezone.utc)
         for c in self.complaints:
             if c.id == complaint_id or c.report_id == complaint_id:
                 c.status = new_status
@@ -1385,6 +1416,9 @@ class CivicDataStore:
                     c.citizen_verification_status = "PENDING"
                     c.citizen_resolution_confirmed = None
                     c.citizen_reopened = False
+                    c.priority_score = 0.0
+                    c.priority_level = "LOW"
+                    c.priority_explanation = "Defect marked resolved by municipal authority. Awaiting citizen confirmation."
 
                     c.status_history.append(StatusHistoryItem(
                         status="RESOLVED",
@@ -1394,6 +1428,11 @@ class CivicDataStore:
                         actor_role="authority",
                     ))
                 elif new_status == "IN_PROGRESS":
+                    score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                    c.priority_score = score
+                    c.priority_level = level  # type: ignore
+                    c.priority_explanation = explanation
+
                     c.status_history.append(StatusHistoryItem(
                         status="IN_PROGRESS",
                         timestamp=now_iso,
@@ -1402,6 +1441,11 @@ class CivicDataStore:
                         actor_role="authority",
                     ))
                 elif new_status == "ASSIGNED":
+                    score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                    c.priority_score = score
+                    c.priority_level = level  # type: ignore
+                    c.priority_explanation = explanation
+
                     c.status_history.append(StatusHistoryItem(
                         status="ASSIGNED",
                         timestamp=now_iso,
@@ -1414,6 +1458,16 @@ class CivicDataStore:
                     c.citizen_reopened = True
                     c.citizen_reopened_at = now_iso
                     c.reopened_at = now_iso
+                    if resolution_note:
+                        c.reopen_reason = resolution_note
+                    elif not c.reopen_reason:
+                        c.reopen_reason = "Citizen reported that this issue is still unresolved."
+
+                    score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                    c.priority_score = score
+                    c.priority_level = level  # type: ignore
+                    c.priority_explanation = explanation
+
                     c.status_history.append(StatusHistoryItem(
                         status="REOPENED",
                         timestamp=now_iso,
@@ -1432,6 +1486,8 @@ class CivicDataStore:
                     payload_to_supabase: Dict[str, Any] = {
                         "status": new_status,
                         "updated_at": now_iso,
+                        "priority_score": updated_c.priority_score,
+                        "priority_level": updated_c.priority_level,
                     }
                     if updated_c.resolved_at:
                         payload_to_supabase["resolved_at"] = updated_c.resolved_at
@@ -1439,17 +1495,57 @@ class CivicDataStore:
                         payload_to_supabase["resolution_image_url"] = updated_c.resolution_image_url
                     if updated_c.reopen_reason:
                         payload_to_supabase["reopen_reason"] = updated_c.reopen_reason
-                    client.table("complaints").update(payload_to_supabase).eq("report_id", updated_c.report_id).execute()
+                    if updated_c.citizen_verification_status:
+                        payload_to_supabase["citizen_verification_status"] = updated_c.citizen_verification_status
+
+                    res = client.table("complaints").update(payload_to_supabase).eq("report_id", updated_c.report_id).execute()
+                    if (not res.data or len(res.data) == 0) and updated_c.id:
+                        client.table("complaints").update(payload_to_supabase).eq("id", updated_c.id).execute()
                     logger.info(f"Updated status for {updated_c.report_id} in Supabase")
                 except Exception as se:
                     try:
-                        client.table("complaints").update({
+                        core_payload = {
                             "status": new_status,
                             "updated_at": now_iso,
-                        }).eq("report_id", updated_c.report_id).execute()
+                        }
+                        if updated_c.resolution_image_url:
+                            core_payload["resolution_image_url"] = updated_c.resolution_image_url
+                        client.table("complaints").update(core_payload).eq("report_id", updated_c.report_id).execute()
                         logger.info(f"Updated core status for {updated_c.report_id} in Supabase")
                     except Exception as se2:
                         logger.warning(f"Failed to update status in Supabase: {se2}")
+
+                # Insert into complaint_status_history
+                try:
+                    history_note = (
+                        updated_c.resolution_note if new_status == "RESOLVED"
+                        else (updated_c.reopen_reason if new_status == "REOPENED" else f"Status changed to {new_status}")
+                    )
+                    client.table("complaint_status_history").insert({
+                        "complaint_id": updated_c.id or updated_c.report_id,
+                        "status": new_status,
+                        "actor": resolved_by or "Municipal Authority Officer",
+                        "note": history_note or "",
+                        "timestamp": now_iso,
+                    }).execute()
+                except Exception:
+                    pass
+
+                # Notify citizen if citizen_id exists
+                if getattr(updated_c, "citizen_id", None):
+                    try:
+                        client.table("citizen_notifications").insert({
+                            "user_id": updated_c.citizen_id,
+                            "complaint_id": updated_c.id or updated_c.report_id,
+                            "report_id": updated_c.report_id,
+                            "type": f"STATUS_{new_status}",
+                            "title": f"Complaint {updated_c.report_id} updated",
+                            "message": f"Your civic report has been updated to {new_status}.",
+                            "created_at": now_iso,
+                            "read": False,
+                        }).execute()
+                    except Exception:
+                        pass
 
             self._save_to_storage()
             self._notify_user_site_status(updated_c.report_id, new_status)
@@ -1484,6 +1580,9 @@ class CivicDataStore:
                 c.citizen_verified_at = now_iso
                 c.citizen_verification_status = "CONFIRMED"
                 c.citizen_reopened = False
+                c.priority_score = 0.0
+                c.priority_level = "LOW"
+                c.priority_explanation = "Resolution confirmed and accepted by citizen."
                 c.updated_at = now_iso
                 c.status_history.append(StatusHistoryItem(
                     status="CITIZEN_CONFIRMED",
@@ -1499,11 +1598,15 @@ class CivicDataStore:
             client = self._get_supabase_client()
             if client:
                 try:
-                    client.table("complaints").update({
+                    payload = {
                         "citizen_resolution_confirmed": True,
                         "citizen_resolution_confirmed_at": now_iso,
+                        "citizen_verification_status": "CONFIRMED",
                         "updated_at": now_iso,
-                    }).eq("report_id", updated_c.report_id).execute()
+                    }
+                    res = client.table("complaints").update(payload).eq("report_id", updated_c.report_id).execute()
+                    if (not res.data or len(res.data) == 0) and updated_c.id:
+                        client.table("complaints").update(payload).eq("id", updated_c.id).execute()
                 except Exception:
                     try:
                         client.table("complaints").update({
@@ -1512,6 +1615,17 @@ class CivicDataStore:
                         }).eq("report_id", updated_c.report_id).execute()
                     except Exception as se:
                         logger.warning(f"Could not update confirmation in Supabase: {se}")
+
+                try:
+                    client.table("complaint_status_history").insert({
+                        "complaint_id": updated_c.id or updated_c.report_id,
+                        "status": "CITIZEN_CONFIRMED",
+                        "actor": "Citizen User",
+                        "note": "Citizen confirmed resolution",
+                        "timestamp": now_iso,
+                    }).execute()
+                except Exception:
+                    pass
             self._save_to_storage()
             return updated_c
         return None
@@ -1520,6 +1634,7 @@ class CivicDataStore:
         self._check_auto_reload()
         updated_c = None
         now_iso = datetime.now(timezone.utc).isoformat()
+        now_utc = datetime.now(timezone.utc)
         for c in self.complaints:
             if c.id == complaint_id or c.report_id == complaint_id:
                 if c.status != "RESOLVED":
@@ -1532,6 +1647,13 @@ class CivicDataStore:
                 c.citizen_resolution_confirmed = False
                 c.citizen_verification_status = "REOPENED"
                 c.updated_at = now_iso
+
+                # Recalculate priority with +30 boost for reopened complaints!
+                score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                c.priority_score = score
+                c.priority_level = level  # type: ignore
+                c.priority_explanation = explanation
+
                 # Note: Prior resolution image and timestamp remain PRESERVED!
                 c.status_history.append(StatusHistoryItem(
                     status="REOPENED",
@@ -1547,11 +1669,18 @@ class CivicDataStore:
             client = self._get_supabase_client()
             if client:
                 try:
-                    client.table("complaints").update({
+                    payload = {
                         "status": "REOPENED",
                         "reopen_reason": updated_c.reopen_reason,
+                        "citizen_reopened": True,
+                        "citizen_verification_status": "REOPENED",
+                        "priority_score": updated_c.priority_score,
+                        "priority_level": updated_c.priority_level,
                         "updated_at": now_iso,
-                    }).eq("report_id", updated_c.report_id).execute()
+                    }
+                    res = client.table("complaints").update(payload).eq("report_id", updated_c.report_id).execute()
+                    if (not res.data or len(res.data) == 0) and updated_c.id:
+                        client.table("complaints").update(payload).eq("id", updated_c.id).execute()
                 except Exception:
                     try:
                         client.table("complaints").update({
@@ -1560,7 +1689,19 @@ class CivicDataStore:
                         }).eq("report_id", updated_c.report_id).execute()
                     except Exception as se:
                         logger.warning(f"Could not update reopen in Supabase: {se}")
+
+                try:
+                    client.table("complaint_status_history").insert({
+                        "complaint_id": updated_c.id or updated_c.report_id,
+                        "status": "REOPENED",
+                        "actor": "Citizen User",
+                        "note": updated_c.reopen_reason or "Complaint reopened by citizen",
+                        "timestamp": now_iso,
+                    }).execute()
+                except Exception:
+                    pass
             self._save_to_storage()
+            self._notify_user_site_status(updated_c.report_id, "REOPENED")
             return updated_c
         return None
 
@@ -1774,6 +1915,12 @@ class CivicDataStore:
                 if c.status == "REPORTED":
                     c.status = "ASSIGNED"
 
+                now_utc = datetime.now(timezone.utc)
+                score, level, explanation = compute_priority(c, self.complaints, now_utc)
+                c.priority_score = score
+                c.priority_level = level  # type: ignore
+                c.priority_explanation = explanation
+
                 actor_name = changed_by or "Municipal Authority Officer"
 
                 record = AssignmentRecord(
@@ -1808,11 +1955,16 @@ class CivicDataStore:
             client = self._get_supabase_client()
             if client:
                 try:
-                    client.table("complaints").update({
+                    payload = {
                         "department": updated_c.department,
                         "status": updated_c.status,
+                        "priority_score": updated_c.priority_score,
+                        "priority_level": updated_c.priority_level,
                         "updated_at": now_iso,
-                    }).eq("report_id", updated_c.report_id).execute()
+                    }
+                    res = client.table("complaints").update(payload).eq("report_id", updated_c.report_id).execute()
+                    if (not res.data or len(res.data) == 0) and updated_c.id:
+                        client.table("complaints").update(payload).eq("id", updated_c.id).execute()
                 except Exception as se:
                     logger.warning(f"Could not sync assignment to Supabase: {se}")
             return updated_c

@@ -41,6 +41,131 @@ function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: number)
   return R * c;
 }
 
+export function computePriority(
+  complaint: Complaint,
+  allComplaints: Complaint[]
+): { score: number; level: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'; explanation: string } {
+  if (complaint.status === 'RESOLVED') {
+    return {
+      score: 0.0,
+      level: 'LOW',
+      explanation: 'Resolved civic complaint (no active field intervention required).',
+    };
+  }
+
+  let score = 0.0;
+  const factors: string[] = [];
+
+  // 1. Base Severity Weight
+  const sev = (complaint.severity || 'MEDIUM').toUpperCase();
+  if (sev === 'CRITICAL') {
+    score += 40.0;
+    factors.push('Critical severity (+40)');
+  } else if (sev === 'HIGH') {
+    score += 25.0;
+    factors.push('High severity (+25)');
+  } else if (sev === 'MEDIUM') {
+    score += 12.0;
+    factors.push('Medium severity (+12)');
+  } else {
+    score += 5.0;
+    factors.push('Low severity (+5)');
+  }
+
+  // 2. Reopened Civic Defect Boost (+20)
+  const isReopened =
+    complaint.status === 'REOPENED' ||
+    complaint.citizen_reopened === true ||
+    complaint.citizen_verification_status === 'REOPENED';
+  if (isReopened) {
+    score += 20.0;
+    factors.push('Citizen reopened defect (+20)');
+  }
+
+  // 3. Unresolved Duration (Age)
+  const createdAtMs = new Date(complaint.created_at || Date.now()).getTime();
+  const ageDays = Math.max(0, (Date.now() - createdAtMs) / (1000 * 60 * 60 * 24));
+  if (ageDays >= 7) {
+    score += 20.0;
+    factors.push('Aging > 7d (+20)');
+  } else if (ageDays >= 3) {
+    score += 12.0;
+    factors.push('Aging 3-7d (+12)');
+  } else if (ageDays >= 1) {
+    score += 6.0;
+    factors.push('Aging 1-3d (+6)');
+  } else {
+    score += 2.0;
+    factors.push('Fresh intake < 24h (+2)');
+  }
+
+  // 4. Lifecycle Status Weight
+  if (complaint.status === 'REOPENED') {
+    score += 10.0;
+    factors.push('Reopened status (+10)');
+  } else if (complaint.status === 'REPORTED') {
+    score += 8.0;
+    factors.push('Untriaged citizen intake (+8)');
+  } else if (complaint.status === 'ASSIGNED' || complaint.status === 'IN_PROGRESS') {
+    score += 5.0;
+    factors.push('In progress (+5)');
+  }
+
+  // 5. Problem Category Urgency
+  const prob = (complaint.problem_type || 'other').toLowerCase();
+  if (prob === 'pothole') {
+    score += 5.0;
+    factors.push('Road safety hazard (+5)');
+  } else if (prob === 'drain') {
+    score += 4.0;
+    factors.push('Drainage overflow (+4)');
+  } else if (prob === 'streetlight') {
+    score += 3.0;
+    factors.push('Night visibility hazard (+3)');
+  } else if (prob === 'garbage') {
+    score += 2.0;
+    factors.push('Sanitation hazard (+2)');
+  } else {
+    score += 1.0;
+    factors.push('General hazard (+1)');
+  }
+
+  // 6. Nearby Density within 1400m
+  if (complaint.latitude && complaint.longitude && Array.isArray(allComplaints)) {
+    const nearbyUnresolved = allComplaints.filter((other) => {
+      if (other.id === complaint.id || other.report_id === complaint.report_id) return false;
+      if (other.status === 'RESOLVED') return false;
+      if (!other.latitude || !other.longitude) return false;
+      const d = haversineMeters(complaint.latitude, complaint.longitude, other.latitude, other.longitude);
+      return d <= 1400.0;
+    }).length;
+
+    if (nearbyUnresolved >= 4) {
+      score += 15.0;
+      factors.push(`High corridor density [${nearbyUnresolved}] (+15)`);
+    } else if (nearbyUnresolved >= 2) {
+      score += 8.0;
+      factors.push(`Cluster density [${nearbyUnresolved}] (+8)`);
+    } else if (nearbyUnresolved === 1) {
+      score += 4.0;
+      factors.push('Adjacent defect (+4)');
+    }
+  }
+
+  score = Math.min(100.0, Math.max(0.0, Math.round(score * 10) / 10));
+  let level: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' = 'LOW';
+  if (score >= 70.0) level = 'CRITICAL';
+  else if (score >= 50.0) level = 'HIGH';
+  else if (score >= 30.0) level = 'MEDIUM';
+  else level = 'LOW';
+
+  return {
+    score,
+    level,
+    explanation: factors.join(' + '),
+  };
+}
+
 class ClientCivicStore {
   private complaints: Complaint[] = [];
   private syncedWithSupabase = false;
@@ -82,8 +207,58 @@ class ClientCivicStore {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && Array.isArray(data)) {
-        this.complaints = data;
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const localByRep = new Map<string, Complaint>();
+        const localById = new Map<string, Complaint>();
+        for (const lc of this.complaints) {
+          if (lc.report_id) localByRep.set(lc.report_id, lc);
+          if (lc.id) localById.set(lc.id, lc);
+        }
+
+        const merged: Complaint[] = [];
+        const seenKeys = new Set<string>();
+
+        for (const remote of data) {
+          const rid = remote.report_id;
+          const cid = remote.id;
+          const localMatch = (rid ? localByRep.get(rid) : null) || (cid ? localById.get(cid) : null);
+
+          if (localMatch) {
+            const localUpdated = new Date(localMatch.updated_at || 0).getTime();
+            const remoteUpdated = new Date(remote.updated_at || 0).getTime();
+
+            // When local update is equal or newer, preserve local status updates!
+            if (localUpdated >= remoteUpdated) {
+              merged.push(localMatch);
+            } else {
+              // Remote update is newer (e.g. citizen reopened or confirmed on citizen app)
+              const mergedItem: Complaint = {
+                ...localMatch,
+                ...remote,
+                status_history:
+                  Array.isArray(localMatch.status_history) && localMatch.status_history.length > 0
+                    ? localMatch.status_history
+                    : Array.isArray(remote.status_history)
+                    ? remote.status_history
+                    : [],
+              };
+              merged.push(mergedItem);
+            }
+          } else {
+            merged.push(remote as Complaint);
+          }
+          if (rid) seenKeys.add(rid);
+          if (cid) seenKeys.add(cid);
+        }
+
+        // Keep local complaints that have not yet synced to Supabase
+        for (const lc of this.complaints) {
+          if ((!lc.report_id || !seenKeys.has(lc.report_id)) && (!lc.id || !seenKeys.has(lc.id))) {
+            merged.push(lc);
+          }
+        }
+
+        this.complaints = merged;
         this.save();
         this.syncedWithSupabase = true;
       }
@@ -91,6 +266,24 @@ class ClientCivicStore {
       // ignore
     }
     return this.complaints;
+  }
+
+  public setComplaints(complaints: Complaint[]) {
+    this.complaints = complaints;
+    this.save();
+  }
+
+  public syncItem(item: Complaint) {
+    if (!item) return;
+    const idx = this.complaints.findIndex(
+      (c) => (item.id && c.id === item.id) || (item.report_id && c.report_id === item.report_id)
+    );
+    if (idx >= 0) {
+      this.complaints[idx] = { ...this.complaints[idx], ...item };
+    } else {
+      this.complaints.unshift(item);
+    }
+    this.save();
   }
 
   private save() {
@@ -166,28 +359,208 @@ class ClientCivicStore {
     if (status === 'RESOLVED') {
       c.resolved_at = now;
       c.resolved_by = 'Municipal Authority Officer';
-      if (resolution?.resolution_image_url) c.resolution_image_url = resolution.resolution_image_url;
-      if (resolution?.resolution_note) c.resolution_note = resolution.resolution_note;
+      if (resolution?.resolution_image_url) {
+        c.resolution_image_url = resolution.resolution_image_url;
+        c.resolution_image_path = resolution.resolution_image_url;
+      }
+      if (resolution?.resolution_note !== undefined) {
+        c.resolution_note = resolution.resolution_note;
+      }
       c.citizen_verification_status = 'PENDING';
-      c.priority_score = 0;
+      c.citizen_resolution_confirmed = false;
+      c.citizen_reopened = false;
+      c.priority_score = 0.0;
       c.priority_level = 'LOW';
+      c.priority_explanation = 'Resolved civic complaint (no active field intervention required).';
     } else if (status === 'REOPENED') {
       c.citizen_reopened = true;
       c.reopened_at = now;
+      c.citizen_reopened_at = now;
       c.citizen_verification_status = 'REOPENED';
+      c.citizen_resolution_confirmed = false;
+      if (resolution?.resolution_note) {
+        c.reopen_reason = resolution.resolution_note;
+      }
+      const prio = computePriority(c, this.complaints);
+      c.priority_score = prio.score;
+      c.priority_level = prio.level;
+      c.priority_explanation = prio.explanation;
+    } else if (status === 'IN_PROGRESS' || status === 'ASSIGNED') {
+      c.citizen_verification_status = null as any;
+      c.citizen_reopened = false;
+      c.citizen_resolution_confirmed = false;
+      const prio = computePriority(c, this.complaints);
+      c.priority_score = prio.score;
+      c.priority_level = prio.level;
+      c.priority_explanation = prio.explanation;
     }
 
     if (!c.status_history) c.status_history = [];
     c.status_history.push({
       status,
       timestamp: now,
-      note: resolution?.resolution_note || `Status changed to ${status}`,
+      note:
+        resolution?.resolution_note ||
+        (status === 'RESOLVED'
+          ? 'Defect rectified and resolution evidence uploaded'
+          : `Status changed to ${status}`),
       actor: 'Municipal Authority Officer',
       actor_role: 'authority',
     });
 
     this.save();
+    this.pushUpdateToSupabase(c, status, resolution);
     return c;
+  }
+
+  public confirmResolution(id: string): Complaint {
+    const c = this.getComplaintById(id);
+    if (!c) throw new Error('Complaint not found');
+
+    const now = new Date().toISOString();
+    c.citizen_resolution_confirmed = true;
+    c.citizen_resolution_confirmed_at = now;
+    c.citizen_verified_at = now;
+    c.citizen_verification_status = 'CONFIRMED';
+    c.citizen_reopened = false;
+    c.updated_at = now;
+
+    if (!c.status_history) c.status_history = [];
+    c.status_history.push({
+      status: 'CITIZEN_CONFIRMED',
+      timestamp: now,
+      note: 'Citizen confirmed resolution',
+      actor: 'Citizen User',
+      actor_role: 'citizen',
+    });
+
+    this.save();
+    this.pushConfirmToSupabase(c);
+    return c;
+  }
+
+  public reopenComplaint(id: string, reason?: string): Complaint {
+    const c = this.getComplaintById(id);
+    if (!c) throw new Error('Complaint not found');
+
+    const now = new Date().toISOString();
+    c.status = 'REOPENED';
+    c.citizen_reopened = true;
+    c.reopened_at = now;
+    c.citizen_reopened_at = now;
+    c.reopen_reason = reason || 'Citizen reported issue still persists';
+    c.citizen_verification_status = 'REOPENED';
+    c.citizen_resolution_confirmed = false;
+    c.updated_at = now;
+
+    const prio = computePriority(c, this.complaints);
+    c.priority_score = prio.score;
+    c.priority_level = prio.level;
+    c.priority_explanation = prio.explanation;
+
+    if (!c.status_history) c.status_history = [];
+    c.status_history.push({
+      status: 'REOPENED',
+      timestamp: now,
+      note: c.reopen_reason,
+      actor: 'Citizen User',
+      actor_role: 'citizen',
+    });
+
+    this.save();
+    this.pushReopenToSupabase(c);
+    return c;
+  }
+
+  private async pushUpdateToSupabase(
+    c: Complaint,
+    status: ComplaintStatus,
+    resolution?: { resolution_image_url?: string; resolution_note?: string }
+  ) {
+    try {
+      const now = c.updated_at || new Date().toISOString();
+      const payload: Record<string, any> = {
+        status,
+        updated_at: now,
+      };
+
+      if (status === 'RESOLVED') {
+        payload.resolved_at = c.resolved_at || now;
+        if (resolution?.resolution_image_url || c.resolution_image_url) {
+          payload.resolution_image_url = resolution?.resolution_image_url || c.resolution_image_url;
+        }
+        if (resolution?.resolution_note !== undefined) {
+          payload.resolution_note = resolution.resolution_note;
+        }
+        payload.citizen_resolution_confirmed = null;
+        payload.citizen_reopened = false;
+      } else if (status === 'REOPENED') {
+        payload.citizen_reopened = true;
+        payload.citizen_reopened_at = c.citizen_reopened_at || now;
+        payload.reopen_reason = c.reopen_reason;
+        payload.citizen_resolution_confirmed = false;
+      } else {
+        payload.citizen_reopened = false;
+      }
+
+      if (c.report_id) {
+        const { error } = await supabase.from('complaints').update(payload).eq('report_id', c.report_id);
+        if (error && c.id) {
+          await supabase.from('complaints').update(payload).eq('id', c.id);
+        }
+      } else if (c.id) {
+        await supabase.from('complaints').update(payload).eq('id', c.id);
+      }
+
+      try {
+        await supabase.from('complaint_status_history').insert({
+          complaint_id: c.id,
+          previous_status: null,
+          new_status: status,
+          changed_by_role: 'authority',
+          note: resolution?.resolution_note || `Status updated to ${status}`,
+          created_at: now,
+        });
+      } catch {}
+    } catch {
+      // ignore
+    }
+  }
+
+  private async pushConfirmToSupabase(c: Complaint) {
+    try {
+      const now = c.updated_at || new Date().toISOString();
+      const payload = {
+        citizen_resolution_confirmed: true,
+        citizen_resolution_confirmed_at: now,
+        citizen_reopened: false,
+        updated_at: now,
+      };
+      if (c.report_id) {
+        await supabase.from('complaints').update(payload).eq('report_id', c.report_id);
+      } else if (c.id) {
+        await supabase.from('complaints').update(payload).eq('id', c.id);
+      }
+    } catch {}
+  }
+
+  private async pushReopenToSupabase(c: Complaint) {
+    try {
+      const now = c.updated_at || new Date().toISOString();
+      const payload = {
+        status: 'REOPENED',
+        citizen_reopened: true,
+        citizen_reopened_at: now,
+        reopen_reason: c.reopen_reason,
+        citizen_resolution_confirmed: false,
+        updated_at: now,
+      };
+      if (c.report_id) {
+        await supabase.from('complaints').update(payload).eq('report_id', c.report_id);
+      } else if (c.id) {
+        await supabase.from('complaints').update(payload).eq('id', c.id);
+      }
+    } catch {}
   }
 
   public assign(id: string, payload: { department: string; assigned_to: string; note?: string }): Complaint {
@@ -205,6 +578,11 @@ class ClientCivicStore {
     if (c.status === 'REPORTED') {
       c.status = 'ASSIGNED';
     }
+
+    const prio = computePriority(c, this.complaints);
+    c.priority_score = prio.score;
+    c.priority_level = prio.level;
+    c.priority_explanation = prio.explanation;
 
     if (!c.assignment_history) c.assignment_history = [];
     c.assignment_history.unshift({
@@ -228,6 +606,18 @@ class ClientCivicStore {
     });
 
     this.save();
+    try {
+      const updateData = {
+        department: payload.department,
+        status: c.status,
+        updated_at: now,
+      };
+      if (c.report_id) {
+        supabase.from('complaints').update(updateData).eq('report_id', c.report_id).then(() => {});
+      } else if (c.id) {
+        supabase.from('complaints').update(updateData).eq('id', c.id).then(() => {});
+      }
+    } catch {}
     return c;
   }
 
